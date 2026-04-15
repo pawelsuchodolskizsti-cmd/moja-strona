@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kod Bonusowy - Gwiazdka One Day</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --accent:#7c6af7;
+  --gold:#f7c94e;
+  --text:#f0f0f8;
+  --muted:#6b6b88;
+  --success:#5cf0a0;
+  --error:#f05c6e;
+  --bg:#0a0a0f;
+  --surface:#13131a;
+  --border:#2a2a3a;
+}
+
+* { box-sizing:border-box; margin:0; padding:0; }
+
+body {
+  background:var(--bg);
+  color:var(--text);
+  font-family:'DM Sans',sans-serif;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  min-height:100vh;
+  padding:24px;
+}
+
+.card {
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:20px;
+  padding:32px;
+  width:100%;
+  max-width:420px;
+  text-align:center;
+}
+
+.logo {
+  font-family:'Syne',sans-serif;
+  font-weight:800;
+  font-size:12px;
+  letter-spacing:.2em;
+  color:var(--gold);
+  margin-bottom:20px;
+}
+
+h1 {
+  font-family:'Syne',sans-serif;
+  margin-bottom:10px;
+}
+
+.subtitle {
+  color:var(--muted);
+  margin-bottom:20px;
+  line-height:1.5;
+}
+
+input {
+  width:100%;
+  padding:12px;
+  border-radius:10px;
+  border:1px solid var(--border);
+  background:#0f0f16;
+  color:white;
+  margin-bottom:12px;
+}
+
+.btn {
+  width:100%;
+  padding:14px;
+  border:none;
+  border-radius:10px;
+  background:var(--gold);
+  color:#231a00;
+  font-family:'Syne',sans-serif;
+  font-weight:700;
+  cursor:pointer;
+}
+
+.btn:disabled {
+  opacity:.5;
+  cursor:not-allowed;
+}
+
+.msg { margin-top:12px; min-height:20px; }
+.msg.error { color:var(--error); }
+.msg.success { color:var(--success); }
+
+.success-big {
+  font-size:64px;
+  color:var(--success);
+  font-family:'Syne',sans-serif;
+  margin:10px 0;
+}
+</style>
+</head>
+<body>
+
+<div class="card" id="name-screen" style="display:none">
+  <div class="logo">Gwiazdka One Day</div>
+  <h1>Kod bonusowy</h1>
+  <p class="subtitle">Podaj swoje dane, aby odebrać punkt bonusowy.</p>
+
+  <input type="text" id="fname" placeholder="Imię">
+  <input type="text" id="lname" placeholder="Nazwisko">
+
+  <button class="btn" id="name-btn" onclick="doNameLogin()">Dalej</button>
+  <div class="msg" id="name-msg"></div>
+</div>
+
+<div class="card" id="secret-screen" style="display:none">
+  <div class="logo">Gwiazdka One Day</div>
+  <h1>Wpisz hasło</h1>
+  <p class="subtitle" id="bonus-label">Ładowanie bonusu...</p>
+
+  <input type="text" id="secret-input" placeholder="Hasło">
+
+  <button class="btn" id="secret-btn" onclick="submitSecret()">Odbierz punkt</button>
+  <div class="msg" id="secret-msg"></div>
+</div>
+
+<div class="card" id="success-screen" style="display:none">
+  <div class="logo">Gwiazdka One Day</div>
+  <div class="success-big">+1</div>
+  <h1>Punkt zdobyty!</h1>
+  <p class="subtitle">Brawo, bonus został zapisany na Twoim koncie.</p>
+</div>
+
+<script>
+let participantId = null;
+let deviceToken = null;
+const bonusId = new URLSearchParams(window.location.search).get('b');
+
+function getDeviceToken() {
+  let token = localStorage.getItem('deviceToken');
+  if (!token) {
+    token = window.crypto?.randomUUID
+      ? window.crypto.randomUUID()
+      : `device-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+    localStorage.setItem('deviceToken', token);
+  }
+  return token;
+}
+
+async function restoreParticipantSession() {
+  if (!deviceToken) return null;
+
+  try {
+    const res = await fetch(`/.netlify/functions/participant-session?token=${encodeURIComponent(deviceToken)}`);
+    if (!res.ok) return null;
+
+    const data = await res.json();
+    if (!data.id) return null;
+
+    participantId = data.id;
+    localStorage.setItem('participantId', String(participantId));
+    return participantId;
+  } catch (e) {
+    return null;
+  }
+}
+
+window.onload = async () => {
+  if (!bonusId) {
+    document.body.innerHTML = 'Nieprawidlowy kod QR';
+    return;
+  }
+
+  deviceToken = getDeviceToken();
+  await loadBonusLabel();
+
+  const saved = localStorage.getItem('participantId');
+  if (saved && await validateParticipant(saved)) {
+    participantId = saved;
+    showSecret();
+  } else if (await restoreParticipantSession()) {
+    showSecret();
+  } else {
+    localStorage.removeItem('participantId');
+    document.getElementById('name-screen').style.display = 'block';
+  }
+};
+
+async function loadBonusLabel() {
+  try {
+    const res = await fetch(`/.netlify/functions/bonus?b=${encodeURIComponent(bonusId)}`);
+    const data = await res.json();
+    document.getElementById('bonus-label').innerText = data.label || 'Podaj haslo do tego bonusu.';
+  } catch (e) {
+    document.getElementById('bonus-label').innerText = 'Podaj haslo do tego bonusu.';
+  }
+}
+
+async function validateParticipant(id) {
+  try {
+    const res = await fetch(`/.netlify/functions/participant-stats?pid=${id}`);
+    return res.ok;
+  } catch (e) {
+    return false;
+  }
+}
+
+function showSecret() {
+  document.getElementById('name-screen').style.display = 'none';
+  document.getElementById('secret-screen').style.display = 'block';
+}
+
+async function doNameLogin() {
+  const fn = document.getElementById('fname').value.trim();
+  const ln = document.getElementById('lname').value.trim();
+  const msg = document.getElementById('name-msg');
+  const btn = document.getElementById('name-btn');
+
+  if (!fn || !ln) {
+    msg.className = 'msg error';
+    msg.innerText = 'Uzupelnij dane';
+    return;
+  }
+
+  btn.disabled = true;
+  msg.innerText = '';
+
+  try {
+    const res = await fetch('/.netlify/functions/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ firstName: fn, lastName: ln, deviceToken })
+    });
+
+    const data = await res.json();
+    if (!res.ok || !data.id) {
+      throw new Error(data.error || 'Blad logowania');
+    }
+
+    participantId = data.id;
+    localStorage.setItem('participantId', String(participantId));
+    showSecret();
+  } catch (e) {
+    msg.className = 'msg error';
+    msg.innerText = e.message || 'Blad polaczenia';
+    btn.disabled = false;
+  }
+}
+
+async function submitSecret() {
+  const secret = document.getElementById('secret-input').value.trim();
+  const msg = document.getElementById('secret-msg');
+  const btn = document.getElementById('secret-btn');
+
+  if (!secret) {
+    msg.className = 'msg error';
+    msg.innerText = 'Wpisz haslo';
+    return;
+  }
+
+  btn.disabled = true;
+  msg.innerText = '';
+
+  try {
+    const res = await fetch('/.netlify/functions/bonus', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ participantId, bonusId, secret })
+    });
+
+    const data = await res.json();
+
+    if (data.correct) {
+      document.getElementById('secret-screen').style.display = 'none';
+      document.getElementById('success-screen').style.display = 'block';
+      return;
+    }
+
+    if (res.status === 404 && /uczestnika/i.test(data.error || '')) {
+      localStorage.removeItem('participantId');
+    }
+
+    msg.className = 'msg error';
+    msg.innerText = data.error || 'Blad';
+    btn.disabled = false;
+  } catch (e) {
+    msg.className = 'msg error';
+    msg.innerText = 'Blad polaczenia';
+    btn.disabled = false;
+  }
+}
+</script>
+</body>
+</html>

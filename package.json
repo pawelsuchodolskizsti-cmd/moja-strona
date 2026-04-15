@@ -1,0 +1,14 @@
+{
+  "name": "gra-terenowa-qr",
+  "version": "1.0.0",
+  "description": "Gra terenowa oparta na kodach QR z bazą Neon (PostgreSQL) i Netlify Functions",
+  "scripts": {
+    "dev": "netlify dev"
+  },
+  "dependencies": {
+    "@neondatabase/serverless": "^0.9.0"
+  },
+  "devDependencies": {
+    "netlify-cli": "^17.0.0"
+  }
+}
