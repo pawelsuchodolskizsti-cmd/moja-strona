@@ -3,369 +3,483 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ekran Wyników - Gwiazdka One Day 2026</title>
+<title>Ekran Wynikow - Gwiazdka One Day 2026</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #07090e;
-    --surface: rgba(14, 18, 28, 0.92);
-    --surface-strong: rgba(20, 25, 38, 0.98);
-    --surface-soft: rgba(255, 255, 255, 0.06);
-    --border: rgba(255, 255, 255, 0.1);
-    --text: #f5f7ff;
-    --muted: #a7b0cb;
-    --pink: #ff4f7b;
-    --purple: #8b5cf6;
-    --lime: #b7ff48;
-    --gold: #ffd76d;
-    --shadow: 0 30px 80px rgba(0, 0, 0, 0.36);
+    --pink: #ff3d6b;
+    --purple: #7c6af7;
+    --lime: #c8ff39;
+    --gold: #ffd45a;
+    --text: #191532;
+    --muted: #645f7a;
+    --card: rgba(255, 255, 255, 0.92);
+    --card-strong: rgba(255, 255, 255, 0.97);
+    --line: rgba(124, 106, 247, 0.16);
+    --shadow: 0 28px 70px rgba(30, 22, 70, 0.22);
   }
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
 
   body {
     min-height: 100vh;
-    padding: 28px;
+    padding: 22px;
     font-family: 'DM Sans', sans-serif;
     color: var(--text);
+    background: url('/tlo-gry.png') no-repeat center center fixed;
+    background-size: cover;
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
     background:
-      radial-gradient(circle at top left, rgba(139, 92, 246, 0.24), transparent 24%),
-      radial-gradient(circle at top right, rgba(183, 255, 72, 0.16), transparent 22%),
-      radial-gradient(circle at bottom center, rgba(255, 79, 123, 0.14), transparent 26%),
-      linear-gradient(180deg, #07090e, #0a0d15 44%, #07090e);
+      radial-gradient(circle at 14% 16%, rgba(255, 61, 107, 0.16), transparent 28%),
+      radial-gradient(circle at 82% 18%, rgba(124, 106, 247, 0.16), transparent 28%),
+      radial-gradient(circle at 50% 100%, rgba(200, 255, 57, 0.12), transparent 34%);
+    pointer-events: none;
   }
 
   .screen {
-    max-width: 1540px;
+    position: relative;
+    z-index: 1;
+    max-width: 1340px;
     margin: 0 auto;
   }
 
-  .topbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 18px;
-    margin-bottom: 18px;
-  }
-
-  .logo {
-    font-family: 'Syne', sans-serif;
-    font-size: 16px;
-    font-weight: 800;
-    letter-spacing: .18em;
-    text-transform: uppercase;
-    color: var(--lime);
-    margin-bottom: 10px;
-  }
-
-  .headline {
-    font-family: 'Syne', sans-serif;
-    font-size: clamp(34px, 5vw, 54px);
-    font-weight: 800;
-    line-height: 1.04;
-    margin-bottom: 8px;
-  }
-
-  .subline {
-    font-size: 18px;
-    line-height: 1.55;
-    color: var(--muted);
-    max-width: 840px;
-  }
-
-  .topbar-side {
-    min-width: 260px;
-    display: grid;
-    gap: 10px;
-    justify-items: end;
-  }
-
-  .live-pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    min-height: 42px;
-    padding: 0 18px;
-    border-radius: 999px;
-    background: rgba(255, 255, 255, 0.06);
-    border: 1px solid var(--border);
-    font-size: 13px;
-    font-weight: 700;
-    letter-spacing: .08em;
-    text-transform: uppercase;
-  }
-
-  .live-dot {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    background: var(--lime);
-    box-shadow: 0 0 18px rgba(183, 255, 72, 0.72);
-    animation: pulse 1.1s ease infinite;
-  }
-
-  .last-updated {
-    color: var(--muted);
-    font-size: 14px;
+  .card {
+    background: linear-gradient(180deg, var(--card-strong), var(--card));
+    border: 1px solid rgba(255, 255, 255, 0.72);
+    border-radius: 28px;
+    box-shadow: var(--shadow);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
   }
 
   .hero {
     display: grid;
-    grid-template-columns: 1.1fr .9fr;
+    grid-template-columns: minmax(0, 1.18fr) minmax(320px, 0.82fr);
     gap: 18px;
     margin-bottom: 18px;
   }
 
-  .card {
-    background: linear-gradient(180deg, var(--surface), var(--surface-strong));
-    border: 1px solid var(--border);
-    border-radius: 28px;
-    box-shadow: var(--shadow);
+  .hero-main,
+  .hero-side {
+    padding: 28px 28px 24px;
   }
 
-  .status-card {
-    padding: 24px;
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 38px;
+    padding: 0 18px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, rgba(255, 61, 107, 0.16), rgba(124, 106, 247, 0.16));
+    border: 1px solid rgba(124, 106, 247, 0.18);
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: #433b6d;
+    margin-bottom: 16px;
+  }
+
+  .logo {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(17px, 2.2vw, 22px);
+    font-weight: 800;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    line-height: 1.12;
+    max-width: 100%;
+    overflow-wrap: anywhere;
+    margin-bottom: 14px;
+    background: linear-gradient(135deg, var(--pink), var(--purple));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .headline {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(34px, 5vw, 58px);
+    font-weight: 800;
+    line-height: 1.02;
+    margin-bottom: 10px;
+  }
+
+  .subline {
+    font-size: 17px;
+    line-height: 1.62;
+    color: var(--muted);
+    max-width: 760px;
+  }
+
+  .hero-meta {
+    margin-top: 18px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    color: var(--muted);
+    font-size: 14px;
+    font-weight: 700;
+  }
+
+  .meta-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 38px;
+    padding: 0 16px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.68);
+    border: 1px solid rgba(124, 106, 247, 0.14);
+  }
+
+  .live-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: var(--lime);
+    box-shadow: 0 0 18px rgba(200, 255, 57, 0.72);
+    animation: pulse 1.1s ease infinite;
   }
 
   .status-grid {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr);
     gap: 14px;
-    margin-top: 18px;
   }
 
   .status-box {
+    border-radius: 24px;
     padding: 18px 18px 16px;
-    border-radius: 22px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.64);
+    border: 1px solid rgba(124, 106, 247, 0.12);
+  }
+
+  .status-box.timer-box {
+    grid-row: span 2;
+    min-height: 210px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    background:
+      radial-gradient(circle at top right, rgba(255, 212, 90, 0.2), transparent 34%),
+      linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(255, 245, 225, 0.92));
+    border-color: rgba(255, 212, 90, 0.3);
   }
 
   .status-label {
     font-size: 12px;
-    font-weight: 700;
+    font-weight: 800;
     letter-spacing: .12em;
     text-transform: uppercase;
-    color: var(--muted);
+    color: #73688c;
     margin-bottom: 10px;
   }
 
   .status-value {
     font-family: 'Syne', sans-serif;
-    font-size: clamp(28px, 4vw, 42px);
+    font-size: clamp(28px, 3.3vw, 42px);
     font-weight: 800;
-    line-height: 1.04;
-  }
-
-  .status-value.timer {
-    color: var(--gold);
+    line-height: 1.02;
+    overflow-wrap: anywhere;
   }
 
   .status-value.phase {
-    background: linear-gradient(135deg, var(--pink), var(--purple), var(--lime));
+    background: linear-gradient(135deg, var(--pink), var(--purple));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
   }
 
+  .status-value.timer {
+    font-size: clamp(66px, 7.5vw, 108px);
+    line-height: .94;
+    color: #2f2750;
+    letter-spacing: -.04em;
+  }
+
+  .status-note {
+    margin-top: 14px;
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--muted);
+  }
+
   .announcement-card {
-    padding: 24px;
-    display: grid;
-    gap: 14px;
-    align-content: start;
+    padding: 24px 26px;
+    margin-bottom: 18px;
   }
 
   .announcement-badge {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-height: 38px;
-    padding: 0 16px;
+    min-height: 34px;
+    padding: 0 14px;
     border-radius: 999px;
-    background: linear-gradient(135deg, rgba(255, 79, 123, 0.2), rgba(139, 92, 246, 0.16));
-    border: 1px solid rgba(139, 92, 246, 0.32);
-    font-size: 12px;
+    background: linear-gradient(135deg, rgba(255, 61, 107, 0.14), rgba(124, 106, 247, 0.14));
+    border: 1px solid rgba(124, 106, 247, 0.16);
+    font-size: 11px;
     font-weight: 800;
     letter-spacing: .12em;
     text-transform: uppercase;
-    width: fit-content;
+    margin-bottom: 14px;
   }
 
   .announcement-copy {
-    font-size: 19px;
-    line-height: 1.6;
-    color: var(--text);
-    min-height: 122px;
+    font-size: clamp(18px, 2vw, 24px);
+    line-height: 1.46;
+    margin-bottom: 12px;
   }
 
   .announcement-meta {
-    font-size: 15px;
+    font-size: 14px;
     line-height: 1.5;
     color: var(--muted);
   }
 
-  .stats-row {
+  .summary-row {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 14px;
     margin-bottom: 18px;
   }
 
-  .stat-card {
+  .mini-card {
     padding: 20px 22px;
-    border-radius: 24px;
-    background: linear-gradient(180deg, var(--surface), var(--surface-strong));
-    border: 1px solid var(--border);
-    box-shadow: var(--shadow);
   }
 
-  .stat-label {
-    font-size: 12px;
-    font-weight: 700;
-    letter-spacing: .12em;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin-bottom: 10px;
-  }
-
-  .stat-value {
+  .mini-value {
     font-family: 'Syne', sans-serif;
-    font-size: clamp(34px, 4vw, 50px);
+    font-size: clamp(28px, 3vw, 42px);
     font-weight: 800;
     line-height: 1;
-    margin-bottom: 8px;
+    margin-top: 8px;
   }
 
-  .stat-value.lime { color: var(--lime); }
-  .stat-value.purple { color: #cdb5ff; }
-  .stat-value.gold { color: var(--gold); }
+  .mini-value.lime {
+    color: #55610f;
+  }
 
-  .stat-copy {
-    color: var(--muted);
-    font-size: 15px;
+  .mini-value.purple {
+    color: #4c3fc9;
+  }
+
+  .mini-copy {
+    margin-top: 10px;
+    font-size: 14px;
     line-height: 1.5;
+    color: var(--muted);
   }
 
-  .board {
-    display: grid;
-    grid-template-columns: 1.12fr .88fr;
-    gap: 18px;
+  .city-card,
+  .board-card {
+    padding: 24px 24px 22px;
+    margin-bottom: 18px;
   }
 
-  .podium-card,
-  .list-card {
-    padding: 24px;
+  .section-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 14px;
+    margin-bottom: 16px;
   }
 
   .section-title {
     font-family: 'Syne', sans-serif;
-    font-size: 24px;
+    font-size: 22px;
     font-weight: 800;
-    margin-bottom: 16px;
+    line-height: 1.08;
+    margin-bottom: 6px;
+  }
+
+  .section-copy {
+    font-size: 14px;
+    line-height: 1.55;
+    color: var(--muted);
+    max-width: 620px;
+  }
+
+  .city-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 14px;
+  }
+
+  .city-item {
+    padding: 18px 18px 16px;
+    border-radius: 22px;
+    background:
+      radial-gradient(circle at top right, rgba(255, 212, 90, 0.16), transparent 34%),
+      rgba(255, 255, 255, 0.72);
+    border: 1px solid rgba(124, 106, 247, 0.12);
+  }
+
+  .city-item-name {
+    font-family: 'Syne', sans-serif;
+    font-size: 19px;
+    font-weight: 800;
+    line-height: 1.08;
+    margin-bottom: 10px;
+    overflow-wrap: anywhere;
+  }
+
+  .city-item-score {
+    font-family: 'Syne', sans-serif;
+    font-size: 32px;
+    font-weight: 800;
+    line-height: 1;
+    color: #2f2750;
+    margin-bottom: 8px;
+  }
+
+  .city-item-meta {
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--muted);
+  }
+
+  .board {
+    display: grid;
+    grid-template-columns: minmax(320px, .9fr) minmax(0, 1.1fr);
+    gap: 18px;
+  }
+
+  .board-tools {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .sort-select {
+    min-height: 44px;
+    padding: 0 16px;
+    border-radius: 14px;
+    border: 1px solid rgba(124, 106, 247, 0.18);
+    background: rgba(255, 255, 255, 0.86);
+    color: #2f2750;
+    font-size: 14px;
+    font-weight: 700;
+    outline: none;
   }
 
   .podium-grid {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 14px;
+    gap: 12px;
   }
 
   .podium-item {
-    min-height: 250px;
-    padding: 20px 18px;
-    border-radius: 26px;
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04));
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    gap: 16px;
-    text-align: center;
+    padding: 18px 18px 16px;
+    border-radius: 22px;
+    border: 1px solid rgba(124, 106, 247, 0.12);
+    background: rgba(255, 255, 255, 0.76);
   }
 
   .podium-item.gold {
-    background: linear-gradient(180deg, rgba(255, 215, 109, 0.2), rgba(255, 215, 109, 0.08));
-    border-color: rgba(255, 215, 109, 0.28);
+    background:
+      radial-gradient(circle at top right, rgba(255, 212, 90, 0.24), transparent 34%),
+      linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(255, 248, 225, 0.94));
+    border-color: rgba(255, 212, 90, 0.3);
   }
 
   .podium-item.silver {
-    background: linear-gradient(180deg, rgba(205, 213, 235, 0.16), rgba(205, 213, 235, 0.06));
-    border-color: rgba(205, 213, 235, 0.22);
+    background:
+      radial-gradient(circle at top right, rgba(124, 106, 247, 0.14), transparent 34%),
+      linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(244, 242, 255, 0.94));
   }
 
   .podium-item.bronze {
-    background: linear-gradient(180deg, rgba(204, 147, 90, 0.18), rgba(204, 147, 90, 0.06));
-    border-color: rgba(204, 147, 90, 0.24);
+    background:
+      radial-gradient(circle at top right, rgba(255, 61, 107, 0.14), transparent 34%),
+      linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(255, 242, 246, 0.94));
   }
 
   .podium-rank {
-    font-family: 'Syne', sans-serif;
-    font-size: 18px;
+    font-size: 12px;
     font-weight: 800;
     letter-spacing: .12em;
     text-transform: uppercase;
-    color: var(--muted);
+    color: #73688c;
+    margin-bottom: 10px;
   }
 
   .podium-name {
     font-family: 'Syne', sans-serif;
-    font-size: clamp(22px, 2vw, 30px);
+    font-size: clamp(24px, 2.4vw, 34px);
     font-weight: 800;
-    line-height: 1.1;
-  }
-
-  .podium-city {
-    color: var(--muted);
-    font-size: 15px;
-    margin-top: 8px;
+    line-height: 1.04;
+    overflow-wrap: anywhere;
+    margin-bottom: 10px;
   }
 
   .podium-score {
     font-family: 'Syne', sans-serif;
-    font-size: clamp(34px, 3.2vw, 48px);
+    font-size: 34px;
     font-weight: 800;
     line-height: 1;
+    color: #2f2750;
+    margin-bottom: 8px;
   }
 
   .podium-meta {
-    color: var(--muted);
     font-size: 14px;
+    line-height: 1.5;
+    color: var(--muted);
   }
 
-  .list-card {
+  .list {
     display: grid;
     gap: 12px;
   }
 
   .list-item {
     display: grid;
-    grid-template-columns: 70px 1fr auto;
-    gap: 14px;
+    grid-template-columns: 66px minmax(0, 1fr) auto;
     align-items: center;
+    gap: 14px;
     padding: 16px 18px;
     border-radius: 20px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.74);
+    border: 1px solid rgba(124, 106, 247, 0.1);
   }
 
   .list-rank {
+    width: 52px;
+    height: 52px;
+    border-radius: 18px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, rgba(255, 61, 107, 0.12), rgba(124, 106, 247, 0.14));
+    color: #433b6d;
     font-family: 'Syne', sans-serif;
-    font-size: 26px;
+    font-size: 18px;
     font-weight: 800;
-    color: var(--muted);
-    text-align: center;
   }
 
   .list-name {
     font-family: 'Syne', sans-serif;
     font-size: 22px;
     font-weight: 800;
-    line-height: 1.1;
+    line-height: 1.08;
+    overflow-wrap: anywhere;
   }
 
   .list-city {
     margin-top: 6px;
-    color: var(--muted);
     font-size: 14px;
+    line-height: 1.5;
+    color: var(--muted);
   }
 
   .list-score {
@@ -377,138 +491,169 @@
     font-family: 'Syne', sans-serif;
     font-size: 28px;
     font-weight: 800;
-    color: var(--text);
+    line-height: 1;
+    color: #2f2750;
   }
 
   .list-score span {
-    color: var(--muted);
+    display: block;
+    margin-top: 8px;
     font-size: 13px;
+    font-weight: 700;
+    color: var(--muted);
   }
 
   .empty-state {
-    padding: 28px;
-    border-radius: 24px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    text-align: center;
+    padding: 18px;
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.68);
+    border: 1px dashed rgba(124, 106, 247, 0.2);
     color: var(--muted);
-    font-size: 18px;
-    line-height: 1.6;
+    font-size: 15px;
+    line-height: 1.55;
   }
 
   @keyframes pulse {
-    0%, 100% { transform: scale(1); opacity: 1; }
-    50% { transform: scale(.76); opacity: .6; }
+    0% { transform: scale(1); opacity: .82; }
+    50% { transform: scale(1.18); opacity: 1; }
+    100% { transform: scale(1); opacity: .82; }
   }
 
-  @media (max-width: 1180px) {
+  @media (max-width: 1080px) {
     .hero,
     .board {
-      grid-template-columns: 1fr;
-    }
-
-    .podium-grid {
       grid-template-columns: 1fr;
     }
   }
 
   @media (max-width: 760px) {
     body {
-      padding: 18px 14px 24px;
+      padding: 14px;
     }
 
-    .topbar {
-      flex-direction: column;
-    }
-
-    .topbar-side {
-      justify-items: start;
-      min-width: 0;
+    .hero-main,
+    .hero-side,
+    .announcement-card,
+    .city-card,
+    .board-card,
+    .mini-card {
+      padding: 22px 18px 20px;
     }
 
     .status-grid,
-    .stats-row {
+    .summary-row {
       grid-template-columns: 1fr;
     }
 
+    .status-box.timer-box {
+      grid-row: auto;
+      min-height: 170px;
+    }
+
     .list-item {
-      grid-template-columns: 54px 1fr;
+      grid-template-columns: 58px minmax(0, 1fr);
     }
 
     .list-score {
       grid-column: 1 / -1;
       text-align: left;
-      padding-left: 68px;
+      padding-left: 72px;
     }
   }
 </style>
 </head>
 <body>
   <div class="screen">
-    <div class="topbar">
-      <div>
+    <section class="card hero">
+      <div class="hero-main">
+        <div class="eyebrow">Publiczny ekran wynikow</div>
         <div class="logo">Gwiazdka One Day 2026</div>
-        <div class="headline" id="headline">Ranking na żywo</div>
-        <div class="subline" id="subline">Ekran widowni z aktualną topką uczestników, licznikiem czasu i komunikatami organizatora.</div>
+        <div class="headline" id="headline">Ranking na zywo</div>
+        <div class="subline" id="subline">Ekran dla widowni z duzym licznikiem czasu, komunikatami organizatora i rankingiem miast oraz uczestnikow.</div>
+        <div class="hero-meta">
+          <div class="meta-pill"><span class="live-dot"></span> Ekran wydarzenia</div>
+          <div class="meta-pill" id="last-updated">Aktualizacja: --:--</div>
+        </div>
       </div>
-      <div class="topbar-side">
-        <div class="live-pill"><span class="live-dot"></span> Ekran wyników</div>
-        <div class="last-updated" id="last-updated">Aktualizacja: --:--</div>
-      </div>
-    </div>
-
-    <div class="hero">
-      <section class="card status-card">
+      <div class="hero-side">
         <div class="status-grid">
           <div class="status-box">
             <div class="status-label">Status wydarzenia</div>
-            <div class="status-value phase" id="phase-text">Ładowanie</div>
+            <div class="status-value phase" id="phase-text">Ladowanie</div>
           </div>
-          <div class="status-box">
-            <div class="status-label" id="timer-label">Do końca gry</div>
+          <div class="status-box timer-box">
+            <div class="status-label" id="timer-label">Do konca gry</div>
             <div class="status-value timer" id="timer-value">--:--</div>
+            <div class="status-note" id="timer-note">Licznik odswieza sie automatycznie przez cale wydarzenie.</div>
           </div>
           <div class="status-box">
-            <div class="status-label">Lider</div>
-            <div class="status-value" id="leader-name">—</div>
+            <div class="status-label">Lider miast</div>
+            <div class="status-value" id="leader-name">-</div>
           </div>
         </div>
+      </div>
+    </section>
+
+    <section class="card announcement-card">
+      <div class="announcement-badge">Komunikat organizatora</div>
+      <div class="announcement-copy" id="announcement-copy">Czekam na pierwsza aktualizacje z systemu.</div>
+      <div class="announcement-meta" id="announcement-meta">Gdy organizator wysle komunikat z panelu, pojawi sie wlasnie tutaj.</div>
+    </section>
+
+    <div class="summary-row">
+      <section class="card mini-card">
+        <div class="status-label">Uczestnicy</div>
+        <div class="mini-value lime" id="stat-participants">0</div>
+        <div class="mini-copy">Liczba kont bioracych udzial w aktualnej turze gry.</div>
       </section>
-
-      <aside class="card announcement-card">
-        <div class="announcement-badge">Komunikat organizatora</div>
-        <div class="announcement-copy" id="announcement-copy">Czekam na pierwszą aktualizację z systemu.</div>
-        <div class="announcement-meta" id="announcement-meta">Gdy organizator wyśle komunikat z panelu, pojawi się właśnie tutaj.</div>
-      </aside>
+      <section class="card mini-card">
+        <div class="status-label">Widok podium</div>
+        <div class="board-tools">
+          <select class="sort-select" id="city-podium-mode" onchange="setCityPodiumMode(this.value)">
+            <option value="total">Top 3 miast: suma punktow</option>
+            <option value="average">Top 3 miast: srednia na osobe</option>
+          </select>
+        </div>
+        <div class="mini-copy">Mozesz przelaczac podium miedzy suma punktow a srednia punktow na uczestnika.</div>
+      </section>
     </div>
 
-    <div class="stats-row">
-      <div class="stat-card">
-        <div class="stat-label">Uczestnicy</div>
-        <div class="stat-value lime" id="stat-participants">0</div>
-        <div class="stat-copy">Liczba wszystkich kont aktywnych w tej turze.</div>
+    <section class="card city-card">
+      <div class="section-head">
+        <div>
+          <div class="section-title">Ranking miast</div>
+          <div class="section-copy">Tutaj od razu widac, ktore miasto prowadzi lacznie i jak duze ma tempo gry.</div>
+        </div>
       </div>
-      <div class="stat-card">
-        <div class="stat-label">Odpowiedzi</div>
-        <div class="stat-value purple" id="stat-answers">0</div>
-        <div class="stat-copy">Wszystkie zapisane odpowiedzi zebrane podczas gry.</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Bonusy</div>
-        <div class="stat-value gold" id="stat-bonuses">0</div>
-        <div class="stat-copy">Dodatkowe punkty zdobyte poza zwykłymi pytaniami.</div>
-      </div>
-    </div>
+      <div class="city-grid" id="city-ranking"></div>
+    </section>
 
     <div class="board">
-      <section class="card podium-card">
-        <div class="section-title">Top 3</div>
+      <section class="card board-card">
+        <div class="section-head">
+          <div>
+            <div class="section-title">Top 3 miast</div>
+            <div class="section-copy" id="podium-copy">Podium liczone wedlug sumy punktow zdobytych przez cale miasto.</div>
+          </div>
+        </div>
         <div class="podium-grid" id="podium"></div>
       </section>
 
-      <section class="card list-card">
-        <div class="section-title">Kolejne miejsca</div>
-        <div id="leaderboard-list"></div>
+      <section class="card board-card">
+        <div class="section-head">
+          <div>
+            <div class="section-title">Najlepsi uczestnicy</div>
+            <div class="section-copy">Lista indywidualna pozostaje dostepna, ale podium obok pokazuje miasta zamiast osob.</div>
+          </div>
+          <div class="board-tools">
+            <select class="sort-select" id="leaderboard-sort" onchange="setScoreboardSort(this.value)">
+              <option value="score">Sortowanie: punkty</option>
+              <option value="city">Sortowanie: miasto A-Z</option>
+              <option value="city-score">Sortowanie: punkty miasta</option>
+            </select>
+          </div>
+        </div>
+        <div class="list" id="leaderboard-list"></div>
       </section>
     </div>
   </div>
@@ -519,13 +664,30 @@ let scoreboardState = {
   startedAt: null,
   endedAt: null,
   summaryAt: null,
-  durationMinutes: 60,
+  durationMinutes: 10,
   announcementText: '',
   announcementUpdatedAt: null,
   updatedAt: null,
   stats: { participants: 0, answers: 0, bonuses: 0 },
-  leaderboard: []
+  leaderboard: [],
+  cityStats: []
 };
+
+let scoreboardSort = 'score';
+let cityPodiumMode = 'total';
+let scoreboardLoadPromise = null;
+let scoreboardFetchedAt = 0;
+let lastScoreboardSyncAt = 0;
+let lastScoreboardVersion = '';
+let cachedCityStatsKey = '';
+let cachedCityStats = [];
+let cachedLeaderboardKey = '';
+let cachedSortedLeaderboard = [];
+let cachedCityLeadersKey = '';
+let cachedCityLeaders = [];
+
+const SCOREBOARD_CACHE_MS = 4000;
+const SCOREBOARD_SYNC_COOLDOWN_MS = 1200;
 
 function formatDateTime(value) {
   if (!value) return '--:--';
@@ -547,7 +709,7 @@ function formatTimer(ms) {
 
 function getRemainingMs() {
   if (scoreboardState.phase === 'active' && scoreboardState.startedAt) {
-    const endTime = new Date(scoreboardState.startedAt).getTime() + Number(scoreboardState.durationMinutes || 60) * 60000;
+    const endTime = new Date(scoreboardState.startedAt).getTime() + Number(scoreboardState.durationMinutes || 10) * 60000;
     return endTime - Date.now();
   }
 
@@ -558,38 +720,152 @@ function getRemainingMs() {
   return null;
 }
 
+function getCityStats() {
+  const cacheKey = `${scoreboardState.updatedAt || 'none'}|${scoreboardState.leaderboard.length}|${scoreboardState.cityStats.length}`;
+  if (cachedCityStatsKey === cacheKey) {
+    return cachedCityStats;
+  }
+
+  const baseStats = Array.isArray(scoreboardState.cityStats) && scoreboardState.cityStats.length
+    ? scoreboardState.cityStats
+    : [...scoreboardState.leaderboard.reduce((map, participant) => {
+        const cityName = String(participant.city || 'Bez miasta').trim() || 'Bez miasta';
+        const current = map.get(cityName) || {
+          city: cityName,
+          score: 0,
+          participants: 0,
+          answers: 0
+        };
+        current.score += Number(participant.score || 0);
+        current.participants += 1;
+        current.answers += Number(participant.answeredCount || 0);
+        map.set(cityName, current);
+        return map;
+      }, new Map()).values()];
+
+  cachedCityStats = baseStats
+    .map((item) => ({
+      ...item,
+      averageScore: item.participants ? Number(item.score || 0) / item.participants : 0
+    }))
+    .sort((a, b) =>
+      b.score - a.score ||
+      b.participants - a.participants ||
+      a.city.localeCompare(b.city, 'pl')
+    );
+  cachedCityStatsKey = cacheKey;
+  return cachedCityStats;
+}
+
+function getSortedLeaderboard() {
+  const cacheKey = `${scoreboardState.updatedAt || 'none'}|${scoreboardSort}`;
+  if (cachedLeaderboardKey === cacheKey) {
+    return cachedSortedLeaderboard;
+  }
+
+  const cityScores = new Map(getCityStats().map((item) => [item.city, item.score]));
+  cachedSortedLeaderboard = [...scoreboardState.leaderboard].sort((a, b) => {
+    const cityA = String(a.city || 'Bez miasta').trim() || 'Bez miasta';
+    const cityB = String(b.city || 'Bez miasta').trim() || 'Bez miasta';
+
+    if (scoreboardSort === 'city') {
+      return cityA.localeCompare(cityB, 'pl') ||
+        (b.score || 0) - (a.score || 0) ||
+        a.rank - b.rank;
+    }
+
+    if (scoreboardSort === 'city-score') {
+      return (cityScores.get(cityB) || 0) - (cityScores.get(cityA) || 0) ||
+        cityA.localeCompare(cityB, 'pl') ||
+        (b.score || 0) - (a.score || 0) ||
+        a.rank - b.rank;
+    }
+
+    return a.rank - b.rank;
+  });
+  cachedLeaderboardKey = cacheKey;
+  return cachedSortedLeaderboard;
+}
+
+function getCityLeaders() {
+  const cacheKey = `${scoreboardState.updatedAt || 'none'}|${cityPodiumMode}`;
+  if (cachedCityLeadersKey === cacheKey) {
+    return cachedCityLeaders;
+  }
+
+  const leaders = [...getCityStats()];
+
+  if (cityPodiumMode === 'average') {
+    cachedCityLeaders = leaders
+      .sort((a, b) =>
+        b.averageScore - a.averageScore ||
+        b.score - a.score ||
+        b.participants - a.participants ||
+        a.city.localeCompare(b.city, 'pl')
+      )
+      .slice(0, 3);
+    cachedCityLeadersKey = cacheKey;
+    return cachedCityLeaders;
+  }
+
+  cachedCityLeaders = leaders.slice(0, 3);
+  cachedCityLeadersKey = cacheKey;
+  return cachedCityLeaders;
+}
+
+function setScoreboardSort(nextSort) {
+  scoreboardSort = nextSort || 'score';
+  renderLeaderboardList();
+}
+
+function setCityPodiumMode(nextMode) {
+  cityPodiumMode = nextMode || 'total';
+  renderHeader();
+  renderCityPodium();
+}
+
 function renderHeader() {
   const headline = document.getElementById('headline');
   const subline = document.getElementById('subline');
   const phaseText = document.getElementById('phase-text');
   const timerLabel = document.getElementById('timer-label');
   const timerValue = document.getElementById('timer-value');
+  const timerNote = document.getElementById('timer-note');
   const leaderName = document.getElementById('leader-name');
-  const leader = scoreboardState.leaderboard[0];
+  const cityLeader = getCityLeaders()[0];
 
   if (scoreboardState.phase === 'active') {
-    headline.textContent = 'Ranking na żywo';
-    subline.textContent = 'Gra trwa. Ekran pokazuje aktualnych liderów, czas do końca oraz bieżące komunikaty organizatora.';
+    headline.textContent = 'Ranking na zywo';
+    subline.textContent = 'Gra trwa. Widownia widzi najwazniejsze miasta, licznik czasu i aktualne komunikaty od organizatora.';
     phaseText.textContent = 'Gra trwa';
-    timerLabel.textContent = 'Do końca gry';
+    timerLabel.textContent = 'Do konca gry';
+    timerNote.textContent = 'Licznik odswieza sie automatycznie i pozostaje widoczny przez cala gre.';
   } else if (scoreboardState.phase === 'ended') {
-    headline.textContent = 'Finał i podsumowanie';
-    subline.textContent = 'Gra została zatrzymana. Ekran odlicza teraz czas do podsumowania i pokazuje końcową topkę uczestników.';
-    phaseText.textContent = 'Finał';
+    headline.textContent = 'Final i podsumowanie';
+    subline.textContent = 'Gra zostala zatrzymana. Ekran odlicza teraz czas do podsumowania i przejscia do Teatru.';
+    phaseText.textContent = 'Final';
     timerLabel.textContent = 'Do podsumowania';
+    timerNote.textContent = 'To jest ostatni etap przed specjalnym pokazem i rozdaniem upominkow.';
   } else {
     headline.textContent = 'Oczekiwanie na start';
-    subline.textContent = 'System czeka na uruchomienie gry. Po starcie tutaj pojawi się aktualna tabela wyników.';
+    subline.textContent = 'System czeka na uruchomienie gry. Gdy start ruszy, ranking zacznie aktualizowac sie automatycznie.';
     phaseText.textContent = 'Przed startem';
-    timerLabel.textContent = 'Start wkrótce';
+    timerLabel.textContent = 'Start wkrotce';
+    timerNote.textContent = 'Po starcie gry w tym miejscu pojawi sie odliczanie do konca wydarzenia.';
   }
 
   const remaining = getRemainingMs();
   timerValue.textContent = scoreboardState.phase === 'idle'
-    ? '—'
+    ? '-'
     : (remaining !== null && remaining > 0 ? formatTimer(remaining) : (scoreboardState.phase === 'ended' ? 'TEATR' : '00:00'));
 
-  leaderName.textContent = leader ? leader.name : '—';
+  if (!cityLeader) {
+    leaderName.textContent = '-';
+  } else if (cityPodiumMode === 'average') {
+    leaderName.textContent = `${cityLeader.city} ${cityLeader.averageScore.toFixed(1)} pkt/os`;
+  } else {
+    leaderName.textContent = cityLeader.city;
+  }
 }
 
 function renderAnnouncement() {
@@ -599,65 +875,81 @@ function renderAnnouncement() {
   if (scoreboardState.announcementText) {
     copy.textContent = scoreboardState.announcementText;
     meta.textContent = scoreboardState.announcementUpdatedAt
-      ? `Wysłano o ${formatDateTime(scoreboardState.announcementUpdatedAt)}`
+      ? `Wyslano o ${formatDateTime(scoreboardState.announcementUpdatedAt)}`
       : 'Komunikat aktywny';
     return;
   }
 
   if (scoreboardState.phase === 'active') {
-    copy.textContent = 'Gracze są teraz w terenie. Gdy organizator wyśle ważną informację, pojawi się właśnie tutaj.';
+    copy.textContent = 'Gra trwa. Gdy organizator wysle wazna informacje, pojawi sie ona wlasnie tutaj.';
     meta.textContent = 'Na razie brak aktywnego komunikatu.';
   } else if (scoreboardState.phase === 'ended') {
-    copy.textContent = 'Gra dobiegła końca. Za chwilę rozpocznie się podsumowanie wydarzenia i rozdanie upominków.';
-    meta.textContent = 'Ekran pozostaje w trybie finału do czasu wejścia uczestników do Teatru.';
+    copy.textContent = 'Gra dobiegla konca. Za chwile rozpocznie sie podsumowanie wydarzenia oraz przejscie do Teatru.';
+    meta.textContent = 'Ekran pozostaje w trybie finalowym do czasu rozpoczecia podsumowania.';
   } else {
-    copy.textContent = 'Gra jeszcze nie wystartowała. Ekran jest gotowy na start wydarzenia i pierwsze wyniki.';
-    meta.textContent = 'Po uruchomieniu gry ranking zacznie aktualizować się automatycznie.';
+    copy.textContent = 'Gra jeszcze nie wystartowala. Ekran jest gotowy na start wydarzenia i pierwsze wyniki.';
+    meta.textContent = 'Po uruchomieniu gry ranking zacznie aktualizowac sie automatycznie.';
   }
 }
 
 function renderStats() {
   document.getElementById('stat-participants').textContent = scoreboardState.stats.participants || 0;
-  document.getElementById('stat-answers').textContent = scoreboardState.stats.answers || 0;
-  document.getElementById('stat-bonuses').textContent = scoreboardState.stats.bonuses || 0;
   document.getElementById('last-updated').textContent = `Aktualizacja: ${formatDateTime(scoreboardState.updatedAt)}`;
 }
 
-function renderPodium() {
-  const podium = document.getElementById('podium');
-  const top = scoreboardState.leaderboard.slice(0, 3);
-  const variants = ['gold', 'silver', 'bronze'];
+function renderCityStats() {
+  const container = document.getElementById('city-ranking');
+  const cityStats = getCityStats();
 
-  if (!top.length) {
-    podium.innerHTML = '<div class="empty-state" style="grid-column:1 / -1;">Po starcie gry tutaj pojawi się podium liderów.</div>';
+  if (!cityStats.length) {
+    container.innerHTML = '<div class="empty-state" style="grid-column:1 / -1;">Po starcie gry tutaj pojawi sie ranking miast z suma punktow i srednia na osobe.</div>';
     return;
   }
 
-  podium.innerHTML = top.map((participant, index) => `
+  container.innerHTML = cityStats.map((item) => `
+    <div class="city-item">
+      <div class="city-item-name">${item.city}</div>
+      <div class="city-item-score">${item.score} pkt</div>
+      <div class="city-item-meta">${item.participants} uczestnikow | srednio ${item.averageScore.toFixed(1)} pkt na osobe</div>
+    </div>
+  `).join('');
+}
+
+function renderCityPodium() {
+  const podium = document.getElementById('podium');
+  const podiumCopy = document.getElementById('podium-copy');
+  const top = getCityLeaders();
+  const variants = ['gold', 'silver', 'bronze'];
+
+  podiumCopy.textContent = cityPodiumMode === 'average'
+    ? 'Podium liczone wedlug sredniej punktow na jednego uczestnika z danego miasta.'
+    : 'Podium liczone wedlug sumy punktow zdobytych przez cale miasto.';
+
+  if (!top.length) {
+    podium.innerHTML = '<div class="empty-state">Po starcie gry tutaj pojawi sie podium miast.</div>';
+    return;
+  }
+
+  podium.innerHTML = top.map((item, index) => `
     <div class="podium-item ${variants[index] || ''}">
-      <div>
-        <div class="podium-rank">Miejsce ${participant.rank}</div>
-        <div class="podium-name">${participant.name}</div>
-        <div class="podium-city">${participant.city || 'Bez miasta'}</div>
-      </div>
-      <div>
-        <div class="podium-score">${participant.score} pkt</div>
-        <div class="podium-meta">${participant.answeredCount || 0} odpowiedzi</div>
-      </div>
+      <div class="podium-rank">Miejsce ${index + 1}</div>
+      <div class="podium-name">${item.city}</div>
+      <div class="podium-score">${cityPodiumMode === 'average' ? `${item.averageScore.toFixed(1)} pkt/os` : `${item.score} pkt`}</div>
+      <div class="podium-meta">${item.participants} uczestnikow | suma ${item.score} pkt</div>
     </div>
   `).join('');
 }
 
 function renderLeaderboardList() {
   const container = document.getElementById('leaderboard-list');
-  const list = scoreboardState.leaderboard.slice(3, 10);
+  const sorted = getSortedLeaderboard().slice(0, 10);
 
-  if (!list.length) {
-    container.innerHTML = '<div class="empty-state">Po zebraniu pierwszych wyników tutaj pokażą się kolejne miejsca.</div>';
+  if (!sorted.length) {
+    container.innerHTML = '<div class="empty-state">Po zebraniu pierwszych wynikow tutaj pojawia sie najlepsi uczestnicy.</div>';
     return;
   }
 
-  container.innerHTML = list.map((participant) => `
+  container.innerHTML = sorted.map((participant) => `
     <div class="list-item">
       <div class="list-rank">${participant.rank}</div>
       <div>
@@ -676,29 +968,78 @@ function renderAll() {
   renderHeader();
   renderAnnouncement();
   renderStats();
-  renderPodium();
+  renderCityStats();
+  renderCityPodium();
   renderLeaderboardList();
 }
 
-async function loadScoreboard() {
-  try {
-    const res = await fetch('/api/public-scoreboard');
-    const data = await res.json();
-    if (!res.ok || data.error) {
-      throw new Error(data.error || 'Nie udało się pobrać danych ekranu wyników.');
-    }
-
-    scoreboardState = {
-      ...scoreboardState,
-      ...data,
-      stats: data.stats || { participants: 0, answers: 0, bonuses: 0 },
-      leaderboard: Array.isArray(data.leaderboard) ? data.leaderboard : []
-    };
-    renderAll();
-  } catch (error) {
-    document.getElementById('announcement-copy').textContent = 'Nie udało się pobrać danych do publicznego ekranu wyników.';
-    document.getElementById('announcement-meta').textContent = 'Sprawdź połączenie z API lub konfigurację projektu.';
+async function loadScoreboard(force = false) {
+  if (!force && scoreboardLoadPromise) return scoreboardLoadPromise;
+  if (!force && scoreboardFetchedAt && (Date.now() - scoreboardFetchedAt) < SCOREBOARD_CACHE_MS) {
+    return scoreboardState;
   }
+
+  try {
+    scoreboardLoadPromise = (async () => {
+      const res = await fetch('/api/public-scoreboard');
+      const data = await res.json();
+      if (!res.ok || data.error) {
+        throw new Error(data.error || 'Nie udalo sie pobrac danych ekranu wynikow.');
+      }
+
+      const nextVersion = [
+        data.updatedAt || 'none',
+        data.phase || 'idle',
+        data.announcementUpdatedAt || '',
+        data.startedAt || '',
+        data.endedAt || '',
+        data.summaryAt || '',
+        data.durationMinutes || 0,
+        Array.isArray(data.leaderboard) ? data.leaderboard.length : 0,
+        Array.isArray(data.cityStats) ? data.cityStats.length : 0
+      ].join('|');
+
+      scoreboardState = {
+        ...scoreboardState,
+        ...data,
+        stats: data.stats || { participants: 0, answers: 0, bonuses: 0 },
+        leaderboard: Array.isArray(data.leaderboard) ? data.leaderboard : [],
+        cityStats: Array.isArray(data.cityStats) ? data.cityStats : []
+      };
+      scoreboardFetchedAt = Date.now();
+
+      if (lastScoreboardVersion !== nextVersion) {
+        cachedCityStatsKey = '';
+        cachedLeaderboardKey = '';
+        cachedCityLeadersKey = '';
+        lastScoreboardVersion = nextVersion;
+        renderAll();
+      }
+
+      return scoreboardState;
+    })();
+
+    return await scoreboardLoadPromise;
+  } catch (error) {
+    document.getElementById('announcement-copy').textContent = 'Nie udalo sie pobrac danych do publicznego ekranu wynikow.';
+    document.getElementById('announcement-meta').textContent = 'Sprawdz polaczenie z API lub konfiguracje projektu.';
+  } finally {
+    scoreboardLoadPromise = null;
+  }
+}
+
+function scheduleScoreboardRefresh(force = false) {
+  if (document.hidden) return;
+  const now = Date.now();
+  if (!force && (now - lastScoreboardSyncAt) < SCOREBOARD_SYNC_COOLDOWN_MS) {
+    return;
+  }
+  lastScoreboardSyncAt = now;
+  window.setTimeout(() => {
+    if (!document.hidden) {
+      loadScoreboard(force);
+    }
+  }, 80);
 }
 
 window.onload = async () => {
@@ -706,7 +1047,22 @@ window.onload = async () => {
   setInterval(() => {
     renderHeader();
   }, 1000);
-  setInterval(loadScoreboard, 12000);
+  setInterval(() => {
+    if (!document.hidden) {
+      scheduleScoreboardRefresh();
+    }
+  }, 12000);
+  window.addEventListener('focus', () => {
+    scheduleScoreboardRefresh(true);
+  });
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) {
+      scheduleScoreboardRefresh(true);
+    }
+  });
+  window.addEventListener('pageshow', () => {
+    scheduleScoreboardRefresh(true);
+  });
 };
 </script>
 </body>

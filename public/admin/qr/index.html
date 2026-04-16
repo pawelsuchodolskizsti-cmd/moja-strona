@@ -202,6 +202,12 @@ h1 {
   margin-top:28px;
 }
 
+.details-actions {
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+}
+
 .section-head {
   display:flex;
   justify-content:space-between;
@@ -327,6 +333,53 @@ h1 {
   gap:8px;
 }
 
+.link-table-wrap {
+  overflow:auto;
+  border-radius:22px;
+  border:1px solid rgba(180, 198, 255, 0.14);
+  background:rgba(255,255,255,0.03);
+}
+
+.link-table {
+  width:100%;
+  border-collapse:collapse;
+}
+
+.link-table th,
+.link-table td {
+  padding:14px 16px;
+  border-bottom:1px solid rgba(180, 198, 255, 0.1);
+  text-align:left;
+  vertical-align:top;
+  font-size:14px;
+  overflow-wrap:anywhere;
+  word-break:break-word;
+}
+
+.link-table th {
+  font-size:12px;
+  text-transform:uppercase;
+  letter-spacing:.08em;
+  color:var(--muted);
+}
+
+.link-type {
+  display:inline-flex;
+  min-height:30px;
+  padding:0 10px;
+  border-radius:999px;
+  align-items:center;
+  background:rgba(140, 99, 255, 0.14);
+  color:#ddd0ff;
+  font-size:12px;
+  font-weight:800;
+}
+
+.link-type.bonus {
+  background:rgba(200,255,73,0.16);
+  color:#efffc4;
+}
+
 .qr-btn {
   flex:1 1 0;
   min-height:40px;
@@ -412,6 +465,21 @@ h1 {
     break-inside:avoid;
     box-shadow:none;
   }
+
+  .qr-card-head,
+  .qr-path,
+  .qr-copy,
+  .qr-actions,
+  .section-head,
+  .link-table-wrap,
+  .details-actions {
+    display:none !important;
+  }
+
+  .qr-image-wrap {
+    border:none;
+    padding:8px;
+  }
 }
 </style>
 </head>
@@ -446,13 +514,13 @@ h1 {
           </div>
           <div class="actions">
             <button class="btn primary" type="button" onclick="renderCatalog()">Odśwież kody</button>
-            <button class="btn lime" type="button" onclick="downloadAllAsJpg()">Wszystkie JPG</button>
+            <button class="btn lime" type="button" onclick="downloadAllAsJpg()">ZIP z JPG</button>
             <button class="btn ghost" type="button" onclick="window.print()">PDF / Drukuj</button>
           </div>
         </div>
         <div class="toolbar-note">Końcówki są stałe: `/?q=1...30`, `/bonus/?b=B01...B10`, `/wyniki/` oraz `/` dla strony głównej. Jeśli przepiszesz domenę wyżej, wszystkie kody od razu przeliczą się na nowy adres.</div>
         <div class="download-status" id="download-status">Kody są gotowe do podglądu i pobrania.</div>
-        <div class="print-note">Przy pobieraniu wszystkich JPG przeglądarka może poprosić o zgodę na wiele plików naraz.</div>
+        <div class="print-note">Tryb druku ukrywa przyciski, końcówki linków i opisy, zostawiając wyłącznie same kody QR.</div>
       </section>
     </div>
 
@@ -488,11 +556,40 @@ h1 {
       </div>
       <div class="grid" id="grid-bonuses"></div>
     </section>
+
+    <section class="panel section">
+      <div class="section-head">
+        <div>
+          <h2 class="section-title">Lista linków i odpowiedzi</h2>
+          <p class="section-copy">Pełna lista organizacyjna do druku albo przekazania ekipie technicznej.</p>
+        </div>
+        <div class="details-actions">
+          <button class="btn primary" type="button" onclick="downloadCatalogCsv()">Pobierz CSV</button>
+          <button class="btn ghost" type="button" onclick="downloadCatalogTxt()">Pobierz TXT</button>
+        </div>
+      </div>
+      <div class="link-table-wrap">
+        <table class="link-table">
+          <thead>
+            <tr>
+              <th>Typ</th>
+              <th>Nazwa</th>
+              <th>Link</th>
+              <th>Odpowiedź / hasło</th>
+            </tr>
+          </thead>
+          <tbody id="details-body">
+            <tr><td colspan="4">Ładowanie listy linków...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
   </div>
 
   <script src="/admin/qr-catalog.js"></script>
   <script>
   let qrGroups = { screens: [], questions: [], bonuses: [], all: [] };
+  let qrDetailsRows = [];
 
   function normalizeOrigin(value) {
     const raw = String(value || '').trim();
@@ -560,16 +657,20 @@ h1 {
     document.getElementById('grid-bonuses').innerHTML = qrGroups.bonuses.map(renderQrCard).join('');
     updateCounters();
     setDownloadStatus('Kody zostały przeliczone dla aktualnego adresu strony.', 'success');
+    loadDetailsCatalog();
   }
 
   function findQrItem(id) {
     return qrGroups.all.find((item) => item.id === id);
   }
 
-  function triggerDownload(url) {
+  function triggerDownload(url, filename = '') {
     const anchor = document.createElement('a');
     anchor.href = url;
     anchor.rel = 'noopener';
+    if (filename) {
+      anchor.download = filename;
+    }
     document.body.appendChild(anchor);
     anchor.click();
     anchor.remove();
@@ -587,21 +688,129 @@ h1 {
     setDownloadStatus(`Rozpoczęto pobieranie pliku ${fileName}.`, 'success');
   }
 
-  function delay(ms) {
-    return new Promise((resolve) => window.setTimeout(resolve, ms));
-  }
-
   async function downloadAllAsJpg() {
     if (!qrGroups.all.length) {
       setDownloadStatus('Najpierw wygeneruj listę kodów QR.', 'error');
       return;
     }
 
-    setDownloadStatus('Rozpoczynam pobieranie wszystkich kodów JPG. Przeglądarka może zapytać o zgodę na wiele plików.', 'success');
+    setDownloadStatus('Przygotowuję jedno archiwum ZIP ze wszystkimi kodami JPG.', 'success');
 
-    for (const item of qrGroups.all) {
-      triggerDownload(getProxyQrUrl(item, 'jpg', `${item.id}.jpg`));
-      await delay(180);
+    try {
+      const response = await fetch('/api/qr-proxy', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          format: 'jpg',
+          size: '900x900',
+          name: 'kody-qr-gwiazdka-one-day.zip',
+          items: qrGroups.all.map((item) => ({
+            id: item.id,
+            filename: `${item.id}.jpg`,
+            url: item.url
+          }))
+        })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || 'Nie udało się przygotować archiwum ZIP.');
+      }
+
+      const blob = await response.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      triggerDownload(blobUrl, 'kody-qr-gwiazdka-one-day.zip');
+      window.setTimeout(() => URL.revokeObjectURL(blobUrl), 1500);
+      setDownloadStatus('Archiwum ZIP z kodami JPG zostało przygotowane.', 'success');
+    } catch (error) {
+      setDownloadStatus(error.message || 'Nie udało się pobrać archiwum ZIP.', 'error');
+    }
+  }
+
+  function buildDetailsRows(origin, adminData) {
+    const grouped = window.groupQrCatalog(origin);
+    const questionUrlMap = new Map(grouped.questions.map((item) => [String(item.id).replace('question-', ''), item.url]));
+    const bonusUrlMap = new Map(grouped.bonuses.map((item) => [item.shortLabel, item.url]));
+
+    const questionRows = (adminData.questionCatalog || []).map((question) => ({
+      type: 'Pytanie',
+      typeClass: 'question',
+      label: `Pytanie ${question.id}`,
+      url: questionUrlMap.get(String(question.id)) || `${origin}/?q=${question.id}`,
+      answer: Array.isArray(question.answers) ? question.answers.join(' / ') : ''
+    }));
+
+    const bonusRows = (adminData.bonusCatalog || []).map((bonus) => ({
+      type: 'Bonus',
+      typeClass: 'bonus',
+      label: bonus.label || bonus.id,
+      url: bonusUrlMap.get(bonus.id) || `${origin}/bonus/?b=${bonus.id}`,
+      answer: bonus.secret || ''
+    }));
+
+    return [...questionRows, ...bonusRows];
+  }
+
+  function renderDetailsRows() {
+    const body = document.getElementById('details-body');
+
+    if (!qrDetailsRows.length) {
+      body.innerHTML = '<tr><td colspan="4">Nie udało się pobrać listy linków i odpowiedzi.</td></tr>';
+      return;
+    }
+
+    body.innerHTML = qrDetailsRows.map((row) => `
+      <tr>
+        <td><span class="link-type ${row.typeClass === 'bonus' ? 'bonus' : ''}">${row.type}</span></td>
+        <td>${row.label}</td>
+        <td>${row.url}</td>
+        <td>${row.answer}</td>
+      </tr>
+    `).join('');
+  }
+
+  function downloadFile(content, filename, type) {
+    const blob = new Blob([content], { type });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.download = filename;
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+    window.setTimeout(() => URL.revokeObjectURL(url), 1500);
+  }
+
+  function downloadCatalogCsv() {
+    if (!qrDetailsRows.length) return;
+    const header = 'Typ,Nazwa,Link,Odpowiedz lub haslo\n';
+    const rows = qrDetailsRows.map((row) => {
+      const safe = [row.type, row.label, row.url, row.answer].map((value) => `"${String(value).replace(/"/g, '""')}"`);
+      return safe.join(',');
+    }).join('\n');
+    downloadFile(header + rows, 'lista-linkow-i-odpowiedzi.csv', 'text/csv;charset=utf-8');
+  }
+
+  function downloadCatalogTxt() {
+    if (!qrDetailsRows.length) return;
+    const content = qrDetailsRows.map((row) => `${row.type}: ${row.label}\nLink: ${row.url}\nOdpowiedz / haslo: ${row.answer}\n`).join('\n');
+    downloadFile(content, 'lista-linkow-i-odpowiedzi.txt', 'text/plain;charset=utf-8');
+  }
+
+  async function loadDetailsCatalog() {
+    try {
+      const origin = normalizeOrigin(document.getElementById('base-origin').value);
+      const response = await fetch('/api/admin-results');
+      const data = await response.json();
+      if (!response.ok || data.error) {
+        throw new Error(data.error || 'Nie udało się pobrać listy organizacyjnej.');
+      }
+      qrDetailsRows = buildDetailsRows(origin, data);
+      renderDetailsRows();
+    } catch (error) {
+      qrDetailsRows = [];
+      renderDetailsRows();
+      setDownloadStatus(error.message || 'Nie udało się pobrać listy linków i odpowiedzi.', 'error');
     }
   }
 

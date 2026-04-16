@@ -25,10 +25,12 @@ body {
   background-size: cover;
   font-family:'DM Sans',sans-serif;
   min-height:100vh;
+  min-height:100dvh;
   display:flex;
   align-items:center;
   justify-content:center;
   padding:20px;
+  overflow-x:hidden;
 }
 
 /* CARD */
@@ -37,17 +39,49 @@ body {
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border-radius:24px;
-  padding:32px 28px;
+  padding:30px 26px 26px;
   width:100%;
-  max-width:400px;
+  max-width:430px;
   box-shadow:0 24px 64px rgba(0,0,0,0.22);
   border: 1px solid rgba(255,255,255,0.6);
 }
 
 #login-screen {
-  max-width: 448px;
-  min-height: 600px;
-  padding: 38px 30px 32px;
+  max-width: 430px;
+  min-height: 580px;
+  padding: 34px 28px 28px;
+}
+
+#question-screen,
+#no-q-screen,
+#end-screen {
+  max-width: 430px;
+}
+
+#thanks-screen {
+  max-width: 500px;
+}
+
+.partners-row {
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:14px;
+  flex-wrap:wrap;
+  margin:0 auto 18px;
+}
+
+.partner-logo {
+  display:block;
+  height:34px;
+  width:auto;
+  max-width:132px;
+  object-fit:contain;
+  filter:drop-shadow(0 8px 18px rgba(28,22,69,0.08));
+}
+
+.partner-logo.energy {
+  height:38px;
 }
 
 /* LOGO */
@@ -174,14 +208,14 @@ h1 {
 
 /* GAME NOT STARTED */
 .status-waiting {
-  background: rgba(255,61,107,0.07);
-  border: 1px solid rgba(255,61,107,0.2);
+  background: linear-gradient(135deg, rgba(124,106,247,0.08), rgba(255,61,107,0.06), rgba(124,106,247,0.04));
+  border: 1px solid rgba(124,106,247,0.18);
   border-radius:12px;
   padding:16px 18px;
   text-align:center;
   font-size:15px;
-  line-height:1.45;
-  color:var(--pink);
+  line-height:1.6;
+  color:#5f5877;
   font-weight:600;
   margin-bottom:16px;
 }
@@ -381,7 +415,7 @@ h1 {
   background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(244,251,255,0.94));
   border: 1px solid rgba(124,106,247,0.18);
   border-radius: 20px;
-  padding: 22px 20px;
+  padding: 20px 22px 18px;
   text-align: center;
   box-shadow: 0 18px 34px rgba(40,28,88,0.1);
   margin-bottom: 16px;
@@ -419,11 +453,11 @@ h1 {
   color: #5f5877;
   font-size: 15px;
   line-height: 1.6;
-  margin-bottom: 14px;
+  margin-bottom: 12px;
 }
 
 .status-thanks-note {
-  padding: 14px 16px;
+  padding: 13px 15px;
   border-radius: 16px;
   background: linear-gradient(135deg, rgba(199,255,100,0.18), rgba(124,106,247,0.08));
   border: 1px solid rgba(124,106,247,0.16);
@@ -431,31 +465,33 @@ h1 {
   font-size: 14px;
   font-weight: 600;
   line-height: 1.55;
-  margin-bottom: 14px;
+  margin-bottom: 12px;
 }
 
 .thanks-links {
   display: grid;
   gap: 10px;
-  margin-bottom: 14px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .thanks-link {
   display: flex;
   align-items: center;
-  justify-content: center;
-  min-height: 48px;
-  padding: 0 16px;
+  justify-content: flex-start;
+  gap: 12px;
+  min-height: 52px;
+  padding: 10px 14px;
   border-radius: 14px;
   text-decoration: none;
   font-family: 'Syne';
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 800;
-  letter-spacing: .05em;
+  letter-spacing: .04em;
   color: #fff;
   background: linear-gradient(135deg, var(--pink), var(--purple));
   box-shadow: 0 12px 24px rgba(124,106,247,0.24);
   transition: transform .15s, box-shadow .15s, opacity .15s;
+  text-align: left;
 }
 
 .thanks-link:hover {
@@ -463,12 +499,44 @@ h1 {
   box-shadow: 0 16px 28px rgba(124,106,247,0.32);
 }
 
-.thanks-socials {
-  margin-bottom: 14px;
+.thanks-link-icon {
+  flex: 0 0 36px;
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255,255,255,0.18);
+  border: 1px solid rgba(255,255,255,0.24);
 }
 
-.thanks-socials .socials-note {
-  font-size: 14px;
+.thanks-link-icon svg {
+  width: 18px;
+  height: 18px;
+  fill: currentColor;
+}
+
+.thanks-link-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.thanks-link-title {
+  display: block;
+  line-height: 1.15;
+}
+
+.thanks-link-subtitle {
+  display: block;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: normal;
+  line-height: 1.4;
+  color: rgba(255,255,255,0.82);
 }
 
 .howto-panel {
@@ -897,70 +965,221 @@ textarea {
 
 @media (max-width: 520px) {
   body {
-    padding: 18px 14px;
+    min-height: 100dvh;
+    align-items: flex-start;
+    padding:
+      max(12px, env(safe-area-inset-top))
+      12px
+      max(12px, env(safe-area-inset-bottom));
   }
 
-  #login-screen {
-    min-height: 560px;
-    padding: 30px 20px 24px;
+  .card {
+    max-width: 100%;
+    border-radius: 22px;
+    padding: 24px 18px 20px;
   }
 
-  .countdown {
-    gap: 8px;
+  #login-screen,
+  #question-screen,
+  #no-q-screen,
+  #end-screen {
+    max-width: 100%;
+    min-height: auto;
+    padding: 24px 18px 20px;
   }
 
-  .cd-block {
-    min-height: 84px;
-    padding: 14px 6px 12px;
+  #thanks-screen {
+    max-width: 100%;
+    padding: 24px 18px 20px;
   }
 
-  .cd-num {
-    font-size: 24px;
+  .partners-row {
+    gap:8px;
+    margin-bottom:12px;
   }
 
-  .socials-wrap {
-    padding: 16px 14px 18px;
+  .partner-logo {
+    height:24px;
+    max-width:98px;
   }
 
-  .socials-note {
-    font-size: 14px;
-    margin-bottom: 14px;
-  }
-
-  .socials a {
-    width: 54px;
-    height: 54px;
-  }
-
-  .socials a svg {
-    width: 24px;
-    height: 24px;
+  .partner-logo.energy {
+    height:28px;
   }
 
   .logo {
-    font-size: 16px;
-    letter-spacing: .16em;
+    font-size: 15px;
+    letter-spacing: .14em;
+    line-height: 1.12;
+  }
+
+  .event-bar {
+    padding: 11px 12px;
+    margin-bottom: 16px;
+    font-size: 14px;
+  }
+
+  .countdown {
+    gap: 6px;
+    margin-bottom: 18px;
+  }
+
+  .cd-block {
+    min-height: 74px;
+    border-radius: 12px;
+    padding: 12px 4px 10px;
+  }
+
+  .cd-num {
+    font-size: 22px;
+  }
+
+  .cd-label {
+    font-size: 10px;
+  }
+
+  .socials-wrap {
+    padding: 14px 12px 16px;
+    border-radius: 18px;
+  }
+
+  .socials-note {
+    font-size: 13px;
+    line-height: 1.45;
+    margin-bottom: 12px;
+  }
+
+  .socials a {
+    width: 52px;
+    height: 52px;
+  }
+
+  .socials a svg {
+    width: 22px;
+    height: 22px;
   }
 
   .howto-panel {
-    padding: 18px 14px;
+    padding: 14px 12px;
   }
 
   .howto-title {
-    font-size: 20px;
+    font-size: 18px;
+  }
+
+  .howto-subtitle {
+    font-size: 13px;
+    line-height: 1.42;
+    margin-bottom: 12px;
   }
 
   .howto-step {
-    gap: 10px;
-    padding: 12px;
+    gap: 8px;
+    padding: 10px 12px;
+    border-radius: 14px;
+  }
+
+  .howto-step-no {
+    width: 30px;
+    height: 30px;
+    font-size: 13px;
   }
 
   .howto-step-text {
+    font-size: 13px;
+    line-height: 1.32;
+  }
+
+  .intro-btn {
+    margin-top: 10px;
+  }
+
+  h1 {
+    font-size: clamp(24px, 8vw, 30px);
+  }
+
+  .subtitle {
     font-size: 14px;
+    line-height: 1.45;
+    margin-bottom: 14px;
+  }
+
+  .info-box {
+    padding: 14px 12px;
+  }
+
+  .info-box p {
+    font-size: 14px;
+    line-height: 1.45;
+  }
+
+  .q-badge {
+    padding: 7px 12px;
+    font-size: 11px;
   }
 
   .player-stats-grid {
     gap: 8px;
+  }
+
+  .q-text {
+    font-size: 17px;
+    margin-bottom: 14px;
+    line-height: 1.3;
+  }
+
+  label {
+    font-size: 12px;
+    margin-bottom: 6px;
+  }
+
+  input,
+  textarea {
+    padding: 11px 13px;
+    margin-bottom: 10px;
+    font-size: 16px;
+    line-height: 1.4;
+  }
+
+  textarea {
+    min-height: 72px;
+    resize: none;
+  }
+
+  .btn {
+    min-height: 48px;
+    padding: 13px 14px;
+    font-size: 14px;
+  }
+
+  .msg {
+    font-size: 13px;
+    line-height: 1.35;
+  }
+
+  .game-remaining {
+    margin-top: 12px;
+    padding: 12px 14px;
+    border-radius: 12px;
+  }
+
+  .game-remaining-value {
+    font-size: 26px;
+  }
+
+  .player-stats {
+    margin-top: 12px;
+    padding: 12px;
+    border-radius: 16px;
+  }
+
+  .player-stats-title {
+    font-size: 15px;
+  }
+
+  .player-stats-summary {
+    font-size: 13px;
+    line-height: 1.35;
   }
 
   .player-stat {
@@ -973,6 +1192,15 @@ textarea {
 
   .player-stat-label {
     font-size: 10px;
+  }
+
+  .badge-board {
+    margin-top: 12px;
+    padding: 12px 10px;
+  }
+
+  .badge-board-title {
+    font-size: 14px;
   }
 
   .status-finale {
@@ -1009,9 +1237,126 @@ textarea {
   }
 
   .status-thanks p,
-  .status-thanks-note,
-  .thanks-socials .socials-note {
+  .status-thanks-note {
     font-size: 14px;
+  }
+
+  .thanks-links {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 520px) and (max-height: 760px) {
+  body {
+    padding:
+      max(10px, env(safe-area-inset-top))
+      10px
+      max(10px, env(safe-area-inset-bottom));
+  }
+
+  .logo {
+    font-size: 14px;
+    letter-spacing: .12em;
+  }
+
+  .partners-row {
+    margin-bottom: 10px;
+  }
+
+  .partner-logo {
+    height: 22px;
+    max-width: 90px;
+  }
+
+  .partner-logo.energy {
+    height: 25px;
+  }
+
+  .event-bar {
+    margin-bottom: 14px;
+    padding: 10px 12px;
+  }
+
+  .countdown {
+    margin-bottom: 14px;
+  }
+
+  .cd-block {
+    min-height: 66px;
+    padding: 10px 4px 8px;
+  }
+
+  .cd-num {
+    font-size: 20px;
+  }
+
+  .socials-wrap {
+    padding: 12px 10px 14px;
+  }
+
+  .socials-note {
+    font-size: 12px;
+    margin-bottom: 10px;
+  }
+
+  .howto-panel {
+    padding: 12px 10px;
+  }
+
+  .howto-subtitle {
+    font-size: 12px;
+    margin-bottom: 10px;
+  }
+
+  .howto-step {
+    padding: 9px 10px;
+  }
+
+  .howto-step-no {
+    width: 28px;
+    height: 28px;
+    font-size: 12px;
+  }
+
+  .howto-step-text {
+    font-size: 12px;
+  }
+
+  .q-text {
+    font-size: 16px;
+    margin-bottom: 12px;
+  }
+
+  input,
+  textarea {
+    padding: 10px 12px;
+    margin-bottom: 8px;
+  }
+
+  textarea {
+    min-height: 60px;
+  }
+
+  .game-remaining {
+    margin-top: 10px;
+    padding: 10px 12px;
+  }
+
+  .game-remaining-value {
+    font-size: 24px;
+  }
+
+  .player-stats {
+    margin-top: 10px;
+    padding: 10px;
+  }
+
+  .player-stats-summary {
+    font-size: 12px;
+  }
+
+  .badge-board {
+    display: none;
   }
 }
 </style>
@@ -1021,6 +1366,11 @@ textarea {
 
 <!-- === LOGIN SCREEN === -->
 <div class="card" id="login-screen">
+
+  <div class="partners-row" aria-label="Partnerzy wydarzenia">
+    <img class="partner-logo" src="/fundacjaoneday.svg" alt="Fundacja One Day">
+    <img class="partner-logo energy" src="/energyliandia.png" alt="Energylandia">
+  </div>
 
   <div class="logo">Gwiazdka One Day 2026</div>
 
@@ -1034,7 +1384,7 @@ textarea {
   </div>
 
   <div class="socials-wrap">
-    <div class="socials-note">&#346;led&#378; nas, mo&#380;e ci si&#281; to przyda&#263; w dniu fina&#322;u</div>
+    <div class="socials-note">&#346;led&#378; nas, mo&#380;e Ci si&#281; to przyda&#263; w dniu fina&#322;u. Przygotowania do fina&#322;u to &#347;wietny czas &#8212; &#347;led&#378; nas, aby nic nie przegapi&#263;.</div>
     <div class="socials">
       <a href="https://www.instagram.com/fundacjaoneday/" target="_blank" rel="noopener" aria-label="Instagram">
         <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
@@ -1206,23 +1556,24 @@ textarea {
     <p>Mamy nadziej&#281;, &#380;e ta trasa da&#322;a Wam sporo rado&#347;ci. Do zobaczenia na kolejnych wydarzeniach Fundacji One Day.</p>
     <div class="status-thanks-note">Zdj&#281;cia i relacja z fina&#322;u pojawi&#261; si&#281; na naszych social mediach. Warto zajrze&#263; tam jeszcze po wydarzeniu.</div>
     <div class="thanks-links">
-      <a class="thanks-link" href="https://www.instagram.com/fundacjaoneday/" target="_blank" rel="noopener">Relacja i zdj&#281;cia na Instagramie</a>
-      <a class="thanks-link" href="https://www.facebook.com/fundacjaoneday" target="_blank" rel="noopener">Aktualno&#347;ci na Facebooku</a>
-    </div>
-    <div class="socials-wrap thanks-socials">
-      <div class="socials-note">&#346;led&#378; nas po finale, tam pojawi si&#281; relacja i kolejne informacje</div>
-      <div class="socials">
-        <a href="https://www.instagram.com/fundacjaoneday/" target="_blank" rel="noopener" aria-label="Instagram">
+      <a class="thanks-link" href="https://www.instagram.com/fundacjaoneday/" target="_blank" rel="noopener">
+        <span class="thanks-link-icon" aria-hidden="true">
           <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
-        </a>
-        <a href="https://www.facebook.com/fundacjaoneday" target="_blank" rel="noopener" aria-label="Facebook">
+        </span>
+        <span class="thanks-link-copy">
+          <span class="thanks-link-title">Relacja i zdj&#281;cia z fina&#322;u</span>
+          <span class="thanks-link-subtitle">Instagram Fundacji One Day</span>
+        </span>
+      </a>
+      <a class="thanks-link" href="https://www.facebook.com/fundacjaoneday" target="_blank" rel="noopener">
+        <span class="thanks-link-icon" aria-hidden="true">
           <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
-        </a>
-      </div>
-    </div>
-    <div class="badge-board">
-      <div class="badge-board-title">Twoje odznaki</div>
-      <div class="badge-list" data-badge-list></div>
+        </span>
+        <span class="thanks-link-copy">
+          <span class="thanks-link-title">Aktualno&#347;ci na Facebooku</span>
+          <span class="thanks-link-subtitle">Bie&#380;&#261;ce informacje Fundacji One Day</span>
+        </span>
+      </a>
     </div>
   </div>
 </div>
@@ -1237,17 +1588,48 @@ let activeGameState = {
   startedAt: null,
   endedAt: null,
   summaryAt: null,
-  durationMinutes: 60,
+  durationMinutes: 10,
   announcementText: '',
   announcementUpdatedAt: null
 };
 let gameStateLoadPromise = null;
 let participantStatsLoadPromise = null;
+let questionLoadPromise = null;
+let syncPlayerViewPromise = null;
 let gameRemainingElements = [];
 let summaryRemainingElements = [];
 let announcementElements = [];
 let statsHydrated = false;
 let shownMicroToastKeys = new Set();
+let gameStateFetchedAt = 0;
+let participantStatsFetchedAt = 0;
+let questionFetchedAt = 0;
+let questionRequestKey = '';
+let lastSyncPlayerViewAt = 0;
+let activeScreenId = '';
+
+const GAME_STATE_CACHE_MS = 2500;
+const PARTICIPANT_STATS_CACHE_MS = 4000;
+const QUESTION_CACHE_MS = 2500;
+const VIEW_SYNC_COOLDOWN_MS = 1200;
+const screenIds = ['login-screen', 'question-screen', 'no-q-screen', 'end-screen', 'thanks-screen'];
+const screenElements = Object.fromEntries(screenIds.map((id) => [id, document.getElementById(id)]));
+const loginFormEl = document.getElementById('login-form');
+const statusBoxEl = document.getElementById('game-status-box');
+const howtoPanelEl = document.getElementById('howto-panel');
+const fnameInputEl = document.getElementById('fname');
+const loginBtnEl = document.getElementById('login-btn');
+const loginMsgEl = document.getElementById('login-msg');
+const qTextEl = document.getElementById('q-text');
+const resultAreaEl = document.getElementById('result-area');
+const qMsgEl = document.getElementById('q-msg');
+const answerAreaEl = document.getElementById('answer-area');
+const answerInputEl = document.getElementById('answer-input');
+const submitBtnEl = document.getElementById('submit-btn');
+const statAnswerValueElements = Array.from(document.querySelectorAll('[data-stat-value="answers"]'));
+const statAnswerSummaryElements = Array.from(document.querySelectorAll('[data-stat-summary="answers"]'));
+const statBonusValueElements = Array.from(document.querySelectorAll('[data-stat-value="bonuses"]'));
+const badgeListElements = Array.from(document.querySelectorAll('[data-badge-list]'));
 
 const EVENT_DATE = new Date('2026-12-13T10:00:00+01:00');
 
@@ -1301,10 +1683,34 @@ function showMicroToast(message, type = 'info', title = 'Aktualizacja', key = ''
     toast.classList.add('show');
   });
 
+  if (type === 'success' || type === 'bonus') {
+    triggerHaptic([18, 55, 18]);
+  } else if (type === 'warning') {
+    triggerHaptic([28, 60, 20]);
+  } else if (type === 'info') {
+    triggerHaptic(12);
+  }
+
   setTimeout(() => {
     toast.classList.remove('show');
     setTimeout(() => toast.remove(), 220);
   }, 3200);
+}
+
+function triggerHaptic(pattern) {
+  if (!pattern || typeof navigator === 'undefined' || typeof navigator.vibrate !== 'function') {
+    return;
+  }
+
+  try {
+    navigator.vibrate(pattern);
+  } catch (e) {
+    // Ignore haptic errors on unsupported browsers/devices.
+  }
+}
+
+function getQuestionParam() {
+  return new URLSearchParams(window.location.search).get('q');
 }
 
 function playSuccessMotion(element) {
@@ -1433,7 +1839,7 @@ function renderGameRemaining() {
     return;
   }
 
-  const endTime = new Date(startedAt).getTime() + (Number(durationMinutes || 60) * 60000);
+  const endTime = new Date(startedAt).getTime() + (Number(durationMinutes || 10) * 60000);
   const remaining = endTime - Date.now();
   const label = remaining > 0 ? formatRemainingTime(remaining) : '00:00';
 
@@ -1511,7 +1917,7 @@ function getGamePhase() {
   const summaryTarget = getSummaryCountdownTarget();
 
   if (startedAt) {
-    const endTime = new Date(startedAt).getTime() + (Number(durationMinutes || 60) * 60000);
+  const endTime = new Date(startedAt).getTime() + (Number(durationMinutes || 10) * 60000);
     if (Date.now() < endTime) return 'active';
     if (summaryTarget && Date.now() >= summaryTarget) return 'thanks';
     return 'ended';
@@ -1525,23 +1931,55 @@ function getGamePhase() {
   return 'idle';
 }
 
+function setActiveScreen(screenId = '') {
+  if (activeScreenId === screenId) return;
+
+  screenIds.forEach((id) => {
+    const element = screenElements[id];
+    if (!element) return;
+    const nextDisplay = id === screenId ? 'block' : 'none';
+    if (element.style.display !== nextDisplay) {
+      element.style.display = nextDisplay;
+    }
+  });
+
+  activeScreenId = screenId;
+}
+
 function hideAllScreens() {
-  document.getElementById('login-screen').style.display = 'none';
-  document.getElementById('question-screen').style.display = 'none';
-  document.getElementById('no-q-screen').style.display = 'none';
-  document.getElementById('end-screen').style.display = 'none';
-  document.getElementById('thanks-screen').style.display = 'none';
+  setActiveScreen('');
+}
+
+function showLoginScreen(options = {}) {
+  const {
+    showForm = false,
+    waitingMessage = ''
+  } = options;
+
+  setActiveScreen('login-screen');
+  hasOpenedLogin = showForm;
+  howtoPanelEl.style.display = waitingMessage ? 'none' : (showForm ? 'none' : 'block');
+  loginFormEl.style.display = waitingMessage ? 'none' : (showForm ? 'block' : 'none');
+  statusBoxEl.innerHTML = waitingMessage
+    ? `<div class="status-waiting">${escHtml(waitingMessage)}</div>`
+    : '';
+
+  if (showForm) {
+    fnameInputEl.focus();
+  }
+}
+
+function showNoQuestionScreen() {
+  setActiveScreen('no-q-screen');
 }
 
 function showEndScreen() {
-  hideAllScreens();
-  document.getElementById('end-screen').style.display = 'block';
+  setActiveScreen('end-screen');
   renderSummaryCountdown();
 }
 
 function showThanksScreen() {
-  hideAllScreens();
-  document.getElementById('thanks-screen').style.display = 'block';
+  setActiveScreen('thanks-screen');
 }
 
 async function restoreParticipantSession() {
@@ -1565,23 +2003,22 @@ async function restoreParticipantSession() {
 function clearParticipantAccess(message = 'To konto jest przypisane do innego urządzenia. Zaloguj się ponownie.') {
   participantId = null;
   currentQuestion = null;
+  participantStatsFetchedAt = 0;
+  questionFetchedAt = 0;
   localStorage.removeItem('participantId');
-  hideAllScreens();
-  document.getElementById('login-screen').style.display = 'block';
-  hasOpenedLogin = true;
-  document.getElementById('howto-panel').style.display = 'none';
-  document.getElementById('login-form').style.display = 'block';
-  document.getElementById('game-status-box').innerHTML = '';
-  document.getElementById('login-btn').disabled = false;
-  document.getElementById('login-msg').innerText = message;
+  showLoginScreen({ showForm: true });
+  loginBtnEl.disabled = false;
+  loginMsgEl.innerText = message;
+  triggerHaptic([45, 70, 30]);
 }
 
 /* GAME STATE */
 function openLoginForm() {
+  triggerHaptic(10);
   hasOpenedLogin = true;
-  document.getElementById('howto-panel').style.display = 'none';
-  document.getElementById('login-form').style.display = 'block';
-  document.getElementById('fname').focus();
+  howtoPanelEl.style.display = 'none';
+  loginFormEl.style.display = 'block';
+  fnameInputEl.focus();
 }
 
 function renderParticipantStats(stats) {
@@ -1602,21 +2039,22 @@ function renderParticipantStats(stats) {
   participantStats = nextStats;
   statsHydrated = true;
 
-  document.querySelectorAll('[data-stat-value="answers"]').forEach(el => {
+  statAnswerValueElements.forEach(el => {
     el.innerText = participantStats.answers;
   });
-  document.querySelectorAll('[data-stat-summary="answers"]').forEach(el => {
+  statAnswerSummaryElements.forEach(el => {
     el.innerText = participantStats.answers;
   });
-  document.querySelectorAll('[data-stat-value="bonuses"]').forEach(el => {
+  statBonusValueElements.forEach(el => {
     el.innerText = participantStats.bonuses;
   });
+  participantStatsFetchedAt = Date.now();
   renderParticipantBadges();
 }
 
 function getGameRemainingMs() {
   if (!activeGameState.startedAt) return null;
-  const endTime = new Date(activeGameState.startedAt).getTime() + (Number(activeGameState.durationMinutes || 60) * 60000);
+  const endTime = new Date(activeGameState.startedAt).getTime() + (Number(activeGameState.durationMinutes || 10) * 60000);
   return endTime - Date.now();
 }
 
@@ -1652,10 +2090,9 @@ function getParticipantBadges() {
 }
 
 function renderParticipantBadges() {
-  const badgeLists = document.querySelectorAll('[data-badge-list]');
   const badges = getParticipantBadges();
 
-  badgeLists.forEach((list) => {
+  badgeListElements.forEach((list) => {
     if (badges.length === 0) {
       list.innerHTML = '<div class="badge-empty">Jeszcze chwila i pojawi się tutaj pierwsza odznaka.</div>';
       return;
@@ -1673,9 +2110,13 @@ function renderParticipantBadges() {
   });
 }
 
-async function refreshParticipantStats() {
+async function refreshParticipantStats(options = {}) {
+  const { force = false } = options;
   if (!participantId) return;
-  if (participantStatsLoadPromise) return participantStatsLoadPromise;
+  if (!force && participantStatsLoadPromise) return participantStatsLoadPromise;
+  if (!force && participantStatsFetchedAt && (Date.now() - participantStatsFetchedAt) < PARTICIPANT_STATS_CACHE_MS) {
+    return participantStats;
+  }
 
   participantStatsLoadPromise = (async () => {
     try {
@@ -1699,8 +2140,49 @@ async function refreshParticipantStats() {
   return participantStatsLoadPromise;
 }
 
-async function loadGameState() {
-  if (gameStateLoadPromise) return gameStateLoadPromise;
+function applyGamePhaseScreen(phase, manageScreens) {
+  if (phase === 'ended') {
+    if (manageScreens) {
+      showEndScreen();
+    }
+    return phase;
+  }
+
+  if (phase === 'thanks') {
+    if (manageScreens) {
+      showThanksScreen();
+    }
+    return phase;
+  }
+
+  if (phase === 'idle') {
+    if (participantId) {
+      localStorage.removeItem('participantId');
+      participantId = null;
+      currentQuestion = null;
+      questionFetchedAt = 0;
+      participantStatsFetchedAt = 0;
+    }
+
+    if (manageScreens) {
+      showLoginScreen({ waitingMessage: 'Śledź nas, może Ci się to przydać w dniu finału. Przygotowania do finału to świetny czas — śledź nas, aby nic nie przegapić.' });
+    }
+    return phase;
+  }
+
+  if (!participantId && manageScreens) {
+    showLoginScreen({ showForm: hasOpenedLogin || Boolean(getQuestionParam()) });
+  }
+
+  return phase;
+}
+
+async function loadGameState(options = {}) {
+  const { manageScreens = true, force = false } = options;
+  if (!force && gameStateLoadPromise) return gameStateLoadPromise;
+  if (!force && gameStateFetchedAt && (Date.now() - gameStateFetchedAt) < GAME_STATE_CACHE_MS) {
+    return applyGamePhaseScreen(getGamePhase(), manageScreens);
+  }
 
   gameStateLoadPromise = (async () => {
     try {
@@ -1711,57 +2193,17 @@ async function loadGameState() {
         startedAt: data.started_at || null,
         endedAt: data.ended_at || null,
         summaryAt: data.summary_at || null,
-        durationMinutes: Number(data.duration_minutes || 60),
+        durationMinutes: Number(data.duration_minutes || 10),
         announcementText: data.announcement_text || '',
         announcementUpdatedAt: data.announcement_updated_at || null
       };
+      gameStateFetchedAt = Date.now();
       renderGameRemaining();
       renderSummaryCountdown();
       renderAnnouncement();
       renderParticipantBadges();
 
-      const phase = getGamePhase();
-
-      if (phase === 'ended') {
-        showEndScreen();
-        return phase;
-      }
-
-      if (phase === 'thanks') {
-        showThanksScreen();
-        return phase;
-      }
-
-      if (phase === 'idle') {
-        if (participantId) {
-          localStorage.removeItem('participantId');
-          participantId = null;
-        }
-
-        const loginForm  = document.getElementById('login-form');
-        const statusBox  = document.getElementById('game-status-box');
-        const howtoPanel = document.getElementById('howto-panel');
-        hideAllScreens();
-        document.getElementById('login-screen').style.display = 'block';
-        hasOpenedLogin = false;
-        howtoPanel.style.display = 'none';
-        loginForm.style.display = 'none';
-        statusBox.innerHTML = '<div class="status-waiting">Gra jeszcze nie wystartowała</div>';
-        return phase;
-      }
-
-      if (!participantId) {
-        hideAllScreens();
-        document.getElementById('login-screen').style.display = 'block';
-        const loginForm  = document.getElementById('login-form');
-        const statusBox  = document.getElementById('game-status-box');
-        const howtoPanel = document.getElementById('howto-panel');
-        howtoPanel.style.display = hasOpenedLogin ? 'none' : 'block';
-        loginForm.style.display = hasOpenedLogin ? 'block' : 'none';
-        statusBox.innerHTML = '';
-      }
-
-      return phase;
+      return applyGamePhaseScreen(getGamePhase(), manageScreens);
     } catch(e) {
       return 'idle';
     } finally {
@@ -1774,17 +2216,17 @@ async function loadGameState() {
 
 /* LOGIN */
 async function doLogin() {
-  const fn   = normalizeLoginValue(document.getElementById('fname').value);
+  const fn   = normalizeLoginValue(fnameInputEl.value);
   const ln   = normalizeLoginValue(document.getElementById('lname').value);
   const city = normalizeLoginValue(document.getElementById('city').value);
-  const msg  = document.getElementById('login-msg');
+  const msg  = loginMsgEl;
 
   if (!fn || !ln || !city) {
     msg.innerText = 'Uzupełnij wszystkie pola';
     return;
   }
 
-  document.getElementById('login-btn').disabled = true;
+  loginBtnEl.disabled = true;
   msg.innerText = '';
 
   try {
@@ -1801,36 +2243,78 @@ async function doLogin() {
         return;
       }
       msg.innerText = data.error || 'Błąd logowania';
-      document.getElementById('login-btn').disabled = false;
+      loginBtnEl.disabled = false;
       return;
     }
 
     participantId = data.id;
+    participantStatsFetchedAt = 0;
+    questionFetchedAt = 0;
+    currentQuestion = null;
     localStorage.setItem('participantId', String(participantId));
-
-    showQuestionScreen();
+    triggerHaptic([16, 45, 16]);
+    await showQuestionScreen({ force: true });
   } catch(e) {
     msg.innerText = 'Błąd połączenia';
-    document.getElementById('login-btn').disabled = false;
+    loginBtnEl.disabled = false;
   }
 }
 
 /* QUESTION */
-async function showQuestionScreen() {
-  const q = new URLSearchParams(window.location.search).get('q');
+async function fetchQuestionData(options = {}) {
+  const { trackOpen = false, force = false } = options;
+  const q = getQuestionParam();
+  if (!q || !participantId) return null;
+
+  const questionId = parseInt(q, 10);
+  const requestKey = `${questionId}:${participantId}:${trackOpen ? 'open' : 'refresh'}`;
+  if (!force && questionLoadPromise && questionRequestKey === requestKey) {
+    return questionLoadPromise;
+  }
+
+  if (!force && !trackOpen && currentQuestion?.id === questionId && questionFetchedAt && (Date.now() - questionFetchedAt) < QUESTION_CACHE_MS) {
+    return { res: { ok: true, status: 200 }, data: currentQuestion, fromCache: true };
+  }
+
+  questionRequestKey = requestKey;
+  questionLoadPromise = (async () => {
+    const res = await fetch(`/api/question?q=${q}&pid=${participantId}&token=${encodeURIComponent(deviceToken)}&track=${trackOpen ? '1' : '0'}`);
+    const data = await res.json();
+    if (res.ok && !data.error) {
+      currentQuestion = data;
+      questionFetchedAt = Date.now();
+      if (data.stats) {
+        renderParticipantStats(data.stats);
+      }
+    }
+    return { res, data, fromCache: false };
+  })();
+
+  try {
+    return await questionLoadPromise;
+  } finally {
+    questionLoadPromise = null;
+    questionRequestKey = '';
+  }
+}
+
+async function showQuestionScreen(options = {}) {
+  const { force = false } = options;
+  const q = getQuestionParam();
 
   // Logged in but no QR code in URL
   if (!q) {
-    await refreshParticipantStats();
-    document.getElementById('login-screen').style.display    = 'none';
-    document.getElementById('question-screen').style.display = 'none';
-    document.getElementById('no-q-screen').style.display     = 'block';
+    currentQuestion = null;
+    questionFetchedAt = 0;
+    await refreshParticipantStats({ force });
+    showNoQuestionScreen();
     return;
   }
 
   try {
-    const res  = await fetch(`/api/question?q=${q}&pid=${participantId}&token=${encodeURIComponent(deviceToken)}`);
-    const data = await res.json();
+    const payload = await fetchQuestionData({ trackOpen: true, force });
+    if (!payload) return;
+    const { res, data } = payload;
 
     if (data.error) {
       if (res.status === 403 && /urzadzen|urządzen|przypisane/i.test(String(data.error || ''))) {
@@ -1841,41 +2325,125 @@ async function showQuestionScreen() {
         await loadGameState();
         return;
       }
-      document.getElementById('login-msg').innerText = data.error;
+      loginMsgEl.innerText = data.error;
       return;
     }
 
-    currentQuestion = data;
-    if (data.stats) {
-      renderParticipantStats(data.stats);
-    } else {
-      await refreshParticipantStats();
-    }
-
-    document.getElementById('login-screen').style.display    = 'none';
-    document.getElementById('question-screen').style.display = 'block';
-    document.getElementById('q-text').innerText = data.text;
-    document.getElementById('result-area').innerHTML = '';
-    document.getElementById('q-msg').innerText = '';
-    document.getElementById('answer-area').style.display = 'block';
-    document.getElementById('answer-input').value = '';
-    document.getElementById('answer-input').disabled = false;
-    document.getElementById('submit-btn').disabled = false;
+    setActiveScreen('question-screen');
+    qTextEl.innerText = data.text;
+    resultAreaEl.innerHTML = '';
+    qMsgEl.innerText = '';
+    answerAreaEl.style.display = 'block';
+    answerInputEl.value = '';
+    answerInputEl.disabled = false;
+    submitBtnEl.disabled = false;
 
     if (data.alreadyAnswered) {
       showMicroToast('To pytanie masz już za sobą. Szukaj kolejnego kodu QR.', 'info', 'Już wykonane', `question-repeat-${data.id || q}`);
       showAnsweredState('', 'To pytanie masz już wykonane. Szukaj dalej kolejnych kodów QR.');
     }
   } catch(e) {
-    document.getElementById('login-msg').innerText = 'Błąd połączenia';
+    loginMsgEl.innerText = 'Błąd połączenia';
   }
+}
+
+async function refreshQuestionState(options = {}) {
+  const { force = false } = options;
+  const q = getQuestionParam();
+  if (!q || !participantId) return;
+
+  try {
+    const payload = await fetchQuestionData({ trackOpen: false, force });
+    if (!payload) return;
+    const { res, data, fromCache } = payload;
+
+    if (res.status === 403 && /urzadzen|urządzen|przypisane/i.test(String(data.error || ''))) {
+      clearParticipantAccess(data.error);
+      return;
+    }
+
+    if (!res.ok || data.error) {
+      if (res.status === 403) {
+        await loadGameState({ force: true });
+      }
+      return;
+    }
+
+    if (currentQuestion?.id !== data.id) {
+      currentQuestion = data;
+      qTextEl.innerText = data.text;
+    }
+
+    if (!fromCache && data.alreadyAnswered && answerAreaEl.style.display !== 'none') {
+      currentQuestion = data;
+      showMicroToast('To pytanie zostało już zapisane. Możesz szukać kolejnego kodu QR.', 'info', 'Już wykonane', `question-sync-${data.id}`);
+      showAnsweredState(data.previousAnswer || '', 'Odpowiedź została wysłana.');
+    }
+  } catch (e) {
+    // Keep the current question visible if background refresh fails.
+  }
+}
+
+async function syncPlayerView(options = {}) {
+  const { silent = false, force = false } = options;
+  const now = Date.now();
+  if (!force && syncPlayerViewPromise) {
+    return syncPlayerViewPromise;
+  }
+  if (!force && (now - lastSyncPlayerViewAt) < VIEW_SYNC_COOLDOWN_MS) {
+    return getGamePhase();
+  }
+
+  syncPlayerViewPromise = (async () => {
+    const phase = await loadGameState({ manageScreens: !silent, force });
+
+    if (phase !== 'active') {
+      return phase;
+    }
+
+    if (!participantId) {
+      if (!silent) {
+        showLoginScreen({ showForm: Boolean(getQuestionParam()) || hasOpenedLogin });
+      }
+      return phase;
+    }
+
+    if (getQuestionParam()) {
+      if (currentQuestion) {
+        await refreshQuestionState({ force });
+      } else {
+        await showQuestionScreen({ force });
+      }
+    } else {
+      await refreshParticipantStats({ force });
+      showNoQuestionScreen();
+    }
+
+    return phase;
+  })();
+
+  try {
+    return await syncPlayerViewPromise;
+  } finally {
+    lastSyncPlayerViewAt = Date.now();
+    syncPlayerViewPromise = null;
+  }
+}
+
+function schedulePlayerSync(options = {}) {
+  if (document.hidden) return;
+  window.setTimeout(() => {
+    if (!document.hidden) {
+      syncPlayerView(options);
+    }
+  }, 80);
 }
 
 /* ANSWER */
 async function submitAnswer() {
-  const ansInput = document.getElementById('answer-input');
+  const ansInput = answerInputEl;
   const ans      = ansInput.value.trim();
-  const msg      = document.getElementById('q-msg');
+  const msg      = qMsgEl;
 
   if (!ans) {
     msg.className = 'msg error';
@@ -1883,7 +2451,7 @@ async function submitAnswer() {
     return;
   }
 
-  document.getElementById('submit-btn').disabled = true;
+  submitBtnEl.disabled = true;
   ansInput.disabled = true;
   msg.innerText = '';
 
@@ -1908,12 +2476,16 @@ async function submitAnswer() {
     }
     if (data.stats) {
       renderParticipantStats(data.stats);
-    } else {
-      await refreshParticipantStats();
     }
+    currentQuestion = {
+      ...(currentQuestion || {}),
+      alreadyAnswered: true,
+      previousAnswer: data.answer || ans
+    };
+    questionFetchedAt = Date.now();
 
     // Hide input area, show result
-    document.getElementById('answer-area').style.display = 'none';
+    answerAreaEl.style.display = 'none';
     if (!data.alreadyAnswered) {
       showMicroToast('Nowe pytanie zapisane. Lecisz dalej!', 'success', 'Świetnie', `answer-sent-${currentQuestion.id}`);
     }
@@ -1926,15 +2498,15 @@ async function submitAnswer() {
     }
     msg.className = 'msg error';
     msg.innerText = 'Błąd połączenia — spróbuj ponownie';
-    document.getElementById('submit-btn').disabled = false;
+    submitBtnEl.disabled = false;
     ansInput.disabled = false;
   }
 }
 
 function showAnsweredState(answer, message, animate = false) {
-  document.getElementById('answer-area').style.display = 'none';
+  answerAreaEl.style.display = 'none';
 
-  const area = document.getElementById('result-area');
+  const area = resultAreaEl;
   const previousAnswer = answer
     ? `<div class="prev">Twoja odpowiedź: <strong>${escHtml(answer)}</strong></div>`
     : '<div class="prev">To zadanie masz już zaliczone. Powodzenia przy kolejnych punktach gry.</div>';
@@ -1946,6 +2518,7 @@ function showAnsweredState(answer, message, animate = false) {
     </div>`;
   if (animate) {
     playSuccessMotion(area.querySelector('.answered-box'));
+    triggerHaptic([22, 65, 22]);
   }
   return;
   /*
@@ -1995,32 +2568,35 @@ window.onload = async () => {
 
   if (saved) {
     participantId = parseInt(saved, 10);
-    // Verify game is still running before jumping to question
-    const phase = await loadGameState();
-    if (phase === 'active') {
-      showQuestionScreen();
-    } else if (phase === 'idle') {
-      localStorage.removeItem('participantId');
-      participantId = null;
-      await loadGameState();
-    }
   } else {
     await restoreParticipantSession();
-    const phase = await loadGameState();
-    if (participantId && phase === 'active') {
-      showQuestionScreen();
-    } else if (participantId && phase === 'idle') {
-      localStorage.removeItem('participantId');
-      participantId = null;
-      await loadGameState();
-    }
+  }
+
+  const phase = await loadGameState({ manageScreens: false, force: true });
+  if (participantId && phase === 'active') {
+    await showQuestionScreen({ force: true });
+  } else {
+    await loadGameState({ manageScreens: true, force: true });
   }
 
   renderSummaryCountdown();
   setInterval(renderSummaryCountdown, 1000);
   setInterval(() => {
-    if (!document.hidden) loadGameState();
+    if (!document.hidden) {
+      syncPlayerView();
+    }
   }, 10000);
+  window.addEventListener('focus', () => {
+    schedulePlayerSync({ force: true });
+  });
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) {
+      schedulePlayerSync({ force: true });
+    }
+  });
+  window.addEventListener('pageshow', () => {
+    schedulePlayerSync({ force: true });
+  });
 };
 </script>
 

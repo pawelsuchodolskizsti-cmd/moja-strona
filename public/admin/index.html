@@ -1250,6 +1250,46 @@
     margin-bottom: 26px;
   }
 
+  .table-wrap table {
+    table-layout: fixed;
+  }
+
+  .table-wrap td,
+  .table-wrap th,
+  .live-item-title,
+  .live-item-sub,
+  .insight-sub,
+  .player-preview-title,
+  .player-preview-copy,
+  .player-preview-box p,
+  .player-preview-box strong {
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+
+  .city-summary {
+    margin-top: 16px;
+  }
+
+  .city-summary-head {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+
+  .city-summary-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 18px;
+    font-weight: 800;
+  }
+
+  .city-summary-copy {
+    color: var(--muted);
+    font-size: 13px;
+  }
+
   table {
     width: 100%;
     border-collapse: collapse;
@@ -1920,7 +1960,7 @@
       <div class="ops-title">Komunikat i czas gry</div>
       <div class="ops-copy">Wyślij krótką informację do wszystkich graczy. Pojawi się na ich ekranie przy najbliższym odświeżeniu stanu gry.</div>
       <div class="ops-row">
-        <div class="ops-chip" id="duration-chip">Czas gry: 60 min</div>
+        <div class="ops-chip" id="duration-chip">Czas gry: 10 min</div>
         <div class="ops-chip" id="announcement-chip">Brak aktywnego komunikatu</div>
       </div>
       <textarea id="admin-message" placeholder="Np. Za 10 minut startujemy z finałowym sprintem. Kierujcie się do kolejnej strefy."></textarea>
@@ -1975,7 +2015,7 @@
       <div class="ops-actions">
         <button class="btn primary" type="button" onclick="openQrCenter()">Otwórz generator QR</button>
         <button class="btn outline" type="button" onclick="downloadQrPdfPack()">Pobierz PDF</button>
-        <button class="btn outline" type="button" onclick="downloadQrJpgPack()">Wszystkie JPG</button>
+        <button class="btn outline" type="button" onclick="downloadQrJpgPack()">ZIP z JPG</button>
       </div>
       <div class="ops-meta" id="qr-admin-meta">Stały adres generatora: /admin/qr/</div>
     </section>
@@ -2034,6 +2074,11 @@
   <div id="tab-leaderboard">
     <div class="toolbar">
       <input type="text" id="search-lb" placeholder="Szukaj po imieniu, nazwisku lub mieście..." oninput="renderLeaderboard()">
+      <select id="sort-lb" onchange="renderLeaderboard()">
+        <option value="score">Sortuj: punkty</option>
+        <option value="city">Sortuj: miasto A-Z</option>
+        <option value="city-score">Sortuj: punkty miasta</option>
+      </select>
       <button class="btn primary" onclick="loadData()">Odśwież</button>
       <button class="btn outline" onclick="exportCSV()">Eksportuj CSV</button>
       <div class="toolbar-meta" id="lb-meta">Pokazano 0 z 0 uczestników</div>
@@ -2052,6 +2097,25 @@
         </thead>
         <tbody id="lb-body">
           <tr><td colspan="6" class="empty">Ładowanie...</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="table-wrap city-summary">
+      <div class="city-summary-head">
+        <div class="city-summary-title">Punkty miast</div>
+        <div class="city-summary-copy" id="city-meta">Ładowanie rankingu miast...</div>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Miasto</th>
+            <th>Punkty</th>
+            <th>Uczestnicy</th>
+            <th>Odpowiedzi</th>
+          </tr>
+        </thead>
+        <tbody id="city-body">
+          <tr><td colspan="4" class="empty">Ładowanie...</td></tr>
         </tbody>
       </table>
     </div>
@@ -2757,7 +2821,7 @@ async function loadGameState() {
     if (data.started_at) {
       summaryAt = null;
       gameStartedAt = new Date(data.started_at).getTime();
-      gameDurationMs = (data.duration_minutes || 60) * 60 * 1000;
+  gameDurationMs = (data.duration_minutes || 10) * 60 * 1000;
       const remaining = gameDurationMs - (Date.now() - gameStartedAt);
 
       if (remaining > 0) {
@@ -2768,7 +2832,7 @@ async function loadGameState() {
         if (!timerInterval) timerInterval = setInterval(updateLiveTimer, 1000);
       } else {
         gameStartedAt = null;
-        summaryAt = new Date(data.summary_at || (Date.now() + 30 * 60000)).getTime();
+    summaryAt = new Date(data.summary_at || (Date.now() + 5 * 60000)).getTime();
         clearTimer();
         gamePhase = 'ended';
         setStatus('ended', 'Gra zakończona', 'Czas gry minął. Możesz uruchomić nową turę lub wyczyścić dane.');
@@ -2778,7 +2842,7 @@ async function loadGameState() {
       }
     } else if (data.ended_at || data.summary_at) {
       gameStartedAt = null;
-      summaryAt = new Date(data.summary_at || (new Date(data.ended_at).getTime() + 30 * 60000)).getTime();
+    summaryAt = new Date(data.summary_at || (new Date(data.ended_at).getTime() + 5 * 60000)).getTime();
       clearTimer();
       gamePhase = 'ended';
       setStatus('ended', 'Gra zakończona', 'Uczestnicy widzą zaproszenie do Teatru i licznik do podsumowania.');
@@ -2789,7 +2853,7 @@ async function loadGameState() {
       gameStartedAt = null;
       summaryAt = null;
       clearTimer();
-      gameDurationMs = (data.duration_minutes || 60) * 60 * 1000;
+  gameDurationMs = (data.duration_minutes || 10) * 60 * 1000;
       gamePhase = 'idle';
       setStatus('idle', 'Gra zatrzymana', 'Możesz uruchomić start gry albo wyczyścić dane testowe.');
       syncActionButtons('idle');
@@ -2889,7 +2953,7 @@ function updateLiveTimer() {
   const remaining = gameDurationMs - (Date.now() - gameStartedAt);
   if (remaining <= 0) {
     gameStartedAt = null;
-    summaryAt = Date.now() + 30 * 60000;
+  summaryAt = Date.now() + 5 * 60000;
     timerEl.textContent = 'TEATR';
     timerEl.classList.add('warning');
     gamePhase = 'ended';
@@ -3006,7 +3070,7 @@ async function startGame() {
 
     const data = await res.json();
     gameStartedAt = new Date(data.started_at).getTime();
-    gameDurationMs = (data.duration_minutes || 60) * 60 * 1000;
+    gameDurationMs = (data.duration_minutes || 10) * 60 * 1000;
     document.getElementById('live-timer').classList.remove('warning');
     clearTimer();
     timerInterval = setInterval(updateLiveTimer, 1000);
@@ -3150,7 +3214,7 @@ async function runQuickTest() {
       homeRes.text()
     ]);
 
-    const timerMinutes = Number(stateData.duration_minutes || 60);
+    const timerMinutes = Number(stateData.duration_minutes || 10);
     const timerOk = Number.isFinite(timerMinutes) && timerMinutes > 0;
     const startedOk = !stateData.started_at || !Number.isNaN(new Date(stateData.started_at).getTime());
     const summaryOk = !stateData.summary_at || !Number.isNaN(new Date(stateData.summary_at).getTime());
@@ -3451,11 +3515,64 @@ function renderLiveActivity() {
   }
 }
 
+function getCityStats() {
+  return [...allParticipants.reduce((map, participant) => {
+    const cityName = String(participant.city || 'Bez miasta').trim() || 'Bez miasta';
+    const current = map.get(cityName) || {
+      city: cityName,
+      score: 0,
+      participants: 0,
+      answers: 0
+    };
+
+    current.score += Number(participant.score || 0);
+    current.participants += 1;
+    current.answers += Number(participant.answeredCount || 0);
+    map.set(cityName, current);
+    return map;
+  }, new Map()).values()]
+    .sort((a, b) =>
+      b.score - a.score ||
+      b.participants - a.participants ||
+      a.city.localeCompare(b.city, 'pl')
+    );
+}
+
+function renderCityRanking() {
+  const body = document.getElementById('city-body');
+  const meta = document.getElementById('city-meta');
+  const cityStats = getCityStats();
+
+  if (meta) {
+    meta.textContent = cityStats.length
+      ? `Łącznie punktują ${cityStats.length} miasta.`
+      : 'Brak miast w aktualnych danych.';
+  }
+
+  if (!body) return;
+
+  if (!cityStats.length) {
+    body.innerHTML = '<tr><td colspan="4" class="empty">Brak danych o miastach.</td></tr>';
+    return;
+  }
+
+  body.innerHTML = cityStats.map((item) => `
+    <tr>
+      <td>${escHtml(item.city)}</td>
+      <td><span class="score-pill">${item.score} pkt</span></td>
+      <td>${item.participants}</td>
+      <td>${item.answers}</td>
+    </tr>
+  `).join('');
+}
+
 function renderLeaderboard() {
   const query = normalizeSearch(document.getElementById('search-lb').value);
+  const sortMode = document.getElementById('sort-lb')?.value || 'score';
   const body = document.getElementById('lb-body');
   const meta = document.getElementById('lb-meta');
   const queryTokens = query ? query.split(/\s+/).filter(Boolean) : [];
+  const cityScores = new Map(getCityStats().map((item) => [item.city, item.score]));
 
   const list = [...allParticipants]
     .filter(participant => {
@@ -3464,18 +3581,35 @@ function renderLeaderboard() {
       const city = normalizeSearch(participant.city || '');
       const searchable = `${firstName} ${lastName} ${city}`.trim();
 
-      if (!queryTokens.length) return true;
-      return queryTokens.every(token => searchable.includes(token));
-    })
-    .sort((a, b) =>
-      (b.score || 0) - (a.score || 0) ||
-      new Date(a.lastActivity || 0) - new Date(b.lastActivity || 0)
-    );
+        if (!queryTokens.length) return true;
+        return queryTokens.every(token => searchable.includes(token));
+      })
+    .sort((a, b) => {
+      const cityA = String(a.city || 'Bez miasta').trim() || 'Bez miasta';
+      const cityB = String(b.city || 'Bez miasta').trim() || 'Bez miasta';
+
+      if (sortMode === 'city') {
+        return cityA.localeCompare(cityB, 'pl') ||
+          (b.score || 0) - (a.score || 0) ||
+          new Date(a.lastActivity || 0) - new Date(b.lastActivity || 0);
+      }
+
+      if (sortMode === 'city-score') {
+        return (cityScores.get(cityB) || 0) - (cityScores.get(cityA) || 0) ||
+          cityA.localeCompare(cityB, 'pl') ||
+          (b.score || 0) - (a.score || 0) ||
+          new Date(a.lastActivity || 0) - new Date(b.lastActivity || 0);
+      }
+
+      return (b.score || 0) - (a.score || 0) ||
+        new Date(a.lastActivity || 0) - new Date(b.lastActivity || 0);
+    });
 
   meta.textContent = `Pokazano ${list.length} z ${allParticipants.length} uczestników. Kliknij wiersz, aby otworzyć szczegóły.`;
 
   if (!list.length) {
     body.innerHTML = '<tr><td colspan="6" class="empty">Brak wyników.</td></tr>';
+    renderCityRanking();
     return;
   }
 
@@ -3500,6 +3634,8 @@ function renderLeaderboard() {
       </tr>
     `;
   }).join('');
+
+  renderCityRanking();
 }
 
 function renderAnswers() {
@@ -3925,7 +4061,7 @@ function downloadQrPdfPack() {
 
 function downloadQrJpgPack() {
   window.open(getQrCenterUrl('jpg'), '_blank', 'noopener');
-  setAdminFeedback('Uruchomiłem hurtowe pobieranie wszystkich kodów QR jako osobne pliki JPG. Przeglądarka może poprosić o zgodę na wiele pobrań.', 'success');
+  setAdminFeedback('Uruchomiłem pobieranie pełnego archiwum JPG z kodami QR. Po chwili powinien pobrać się jeden plik ZIP.', 'success');
 }
 
 function exportCSV() {

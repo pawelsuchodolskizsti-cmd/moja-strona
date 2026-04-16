@@ -26,6 +26,7 @@ body {
   background-size:cover;
   font-family:'DM Sans',sans-serif;
   min-height:100vh;
+  min-height:100dvh;
   display:flex;
   align-items:center;
   justify-content:center;
@@ -437,12 +438,177 @@ input:focus {
 }
 
 @media (max-width: 520px) {
+  body {
+    min-height: 100dvh;
+    align-items: flex-start;
+    padding:
+      max(12px, env(safe-area-inset-top))
+      12px
+      max(12px, env(safe-area-inset-bottom));
+  }
+
   .card {
-    padding:28px 20px 22px;
+    max-width: 100%;
+    border-radius: 22px;
+    padding:24px 18px 20px;
+  }
+
+  .logo {
+    font-size: 15px;
+    letter-spacing: .14em;
+    line-height: 1.12;
+  }
+
+  h1 {
+    font-size: clamp(22px, 7vw, 28px);
+    margin-bottom: 8px;
+  }
+
+  .subtitle {
+    font-size: 14px;
+    line-height: 1.45;
+    margin-bottom: 14px;
+  }
+
+  .bonus-highlight {
+    margin-bottom: 14px;
+    padding: 14px 14px;
+    border-radius: 16px;
   }
 
   .bonus-highlight-value {
-    font-size:19px;
+    font-size:18px;
+  }
+
+  .bonus-note {
+    margin-bottom: 14px;
+    padding: 10px 12px;
+    font-size: 12.5px;
+    line-height: 1.4;
+  }
+
+  label {
+    font-size: 12px;
+    margin-bottom: 6px;
+  }
+
+  input {
+    padding: 12px 14px;
+    font-size: 16px;
+    margin-bottom: 10px;
+  }
+
+  .btn {
+    min-height: 48px;
+    padding: 13px 14px;
+    font-size: 14px;
+  }
+
+  .msg {
+    font-size: 13px;
+    line-height: 1.35;
+  }
+
+  .helper-box {
+    margin-top: 12px;
+    padding: 12px 14px;
+    font-size: 13px;
+    line-height: 1.4;
+  }
+
+  .game-remaining {
+    margin-top: 12px;
+    padding: 12px 14px;
+    border-radius: 12px;
+  }
+
+  .game-remaining-value {
+    font-size: 26px;
+  }
+
+  .success-icon {
+    width: 68px;
+    height: 68px;
+    font-size: 23px;
+    margin-bottom: 14px;
+  }
+
+  .success-copy {
+    font-size: 14px;
+    line-height: 1.45;
+    margin-bottom: 12px;
+  }
+}
+
+@media (max-width: 520px) and (max-height: 760px) {
+  body {
+    padding:
+      max(10px, env(safe-area-inset-top))
+      10px
+      max(10px, env(safe-area-inset-bottom));
+  }
+
+  .card {
+    padding:20px 16px 18px;
+  }
+
+  .logo {
+    font-size: 14px;
+    letter-spacing: .12em;
+  }
+
+  h1 {
+    font-size: 22px;
+  }
+
+  .subtitle {
+    font-size: 13px;
+    margin-bottom: 12px;
+  }
+
+  .bonus-highlight {
+    margin-bottom: 12px;
+    padding: 12px 12px;
+  }
+
+  .bonus-highlight-value {
+    font-size: 17px;
+  }
+
+  .bonus-note {
+    margin-bottom: 12px;
+    padding: 9px 10px;
+    font-size: 12px;
+  }
+
+  input {
+    padding: 10px 12px;
+    margin-bottom: 8px;
+  }
+
+  .helper-box {
+    display: none;
+  }
+
+  .game-remaining {
+    margin-top: 10px;
+    padding: 10px 12px;
+  }
+
+  .game-remaining-value {
+    font-size: 24px;
+  }
+
+  .success-icon {
+    width: 60px;
+    height: 60px;
+    font-size: 21px;
+    margin-bottom: 12px;
+  }
+
+  .success-copy {
+    font-size: 13px;
+    margin-bottom: 10px;
   }
 }
 </style>
@@ -528,13 +694,38 @@ let participantId = null;
 let deviceToken = null;
 let activeGameState = {
   startedAt: null,
-  durationMinutes: 60
+  endedAt: null,
+  summaryAt: null,
+  durationMinutes: 10
 };
 let shownMicroToastKeys = new Set();
+let gameStateLoadPromise = null;
+let bonusLabelLoadPromise = null;
+let bonusSyncPromise = null;
+let gameStateFetchedAt = 0;
+let bonusLabelFetchedAt = 0;
+let bonusCountFetchedAt = 0;
+let cachedBonusCount = 0;
+let cachedBonusLabelData = null;
+let lastBonusSyncAt = 0;
+let bonusLabelCacheKey = '';
+let activeBonusScreenId = '';
 
 const bonusId = new URLSearchParams(window.location.search).get('b');
 const bonusLabelElements = Array.from(document.querySelectorAll('[data-bonus-label]'));
 const gameRemainingElements = Array.from(document.querySelectorAll('[data-game-remaining]'));
+const bonusScreenIds = ['name-screen', 'secret-screen', 'success-screen'];
+const bonusScreenElements = Object.fromEntries(bonusScreenIds.map((id) => [id, document.getElementById(id)]));
+const nameBtnEl = document.getElementById('name-btn');
+const nameMsgEl = document.getElementById('name-msg');
+const secretBtnEl = document.getElementById('secret-btn');
+const secretMsgEl = document.getElementById('secret-msg');
+const secretInputEl = document.getElementById('secret-input');
+
+const GAME_STATE_CACHE_MS = 2500;
+const BONUS_LABEL_CACHE_MS = 4000;
+const BONUS_COUNT_CACHE_MS = 4000;
+const BONUS_SYNC_COOLDOWN_MS = 1200;
 
 function getDeviceToken() {
   let token = localStorage.getItem('deviceToken');
@@ -615,10 +806,30 @@ function showMicroToast(message, type = 'info', title = 'Aktualizacja', key = ''
     toast.classList.add('show');
   });
 
+  if (type === 'success' || type === 'bonus') {
+    triggerHaptic([18, 55, 18]);
+  } else if (type === 'warning') {
+    triggerHaptic([28, 60, 20]);
+  } else if (type === 'info') {
+    triggerHaptic(12);
+  }
+
   setTimeout(() => {
     toast.classList.remove('show');
     setTimeout(() => toast.remove(), 220);
   }, 3200);
+}
+
+function triggerHaptic(pattern) {
+  if (!pattern || typeof navigator === 'undefined' || typeof navigator.vibrate !== 'function') {
+    return;
+  }
+
+  try {
+    navigator.vibrate(pattern);
+  } catch (e) {
+    // Ignore haptic errors on unsupported browsers/devices.
+  }
 }
 
 function playSuccessMotion(element) {
@@ -628,8 +839,56 @@ function playSuccessMotion(element) {
   element.classList.add('is-success');
 }
 
-async function getParticipantBonusCount() {
+function getGamePhase() {
+  const startedAt = activeGameState.startedAt ? new Date(activeGameState.startedAt).getTime() : null;
+  const endedAt = activeGameState.endedAt ? new Date(activeGameState.endedAt).getTime() : null;
+  const summaryAt = activeGameState.summaryAt ? new Date(activeGameState.summaryAt).getTime() : null;
+  const durationMs = Number(activeGameState.durationMinutes || 10) * 60000;
+
+  if (startedAt) {
+    const endTime = startedAt + durationMs;
+    if (Date.now() < endTime) return 'active';
+    if (summaryAt && Date.now() >= summaryAt) return 'thanks';
+    return 'ended';
+  }
+
+  if (endedAt || summaryAt) {
+    if (summaryAt && Date.now() >= summaryAt) return 'thanks';
+    return 'ended';
+  }
+
+  return 'idle';
+}
+
+function setActiveBonusScreen(screenId = '') {
+  if (activeBonusScreenId === screenId) return;
+
+  bonusScreenIds.forEach((id) => {
+    const element = bonusScreenElements[id];
+    if (!element) return;
+    const nextDisplay = id === screenId ? 'block' : 'none';
+    if (element.style.display !== nextDisplay) {
+      element.style.display = nextDisplay;
+    }
+  });
+
+  activeBonusScreenId = screenId;
+}
+
+function hideBonusScreens() {
+  setActiveBonusScreen('');
+}
+
+function showNameLoginScreen() {
+  setActiveBonusScreen('name-screen');
+}
+
+async function getParticipantBonusCount(options = {}) {
+  const { force = false } = options;
   if (!participantId) return 0;
+  if (!force && bonusCountFetchedAt && (Date.now() - bonusCountFetchedAt) < BONUS_COUNT_CACHE_MS) {
+    return cachedBonusCount;
+  }
 
   try {
     const res = await fetch(`/api/participant-stats?pid=${encodeURIComponent(participantId)}&token=${encodeURIComponent(deviceToken)}`);
@@ -638,7 +897,9 @@ async function getParticipantBonusCount() {
     }
     if (!res.ok) return 0;
     const data = await res.json();
-    return Number(data?.bonuses || 0);
+    cachedBonusCount = Number(data?.bonuses || 0);
+    bonusCountFetchedAt = Date.now();
+    return cachedBonusCount;
   } catch (e) {
     return 0;
   }
@@ -654,9 +915,7 @@ function showBonusResult(options = {}) {
     animate = false
   } = options;
 
-  document.getElementById('name-screen').style.display = 'none';
-  document.getElementById('secret-screen').style.display = 'none';
-  document.getElementById('success-screen').style.display = 'block';
+  setActiveBonusScreen('success-screen');
   document.getElementById('bonus-result-badge').innerText = badge;
   document.getElementById('bonus-result-icon').innerText = icon;
   document.getElementById('bonus-result-title').innerText = title;
@@ -665,6 +924,7 @@ function showBonusResult(options = {}) {
 
   if (animate) {
     playSuccessMotion(document.getElementById('success-screen'));
+    triggerHaptic([22, 65, 22]);
   } else {
     document.getElementById('success-screen').classList.remove('is-success');
   }
@@ -689,16 +949,19 @@ function formatRemainingTime(milliseconds) {
 
 function clearBonusAccess(message = 'To konto jest przypisane do innego urzadzenia. Zaloguj sie ponownie.') {
   participantId = null;
+  bonusLabelFetchedAt = 0;
+  bonusCountFetchedAt = 0;
+  bonusLabelCacheKey = '';
+  cachedBonusLabelData = null;
   localStorage.removeItem('participantId');
-  document.getElementById('success-screen').style.display = 'none';
-  document.getElementById('secret-screen').style.display = 'none';
-  document.getElementById('name-screen').style.display = 'block';
-  document.getElementById('name-btn').disabled = false;
-  document.getElementById('secret-btn').disabled = false;
-  document.getElementById('secret-msg').innerText = '';
-  const msg = document.getElementById('name-msg');
+  showNameLoginScreen();
+  nameBtnEl.disabled = false;
+  secretBtnEl.disabled = false;
+  secretMsgEl.innerText = '';
+  const msg = nameMsgEl;
   msg.className = 'msg error';
   msg.innerText = message;
+  triggerHaptic([45, 70, 30]);
 }
 
 function renderGameRemaining() {
@@ -711,7 +974,7 @@ function renderGameRemaining() {
     return;
   }
 
-  const endTime = new Date(startedAt).getTime() + Number(durationMinutes || 60) * 60000;
+  const endTime = new Date(startedAt).getTime() + Number(durationMinutes || 10) * 60000;
   const remaining = endTime - Date.now();
   const label = remaining > 0 ? formatRemainingTime(remaining) : '00:00';
 
@@ -729,19 +992,36 @@ function renderGameRemaining() {
   });
 }
 
-async function loadGameState() {
-  try {
+async function loadGameState(options = {}) {
+  const { force = false } = options;
+  if (!force && gameStateLoadPromise) return gameStateLoadPromise;
+  if (!force && gameStateFetchedAt && (Date.now() - gameStateFetchedAt) < GAME_STATE_CACHE_MS) {
+    return getGamePhase();
+  }
+
+  gameStateLoadPromise = (async () => {
     const res = await fetch('/api/game-state');
-    if (!res.ok) return;
+    if (!res.ok) return getGamePhase();
 
     const data = await res.json();
     activeGameState = {
       startedAt: data.started_at || null,
-      durationMinutes: Number(data.duration_minutes || 60)
+      endedAt: data.ended_at || null,
+      summaryAt: data.summary_at || null,
+      durationMinutes: Number(data.duration_minutes || 10)
     };
+    gameStateFetchedAt = Date.now();
     renderGameRemaining();
+    return getGamePhase();
+  })();
+
+  try {
+    return await gameStateLoadPromise;
   } catch (e) {
     renderGameRemaining();
+    return getGamePhase();
+  } finally {
+    gameStateLoadPromise = null;
   }
 }
 
@@ -763,23 +1043,55 @@ async function restoreParticipantSession() {
   }
 }
 
-async function loadBonusLabel() {
-  try {
+async function loadBonusLabel(options = {}) {
+  const { force = false } = options;
+  const cacheKey = `${bonusId}:${participantId || 'guest'}`;
+  if (!force && bonusLabelLoadPromise && bonusLabelCacheKey === cacheKey) {
+    return bonusLabelLoadPromise;
+  }
+  if (!force && bonusLabelFetchedAt && bonusLabelCacheKey === cacheKey && (Date.now() - bonusLabelFetchedAt) < BONUS_LABEL_CACHE_MS) {
+    return cachedBonusLabelData;
+  }
+
+  bonusLabelCacheKey = cacheKey;
+  bonusLabelLoadPromise = (async () => {
     const query = participantId
       ? `/api/bonus?b=${encodeURIComponent(bonusId)}&pid=${encodeURIComponent(participantId)}&token=${encodeURIComponent(deviceToken)}`
       : `/api/bonus?b=${encodeURIComponent(bonusId)}`;
     const res = await fetch(query);
     if (res.status === 403) {
       const data = await res.json();
+      if (data?.inactive) {
+        showBonusResult({
+          title: 'Bonus będzie aktywny po starcie gry',
+          subtitle: 'Ten kod QR jest już gotowy, ale formularz odblokuje się dopiero po uruchomieniu gry przez organizatora.',
+          copy: data.error || 'Wróć do tego bonusu po starcie gry i spróbuj ponownie.',
+          badge: 'Jeszcze chwila',
+          icon: 'QR',
+          animate: false
+        });
+        bonusLabelFetchedAt = Date.now();
+        cachedBonusLabelData = { inactive: true, ...data };
+        return cachedBonusLabelData;
+      }
       clearBonusAccess(data.error || 'To konto jest przypisane do innego urzadzenia. Zaloguj sie ponownie.');
       return null;
     }
     const data = await res.json();
     setBonusLabel(data.label || 'Podaj has\u0142o do tego bonusu.');
-    return data;
+    bonusLabelFetchedAt = Date.now();
+    cachedBonusLabelData = data;
+    return cachedBonusLabelData;
+  })();
+
+  try {
+    return await bonusLabelLoadPromise;
   } catch (e) {
     setBonusLabel('Podaj has\u0142o do tego bonusu.');
+    cachedBonusLabelData = null;
     return null;
+  } finally {
+    bonusLabelLoadPromise = null;
   }
 }
 
@@ -792,8 +1104,13 @@ async function validateParticipant(id) {
   }
 }
 
-async function showSecret() {
-  const bonusData = await loadBonusLabel();
+async function showSecret(existingBonusData = null, options = {}) {
+  const { force = false } = options;
+  const bonusData = existingBonusData || await loadBonusLabel({ force });
+
+  if (bonusData?.inactive) {
+    return;
+  }
 
   if (bonusData?.alreadyRedeemed) {
     showMicroToast(
@@ -812,9 +1129,93 @@ async function showSecret() {
     return;
   }
 
-  document.getElementById('name-screen').style.display = 'none';
-  document.getElementById('success-screen').style.display = 'none';
-  document.getElementById('secret-screen').style.display = 'block';
+  setActiveBonusScreen('secret-screen');
+}
+
+function showBonusPhaseState(phase) {
+  if (phase === 'idle') {
+    showBonusResult({
+      title: 'Bonus będzie aktywny po starcie gry',
+      subtitle: 'Ten punkt bonusowy odblokuje się dopiero po uruchomieniu gry przez organizatora.',
+      copy: 'Zachowaj ten kod QR i wróć do niego po starcie gry.',
+      badge: 'Jeszcze chwila',
+      icon: 'QR',
+      animate: false
+    });
+    return;
+  }
+
+  if (phase === 'ended') {
+    showBonusResult({
+      title: 'Gra została zakończona',
+      subtitle: 'Ten bonus nie jest już aktywny. Trwa odliczanie do podsumowania wydarzenia.',
+      copy: 'Sprawdź komunikaty organizatora i kieruj się do Teatru na finał gry.',
+      badge: 'Finał gry',
+      icon: 'TEATR',
+      animate: false
+    });
+    return;
+  }
+
+  if (phase === 'thanks') {
+    showBonusResult({
+      title: 'Czas na podsumowanie',
+      subtitle: 'Gra jest już zamknięta. Dziękujemy za udział i zapraszamy na część finałową wydarzenia.',
+      copy: 'Za chwilę rozpocznie się podsumowanie oraz rozdanie upominków.',
+      badge: 'Dziękujemy',
+      icon: 'OK',
+      animate: false
+    });
+  }
+}
+
+async function syncBonusView(options = {}) {
+  const { force = false } = options;
+  const now = Date.now();
+  if (!force && bonusSyncPromise) {
+    return bonusSyncPromise;
+  }
+  if (!force && (now - lastBonusSyncAt) < BONUS_SYNC_COOLDOWN_MS) {
+    return getGamePhase();
+  }
+
+  bonusSyncPromise = (async () => {
+    const phase = await loadGameState({ force });
+
+    if (phase !== 'active') {
+      showBonusPhaseState(phase);
+      return phase;
+    }
+
+    const bonusData = await loadBonusLabel({ force });
+    if (bonusData?.inactive) {
+      return phase;
+    }
+
+    if (participantId) {
+      await showSecret(bonusData, { force });
+      return phase;
+    }
+
+    showNameLoginScreen();
+    return phase;
+  })();
+
+  try {
+    return await bonusSyncPromise;
+  } finally {
+    lastBonusSyncAt = Date.now();
+    bonusSyncPromise = null;
+  }
+}
+
+function scheduleBonusSync(options = {}) {
+  if (document.hidden) return;
+  window.setTimeout(() => {
+    if (!document.hidden) {
+      syncBonusView(options);
+    }
+  }, 80);
 }
 
 window.onload = async () => {
@@ -827,30 +1228,39 @@ window.onload = async () => {
   bindUppercaseLoginFields();
   renderGameRemaining();
   setInterval(renderGameRemaining, 1000);
-  setInterval(loadGameState, 10000);
-  await Promise.all([loadBonusLabel(), loadGameState()]);
 
   const saved = localStorage.getItem('participantId');
-  if (saved && await validateParticipant(saved)) {
+  if (saved) {
     participantId = saved;
-    await showSecret();
-    return;
+  } else if (!participantId) {
+    await restoreParticipantSession();
   }
 
-  if (await restoreParticipantSession()) {
-    await showSecret();
-    return;
-  }
+  await syncBonusView({ force: true });
 
-  localStorage.removeItem('participantId');
-  document.getElementById('name-screen').style.display = 'block';
+  setInterval(() => {
+    if (!document.hidden) {
+      syncBonusView();
+    }
+  }, 10000);
+  window.addEventListener('focus', () => {
+    scheduleBonusSync({ force: true });
+  });
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) {
+      scheduleBonusSync({ force: true });
+    }
+  });
+  window.addEventListener('pageshow', () => {
+    scheduleBonusSync({ force: true });
+  });
 };
 
 async function doNameLogin() {
   const fn = normalizeLoginValue(document.getElementById('fname').value);
   const ln = normalizeLoginValue(document.getElementById('lname').value);
-  const msg = document.getElementById('name-msg');
-  const btn = document.getElementById('name-btn');
+  const msg = nameMsgEl;
+  const btn = nameBtnEl;
 
   if (!fn || !ln) {
     msg.className = 'msg error';
@@ -875,8 +1285,13 @@ async function doNameLogin() {
     }
 
     participantId = data.id;
+    bonusLabelFetchedAt = 0;
+    bonusCountFetchedAt = 0;
+    bonusLabelCacheKey = '';
+    cachedBonusLabelData = null;
     localStorage.setItem('participantId', String(participantId));
-    await showSecret();
+    triggerHaptic([16, 45, 16]);
+    await showSecret(null, { force: true });
   } catch (e) {
     msg.className = 'msg error';
     msg.innerText = e.message || 'B\u0142\u0105d po\u0142\u0105czenia.';
@@ -885,9 +1300,9 @@ async function doNameLogin() {
 }
 
 async function submitSecret() {
-  const secret = document.getElementById('secret-input').value.trim();
-  const msg = document.getElementById('secret-msg');
-  const btn = document.getElementById('secret-btn');
+  const secret = secretInputEl.value.trim();
+  const msg = secretMsgEl;
+  const btn = secretBtnEl;
 
   if (!secret) {
     msg.className = 'msg error';
@@ -915,7 +1330,16 @@ async function submitSecret() {
     }
 
     if (data.correct) {
-      const bonusCount = await getParticipantBonusCount();
+      const bonusCount = data.stats
+        ? Number(data.stats.bonuses || 0)
+        : await getParticipantBonusCount({ force: true });
+      cachedBonusCount = bonusCount;
+      bonusCountFetchedAt = Date.now();
+      bonusLabelFetchedAt = 0;
+      cachedBonusLabelData = {
+        ...(cachedBonusLabelData || {}),
+        alreadyRedeemed: true
+      };
       showMicroToast(
         bonusCount > 0
           ? `Masz już ${bonusCount} ${formatPolishCount(bonusCount, 'bonus', 'bonusy', 'bonusów')}.`
@@ -936,6 +1360,10 @@ async function submitSecret() {
     }
 
     if (data.alreadyRedeemed) {
+      if (data.stats) {
+        cachedBonusCount = Number(data.stats.bonuses || cachedBonusCount || 0);
+        bonusCountFetchedAt = Date.now();
+      }
       showMicroToast(
         'Ten bonus masz już zaliczony. Szukaj dalej kolejnych kodów QR.',
         'info',
