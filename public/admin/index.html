@@ -219,6 +219,41 @@
     color: #ffc4cc;
   }
 
+  .utility-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    margin-top: 12px;
+  }
+
+  .action-btn.neon {
+    background: linear-gradient(135deg, rgba(183, 255, 72, 0.24), rgba(183, 255, 72, 0.08));
+    border-color: rgba(183, 255, 72, 0.58);
+    color: #e8ffc0;
+    box-shadow: 0 0 0 1px rgba(183, 255, 72, 0.16), 0 18px 32px rgba(183, 255, 72, 0.08);
+  }
+
+  .action-btn.time {
+    background: linear-gradient(135deg, rgba(109, 255, 179, 0.16), rgba(139, 92, 246, 0.12));
+    border-color: rgba(109, 255, 179, 0.3);
+    color: #cffff0;
+  }
+
+  .admin-feedback {
+    min-height: 22px;
+    margin-top: 14px;
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  .admin-feedback.success {
+    color: var(--success);
+  }
+
+  .admin-feedback.error {
+    color: var(--danger);
+  }
+
   .notes-panel {
     padding: 22px;
     display: flex;
@@ -255,6 +290,68 @@
     color: var(--text);
   }
 
+  .check-item.ok {
+    border-color: rgba(109, 255, 179, 0.24);
+    background: rgba(109, 255, 179, 0.06);
+  }
+
+  .check-item.error {
+    border-color: rgba(255, 107, 129, 0.24);
+    background: rgba(255, 107, 129, 0.08);
+  }
+
+  .check-item.pending {
+    border-color: rgba(139, 92, 246, 0.18);
+  }
+
+  .check-item-head {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 4px;
+  }
+
+  .check-item-title {
+    font-weight: 700;
+  }
+
+  .check-item-sub {
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.5;
+  }
+
+  .check-badge {
+    white-space: nowrap;
+    padding: 4px 9px;
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    border: 1px solid var(--border);
+    color: var(--muted);
+  }
+
+  .check-badge.ok {
+    color: #dfffac;
+    border-color: rgba(183, 255, 72, 0.28);
+    background: rgba(183, 255, 72, 0.1);
+  }
+
+  .check-badge.error {
+    color: #ffc4cc;
+    border-color: rgba(255, 107, 129, 0.26);
+    background: rgba(255, 107, 129, 0.1);
+  }
+
+  .check-badge.pending {
+    color: #d7c8ff;
+    border-color: rgba(139, 92, 246, 0.24);
+    background: rgba(139, 92, 246, 0.1);
+  }
+
   .stats-row {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
@@ -283,6 +380,250 @@
     color: var(--muted);
     text-transform: uppercase;
     letter-spacing: .08em;
+  }
+
+  .ops-grid {
+    display: grid;
+    grid-template-columns: 1.05fr .95fr;
+    gap: 14px;
+    margin-bottom: 24px;
+  }
+
+  .ops-card {
+    padding: 20px;
+    border-radius: 20px;
+    background: linear-gradient(180deg, rgba(18, 23, 34, 0.98), rgba(12, 16, 24, 0.98));
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+  }
+
+  .ops-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 18px;
+    font-weight: 800;
+    margin-bottom: 8px;
+  }
+
+  .ops-copy {
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.55;
+    margin-bottom: 14px;
+  }
+
+  .ops-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 14px;
+  }
+
+  .ops-chip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 42px;
+    padding: 0 14px;
+    border-radius: 12px;
+    border: 1px solid rgba(183, 255, 72, 0.22);
+    background: rgba(183, 255, 72, 0.08);
+    color: #e5ffc1;
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  .ops-card textarea {
+    width: 100%;
+    min-height: 110px;
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    background: rgba(10, 14, 21, 0.92);
+    color: var(--text);
+    padding: 14px 16px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    line-height: 1.55;
+    resize: vertical;
+    outline: none;
+    margin-bottom: 10px;
+  }
+
+  .ops-card textarea:focus {
+    border-color: var(--purple);
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.12);
+  }
+
+  .ops-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .ops-meta {
+    margin-top: 10px;
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.5;
+  }
+
+  .preview-tabs {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+  }
+
+  .preview-tab {
+    min-height: 38px;
+    padding: 0 14px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .preview-tab.active {
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.22), rgba(183, 255, 72, 0.12));
+    border-color: rgba(139, 92, 246, 0.42);
+    color: var(--text);
+  }
+
+  .preview-phase {
+    margin-bottom: 12px;
+    color: var(--muted);
+    font-size: 12px;
+  }
+
+  .player-preview-shell {
+    padding: 16px;
+    border-radius: 20px;
+    background:
+      radial-gradient(circle at top right, rgba(139, 92, 246, 0.18), transparent 32%),
+      radial-gradient(circle at top left, rgba(183, 255, 72, 0.1), transparent 24%),
+      linear-gradient(180deg, #121722, #0d1119);
+    border: 1px solid var(--border);
+  }
+
+  .player-preview-card {
+    border-radius: 22px;
+    padding: 20px 18px;
+    background: rgba(255, 255, 255, 0.94);
+    color: #231c4d;
+    min-height: 340px;
+  }
+
+  .player-preview-logo {
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .14em;
+    text-align: center;
+    margin-bottom: 12px;
+    background: linear-gradient(135deg, #ff4f7b, #8b5cf6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .player-preview-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 14px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, #ff4f7b, #8b5cf6);
+    color: #fff;
+    font-family: 'Syne', sans-serif;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    margin: 0 auto 12px;
+  }
+
+  .player-preview-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 28px;
+    font-weight: 800;
+    line-height: 1.1;
+    text-align: center;
+    margin-bottom: 10px;
+  }
+
+  .player-preview-copy {
+    font-size: 14px;
+    line-height: 1.6;
+    text-align: center;
+    color: #635d7c;
+    margin-bottom: 14px;
+  }
+
+  .player-preview-banner {
+    padding: 12px 14px;
+    border-radius: 14px;
+    background: rgba(124, 106, 247, 0.08);
+    border: 1px solid rgba(124, 106, 247, 0.16);
+    color: #3d336f;
+    font-size: 13px;
+    line-height: 1.5;
+    margin-bottom: 12px;
+    text-align: center;
+  }
+
+  .player-preview-timer {
+    padding: 14px 16px;
+    border-radius: 16px;
+    background: rgba(124, 106, 247, 0.08);
+    border: 1px solid rgba(124, 106, 247, 0.18);
+    text-align: center;
+    margin-bottom: 12px;
+  }
+
+  .player-preview-timer-label {
+    display: block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: #6b6288;
+    margin-bottom: 6px;
+  }
+
+  .player-preview-timer-value {
+    font-family: 'Syne', sans-serif;
+    font-size: 28px;
+    font-weight: 800;
+    color: #241c4d;
+  }
+
+  .player-preview-box {
+    padding: 14px;
+    border-radius: 16px;
+    background: rgba(32, 26, 66, 0.05);
+    border: 1px solid rgba(124, 106, 247, 0.12);
+    margin-bottom: 12px;
+  }
+
+  .player-preview-box:last-child {
+    margin-bottom: 0;
+  }
+
+  .player-preview-box strong {
+    display: block;
+    font-size: 13px;
+    margin-bottom: 6px;
+  }
+
+  .player-preview-box p {
+    font-size: 13px;
+    line-height: 1.55;
+    color: #635d7c;
   }
 
   .tab-row {
@@ -815,6 +1156,10 @@
     .hero {
       grid-template-columns: 1fr;
     }
+
+    .ops-grid {
+      grid-template-columns: 1fr;
+    }
   }
 
   @media (max-width: 700px) {
@@ -838,6 +1183,11 @@
       grid-template-columns: 1fr;
     }
 
+    .utility-grid,
+    .ops-row {
+      grid-template-columns: 1fr;
+    }
+
     .stats-row {
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
@@ -856,6 +1206,11 @@
     .toolbar select,
     .btn {
       width: 100%;
+    }
+
+    .ops-actions {
+      display: grid;
+      grid-template-columns: 1fr;
     }
   }
 </style>
@@ -883,19 +1238,32 @@
       </div>
 
       <div class="action-grid">
-        <button class="action-btn start" id="btn-start" onclick="startGame()">
+        <button class="action-btn start" id="btn-start" onclick="confirmAction('start')">
           Start gry
           <small>Uruchamia turę dla uczestników</small>
         </button>
-        <button class="action-btn stop" id="btn-stop" onclick="stopGame()">
+        <button class="action-btn stop" id="btn-stop" onclick="confirmAction('stop')">
           Stop gry
           <small>Zamyka turę bez kasowania danych</small>
         </button>
-        <button class="action-btn reset" id="btn-reset" onclick="showResetModal()">
+        <button class="action-btn reset" id="btn-reset" onclick="confirmAction('reset')">
           Wyczyść dane
           <small>Usuwa testowe wpisy i odpowiedzi</small>
         </button>
       </div>
+
+      <div class="utility-grid">
+        <button class="action-btn neon" id="btn-quick-test" onclick="runQuickTest()">
+          Szybki test systemu
+          <small>Baza, timer, pytania, bonusy i linki</small>
+        </button>
+        <button class="action-btn time" id="btn-extend" onclick="confirmAction('extend')">
+          +10 minut gry
+          <small>Przedłuża aktywną turę bez resetu</small>
+        </button>
+      </div>
+
+      <div class="admin-feedback" id="admin-feedback">Panel gotowy do pracy.</div>
     </section>
 
     <aside class="panel notes-panel">
@@ -903,10 +1271,35 @@
         <div class="notes-title">Szybkie testy</div>
         <div class="notes-copy">Najbezpieczniejszy cykl testowy to: uruchom grę, sprawdź logowanie i odpowiedzi, zatrzymaj grę, a potem wyczyść dane przed kolejną próbą.</div>
       </div>
-      <div class="checklist">
-        <div class="check-item">Start gry daje natychmiastowy sygnał w panelu i na liczniku.</div>
-        <div class="check-item">Stop gry zostawia wyniki, ale blokuje nowe wejścia do aktywnej tury.</div>
-        <div class="check-item">Wyczyść dane usuwa uczestników, odpowiedzi i bonusy, więc możesz testować od zera.</div>
+      <div class="checklist" id="quick-test-list">
+        <div class="check-item pending">
+          <div class="check-item-head">
+            <div class="check-item-title">Baza danych</div>
+            <div class="check-badge pending">Czeka</div>
+          </div>
+          <div class="check-item-sub">Uruchom szybki test, aby potwierdzić połączenie z API i odczyt stanu gry.</div>
+        </div>
+        <div class="check-item pending">
+          <div class="check-item-head">
+            <div class="check-item-title">Timer</div>
+            <div class="check-badge pending">Czeka</div>
+          </div>
+          <div class="check-item-sub">Sprawdzę poprawność czasu gry i licznika do podsumowania.</div>
+        </div>
+        <div class="check-item pending">
+          <div class="check-item-head">
+            <div class="check-item-title">Pytania i bonusy</div>
+            <div class="check-badge pending">Czeka</div>
+          </div>
+          <div class="check-item-sub">Zweryfikuję, czy katalog pytań i bonusów jest dostępny dla panelu.</div>
+        </div>
+        <div class="check-item pending">
+          <div class="check-item-head">
+            <div class="check-item-title">Linki społecznościowe</div>
+            <div class="check-badge pending">Czeka</div>
+          </div>
+          <div class="check-item-sub">Sprawdzę, czy strona główna zawiera poprawne linki do Instagrama i Facebooka.</div>
+        </div>
       </div>
     </aside>
   </div>
@@ -917,6 +1310,38 @@
     <div class="stat"><div class="stat-val" id="s-correct">—</div><div class="stat-lbl">Poprawnych</div></div>
     <div class="stat"><div class="stat-val" id="s-wrong">—</div><div class="stat-lbl">Błędnych</div></div>
     <div class="stat"><div class="stat-val" id="s-avg">—</div><div class="stat-lbl">Śr. punktów</div></div>
+  </div>
+
+  <div class="ops-grid">
+    <section class="ops-card">
+      <div class="ops-title">Komunikat i czas gry</div>
+      <div class="ops-copy">Wyślij krótką informację do wszystkich graczy. Pojawi się na ich ekranie przy najbliższym odświeżeniu stanu gry.</div>
+      <div class="ops-row">
+        <div class="ops-chip" id="duration-chip">Czas gry: 60 min</div>
+        <div class="ops-chip" id="announcement-chip">Brak aktywnego komunikatu</div>
+      </div>
+      <textarea id="admin-message" placeholder="Np. Za 10 minut startujemy z finałowym sprintem. Kierujcie się do kolejnej strefy."></textarea>
+      <div class="ops-actions">
+        <button class="btn primary" type="button" onclick="confirmAction('announcement')">Wyślij komunikat</button>
+        <button class="btn outline" type="button" onclick="clearAnnouncementField()">Wyczyść pole</button>
+      </div>
+      <div class="ops-meta" id="announcement-meta">Komunikat możesz zmieniać w trakcie gry bez resetowania panelu.</div>
+    </section>
+
+    <section class="ops-card">
+      <div class="ops-title">Co widzi gracz teraz</div>
+      <div class="ops-copy">Lekki podgląd najważniejszych ekranów bez uruchamiania drugiej aplikacji w tle.</div>
+      <div class="preview-tabs">
+        <button class="preview-tab active" data-preview-tab="current" onclick="setPreviewMode('current', this)">Teraz</button>
+        <button class="preview-tab" data-preview-tab="question" onclick="setPreviewMode('question', this)">Pytanie</button>
+        <button class="preview-tab" data-preview-tab="final" onclick="setPreviewMode('final', this)">Finał</button>
+        <button class="preview-tab" data-preview-tab="theater" onclick="setPreviewMode('theater', this)">Teatr</button>
+      </div>
+      <div class="preview-phase" id="player-preview-phase">Podgląd dopasowuje się do aktualnego stanu gry.</div>
+      <div class="player-preview-shell">
+        <div id="player-preview"></div>
+      </div>
+    </section>
   </div>
 
   <div class="tab-row">
@@ -1070,13 +1495,13 @@
   </div>
 </div>
 
-<div class="modal-overlay" id="reset-modal">
+<div class="modal-overlay" id="confirm-modal" onclick="if(event.target === this) hideConfirmModal()">
   <div class="modal">
-    <h2>Wyczyścić dane testowe?</h2>
-    <p>Zostaną usunięci wszyscy uczestnicy, odpowiedzi i bonusy. Stan gry zostanie zresetowany do zera. To jest operacja do testów i nie można jej cofnąć.</p>
+    <h2 id="confirm-modal-title">Potwierdź akcję</h2>
+    <p id="confirm-modal-copy">Ta operacja wymaga potwierdzenia.</p>
     <div class="modal-btns">
-      <button class="btn primary" onclick="confirmReset()">Tak, wyczyść dane</button>
-      <button class="btn outline" onclick="hideResetModal()">Anuluj</button>
+      <button class="btn primary" id="confirm-modal-btn" onclick="confirmPendingAction()">Potwierdź</button>
+      <button class="btn outline" onclick="hideConfirmModal()">Anuluj</button>
     </div>
   </div>
 </div>
@@ -1157,6 +1582,7 @@
 let allParticipants = [];
 let allAnswers = [];
 let allBonuses = [];
+let questionCatalog = [];
 let bonusCatalog = [];
 let liveActivity = { liveParticipants: [], hottestQuestions: [], recentActivity: [] };
 let questionStats = [];
@@ -1166,11 +1592,246 @@ let gameDurationMs = 60 * 60 * 1000;
 let timerInterval = null;
 let prevAnswersCount = 0;
 let currentParticipantId = null;
+let gamePhase = 'idle';
+let announcementText = '';
+let announcementUpdatedAt = null;
+let previewMode = 'current';
+let pendingAction = null;
+let currentTab = 'leaderboard';
+let isStateLoading = false;
+let pendingStateReload = false;
+let isDataLoading = false;
+let pendingDataReload = false;
+
+function setAdminFeedback(message, type = '') {
+  const el = document.getElementById('admin-feedback');
+  el.className = `admin-feedback${type ? ` ${type}` : ''}`;
+  el.textContent = message || '';
+}
+
+function formatDurationLabel(durationMs = gameDurationMs) {
+  const minutes = Math.max(0, Math.round((Number(durationMs || 0) / 60000)));
+  return `${minutes} min`;
+}
+
+function formatCountdown(milliseconds) {
+  if (!Number.isFinite(milliseconds) || milliseconds <= 0) return '00:00';
+
+  const totalSeconds = Math.floor(milliseconds / 1000);
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+
+  return hours > 0
+    ? `${hours}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
+    : `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+}
+
+function formatAnnouncementTime(value) {
+  if (!value) return 'brak daty';
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return 'brak daty';
+
+  return date.toLocaleString('pl-PL', {
+    day: '2-digit',
+    month: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+}
+
+function getSummaryRemainingMs() {
+  if (!summaryAt) return 0;
+  return summaryAt - Date.now();
+}
+
+function getGameRemainingMs() {
+  if (!gameStartedAt) return 0;
+  return gameDurationMs - (Date.now() - gameStartedAt);
+}
+
+function renderOpsState() {
+  const durationChip = document.getElementById('duration-chip');
+  const announcementChip = document.getElementById('announcement-chip');
+  const announcementMeta = document.getElementById('announcement-meta');
+
+  durationChip.textContent = `Czas gry: ${formatDurationLabel()}`;
+
+  if (announcementText) {
+    announcementChip.textContent = 'Komunikat aktywny';
+    announcementMeta.textContent = `Ostatni komunikat zapisano ${formatAnnouncementTime(announcementUpdatedAt)}.`;
+  } else {
+    announcementChip.textContent = 'Brak aktywnego komunikatu';
+    announcementMeta.textContent = 'Komunikat możesz zmieniać w trakcie gry bez resetowania panelu.';
+  }
+}
+
+function renderVisibleData() {
+  updateStats();
+
+  if (currentTab === 'live') {
+    renderLiveActivity();
+    return;
+  }
+
+  if (currentTab === 'answers') {
+    populateAnswerFilters();
+    renderAnswers();
+    return;
+  }
+
+  if (currentTab === 'question-stats') {
+    renderQuestionStats();
+    return;
+  }
+
+  renderLeaderboard();
+}
+
+function clearAnnouncementField() {
+  document.getElementById('admin-message').value = '';
+  setAdminFeedback('Pole komunikatu zostało wyczyszczone. Nic nie zostało jeszcze wysłane.');
+}
+
+function renderQuickTestResults(items) {
+  const list = document.getElementById('quick-test-list');
+
+  list.innerHTML = items.map((item) => `
+    <div class="check-item ${item.status}">
+      <div class="check-item-head">
+        <div class="check-item-title">${escHtml(item.label)}</div>
+        <div class="check-badge ${item.status}">${item.badge}</div>
+      </div>
+      <div class="check-item-sub">${escHtml(item.message)}</div>
+    </div>
+  `).join('');
+}
+
+function getCurrentPreviewMode() {
+  if (gamePhase === 'active') return 'start';
+  if (gamePhase === 'ended') {
+    return getSummaryRemainingMs() > 0 ? 'final' : 'theater';
+  }
+  return 'start';
+}
+
+function previewBannerHtml() {
+  return announcementText
+    ? `<div class="player-preview-banner">${escHtml(announcementText)}</div>`
+    : '';
+}
+
+function renderPlayerPreview() {
+  const container = document.getElementById('player-preview');
+  const phaseLabel = document.getElementById('player-preview-phase');
+  const mode = previewMode === 'current' ? getCurrentPreviewMode() : previewMode;
+  const gameRemaining = formatCountdown(getGameRemainingMs());
+  const summaryRemaining = formatCountdown(getSummaryRemainingMs());
+  const banner = previewBannerHtml();
+
+  let html = '';
+  let phaseText = 'Podgląd dopasowuje się do aktualnego stanu gry.';
+
+  if (mode === 'question') {
+    phaseText = 'Podgląd próbki pytania z licznikiem do końca gry i miejscem na komunikat.';
+    html = `
+      <div class="player-preview-card">
+        <div class="player-preview-logo">Gwiazdka One Day</div>
+        ${banner}
+        <div class="player-preview-pill">Pytanie</div>
+        <div class="player-preview-title">Gdzie ukrył się kolejny punkt trasy?</div>
+        <div class="player-preview-copy">Tu gracz widzi treść pytania, wysyła odpowiedź i cały czas ma licznik do końca gry.</div>
+        <div class="player-preview-box">
+          <strong>Twoja odpowiedź</strong>
+          <p>Wpisz odpowiedź i wyślij ją jednym kliknięciem. Po wysłaniu gracz zobaczy tylko potwierdzenie zapisania.</p>
+        </div>
+        <div class="player-preview-timer">
+          <span class="player-preview-timer-label">Do końca gry zostało</span>
+          <div class="player-preview-timer-value">${gameRemaining}</div>
+        </div>
+      </div>
+    `;
+  } else if (mode === 'final') {
+    phaseText = 'Podgląd finału po zatrzymaniu gry, z zaproszeniem do Teatru i drugim licznikiem.';
+    html = `
+      <div class="player-preview-card">
+        <div class="player-preview-logo">Gwiazdka One Day</div>
+        ${banner}
+        <div class="player-preview-pill">Finał gry</div>
+        <div class="player-preview-title">Zapraszamy na podsumowanie</div>
+        <div class="player-preview-copy">Gra dobiegła końca. Za chwilę zaczynamy specjalny pokaz i rozdanie upominków dla uczestników.</div>
+        <div class="player-preview-box">
+          <strong>Miejsce: Teatr</strong>
+          <p>To ekran końcowy widoczny po zatrzymaniu gry albo po upływie czasu aktywnej tury.</p>
+        </div>
+        <div class="player-preview-timer">
+          <span class="player-preview-timer-label">Do podsumowania zostało</span>
+          <div class="player-preview-timer-value">${summaryRemaining}</div>
+        </div>
+      </div>
+    `;
+  } else if (mode === 'theater') {
+    phaseText = 'Podgląd momentu po zakończeniu odliczania do podsumowania.';
+    html = `
+      <div class="player-preview-card">
+        <div class="player-preview-logo">Gwiazdka One Day</div>
+        ${banner}
+        <div class="player-preview-pill">Teatr</div>
+        <div class="player-preview-title">Czekamy na Was w Teatrze</div>
+        <div class="player-preview-copy">Licznik dobiegł końca. Gracze widzą już tylko jasny komunikat, gdzie mają przejść na finałowe spotkanie.</div>
+        <div class="player-preview-box">
+          <strong>Miejsce: Teatr</strong>
+          <p>To lekki ekran informacyjny, który nie wymaga dalszych zapytań poza zwykłym odczytem stanu gry.</p>
+        </div>
+      </div>
+    `;
+  } else {
+    phaseText = previewMode === 'current'
+      ? (gamePhase === 'active'
+          ? 'Aktualnie gracz na wejściu widzi ekran startowy i może przejść do logowania.'
+          : gamePhase === 'ended'
+            ? 'Aktualnie gracz widzi ekran końcowy związany z finałem lub Teatrem.'
+            : 'Aktualnie gracz widzi ekran oczekiwania na start gry.')
+      : 'Podgląd ekranu startowego gracza.';
+
+    html = `
+      <div class="player-preview-card">
+        <div class="player-preview-logo">Gwiazdka One Day</div>
+        ${banner}
+        <div class="player-preview-pill">${gamePhase === 'active' ? 'Start gry' : 'Przed startem'}</div>
+        <div class="player-preview-title">${gamePhase === 'active' ? 'Jak to działa?' : 'Gra jeszcze nie wystartowała'}</div>
+        <div class="player-preview-copy">${gamePhase === 'active'
+          ? 'Zaloguj się, skanuj kody QR i zbieraj odpowiedzi oraz bonusy.'
+          : 'Na tym ekranie uczestnik czeka na start i widzi odliczanie do wydarzenia oraz linki społecznościowe.'}</div>
+        <div class="player-preview-box">
+          <strong>1. Zaloguj się  2. Skanuj QR  3. Zbieraj bonusy</strong>
+          <p>To jest najczęstszy widok wejściowy dla uczestnika przed pierwszym zeskanowaniem pytania.</p>
+        </div>
+        <div class="player-preview-timer">
+          <span class="player-preview-timer-label">Do końca gry zostało</span>
+          <div class="player-preview-timer-value">${gamePhase === 'active' ? gameRemaining : '—'}</div>
+        </div>
+      </div>
+    `;
+  }
+
+  phaseLabel.textContent = phaseText;
+  container.innerHTML = html;
+}
 
 async function loadGameState() {
+  if (isStateLoading) {
+    pendingStateReload = true;
+    return;
+  }
+
+  isStateLoading = true;
   try {
     const res = await fetch('/api/game-state');
     const data = await res.json();
+    announcementText = (data.announcement_text || '').trim();
+    announcementUpdatedAt = data.announcement_updated_at || null;
 
     if (data.started_at) {
       summaryAt = null;
@@ -1179,6 +1840,7 @@ async function loadGameState() {
       const remaining = gameDurationMs - (Date.now() - gameStartedAt);
 
       if (remaining > 0) {
+        gamePhase = 'active';
         setStatus('active', 'Gra trwa', 'Uczestnicy mogą aktualnie logować się i odpowiadać.');
         syncActionButtons('active');
         updateLiveTimer();
@@ -1187,6 +1849,7 @@ async function loadGameState() {
         gameStartedAt = null;
         summaryAt = new Date(data.summary_at || (Date.now() + 30 * 60000)).getTime();
         clearTimer();
+        gamePhase = 'ended';
         setStatus('ended', 'Gra zakończona', 'Czas gry minął. Możesz uruchomić nową turę lub wyczyścić dane.');
         syncActionButtons('ended');
         updateLiveTimer();
@@ -1196,6 +1859,7 @@ async function loadGameState() {
       gameStartedAt = null;
       summaryAt = new Date(data.summary_at || (new Date(data.ended_at).getTime() + 30 * 60000)).getTime();
       clearTimer();
+      gamePhase = 'ended';
       setStatus('ended', 'Gra zakończona', 'Uczestnicy widzą zaproszenie do Teatru i licznik do podsumowania.');
       syncActionButtons('ended');
       updateLiveTimer();
@@ -1204,15 +1868,29 @@ async function loadGameState() {
       gameStartedAt = null;
       summaryAt = null;
       clearTimer();
+      gameDurationMs = (data.duration_minutes || 60) * 60 * 1000;
+      gamePhase = 'idle';
       setStatus('idle', 'Gra zatrzymana', 'Możesz uruchomić start gry albo wyczyścić dane testowe.');
       syncActionButtons('idle');
       document.getElementById('live-timer').textContent = '--:--';
       document.getElementById('live-timer').classList.remove('warning');
     }
+
+    renderOpsState();
+    renderPlayerPreview();
   } catch (e) {
     console.error(e);
+    gamePhase = 'error';
     setStatus('ended', 'Błąd odczytu stanu gry', 'Nie udało się pobrać aktualnego stanu z backendu.');
     syncActionButtons('error');
+    renderOpsState();
+    renderPlayerPreview();
+  } finally {
+    isStateLoading = false;
+    if (pendingStateReload) {
+      pendingStateReload = false;
+      loadGameState();
+    }
   }
 }
 
@@ -1229,12 +1907,14 @@ function setStatus(type, text, sub) {
 function syncActionButtons(state) {
   const startBtn = document.getElementById('btn-start');
   const stopBtn = document.getElementById('btn-stop');
+  const extendBtn = document.getElementById('btn-extend');
 
   startBtn.classList.toggle('active', state === 'active');
   stopBtn.classList.toggle('active', state === 'idle' || state === 'ended');
 
   startBtn.disabled = state === 'active';
   stopBtn.disabled = state !== 'active';
+  extendBtn.disabled = state !== 'active';
 }
 
 function clearTimer() {
@@ -1258,6 +1938,7 @@ function updateLiveTimer() {
       timerEl.textContent = 'TEATR';
       timerEl.classList.add('warning');
       clearTimer();
+      renderPlayerPreview();
       return;
     }
 
@@ -1279,8 +1960,10 @@ function updateLiveTimer() {
     summaryAt = Date.now() + 30 * 60000;
     timerEl.textContent = 'TEATR';
     timerEl.classList.add('warning');
+    gamePhase = 'ended';
     setStatus('ended', 'Gra zakończona', 'Czas gry minął. Możesz uruchomić nową turę lub wyczyścić dane.');
     syncActionButtons('ended');
+    renderPlayerPreview();
     return;
   }
 
@@ -1295,8 +1978,91 @@ function updateLiveTimer() {
   timerEl.classList.toggle('warning', remaining < 300000);
 }
 
+function confirmAction(action) {
+  const titleEl = document.getElementById('confirm-modal-title');
+  const copyEl = document.getElementById('confirm-modal-copy');
+  const buttonEl = document.getElementById('confirm-modal-btn');
+  const messageValue = document.getElementById('admin-message').value.trim();
+
+  const content = {
+    start: {
+      title: 'Uruchomić grę?',
+      copy: 'Start od razu otworzy logowanie i liczniki dla uczestników.',
+      button: 'Tak, start gry'
+    },
+    stop: {
+      title: 'Zatrzymać grę?',
+      copy: 'Uczestnicy przestaną odpowiadać na pytania i zobaczą ekran finału z Teatrem.',
+      button: 'Tak, stop gry'
+    },
+    reset: {
+      title: 'Wyczyścić dane testowe?',
+      copy: 'Zostaną usunięci uczestnicy, odpowiedzi i bonusy. Tej operacji nie można cofnąć.',
+      button: 'Tak, wyczyść dane'
+    },
+    extend: {
+      title: 'Przedłużyć grę o 10 minut?',
+      copy: 'Ta zmiana od razu powiększy czas aktywnej tury i licznik u graczy.',
+      button: 'Tak, dodaj 10 minut'
+    },
+    announcement: {
+      title: 'Wysłać komunikat do graczy?',
+      copy: `Komunikat pojawi się u graczy na wszystkich ekranach: "${messageValue}"`,
+      button: 'Tak, wyślij komunikat'
+    }
+  }[action];
+
+  if (!content) return;
+
+  if (action === 'announcement' && !messageValue) {
+    setAdminFeedback('Najpierw wpisz treść komunikatu dla graczy.', 'error');
+    return;
+  }
+
+  pendingAction = action;
+  titleEl.textContent = content.title;
+  copyEl.textContent = content.copy;
+  buttonEl.textContent = content.button;
+  document.getElementById('confirm-modal').classList.add('show');
+}
+
+function hideConfirmModal() {
+  pendingAction = null;
+  document.getElementById('confirm-modal').classList.remove('show');
+}
+
+async function confirmPendingAction() {
+  const action = pendingAction;
+  hideConfirmModal();
+
+  if (action === 'start') {
+    await startGame();
+    return;
+  }
+
+  if (action === 'stop') {
+    await stopGame();
+    return;
+  }
+
+  if (action === 'reset') {
+    await confirmReset();
+    return;
+  }
+
+  if (action === 'extend') {
+    await extendGameTime();
+    return;
+  }
+
+  if (action === 'announcement') {
+    await sendAnnouncement();
+  }
+}
+
 async function startGame() {
   document.getElementById('btn-start').disabled = true;
+  setAdminFeedback('Uruchamiam grę...');
   try {
     const res = await fetch('/api/game-state', {
       method: 'POST',
@@ -1313,15 +2079,17 @@ async function startGame() {
     clearTimer();
     timerInterval = setInterval(updateLiveTimer, 1000);
     await loadGameState();
+    setAdminFeedback('Gra została uruchomiona i jest już widoczna dla uczestników.', 'success');
   } catch (e) {
     console.error(e);
-    alert('Nie udało się uruchomić gry.');
+    setAdminFeedback('Nie udało się uruchomić gry.', 'error');
     syncActionButtons('idle');
   }
 }
 
 async function stopGame() {
   document.getElementById('btn-stop').disabled = true;
+  setAdminFeedback('Zatrzymuję grę...');
   try {
     const res = await fetch('/api/game-state', {
       method: 'POST',
@@ -1332,23 +2100,16 @@ async function stopGame() {
     if (!res.ok) throw new Error('Stop gry nie powiódł się.');
 
     await loadGameState();
+    setAdminFeedback('Gra została zatrzymana. Gracze widzą teraz ekran finału.', 'success');
   } catch (e) {
     console.error(e);
-    alert('Nie udało się zatrzymać gry.');
+    setAdminFeedback('Nie udało się zatrzymać gry.', 'error');
     syncActionButtons('active');
   }
 }
 
-function showResetModal() {
-  document.getElementById('reset-modal').classList.add('show');
-}
-
-function hideResetModal() {
-  document.getElementById('reset-modal').classList.remove('show');
-}
-
 async function confirmReset() {
-  hideResetModal();
+  setAdminFeedback('Czyszczę dane testowe...');
 
   try {
     const res = await fetch('/api/game-state', {
@@ -1367,16 +2128,174 @@ async function confirmReset() {
     questionStats = [];
     prevAnswersCount = 0;
     gameStartedAt = null;
+    gamePhase = 'idle';
+    announcementText = '';
+    announcementUpdatedAt = null;
     clearTimer();
     await loadGameState();
     await loadData();
+    document.getElementById('admin-message').value = '';
+    setAdminFeedback('Dane testowe zostały wyczyszczone.', 'success');
   } catch (e) {
     console.error(e);
-    alert('Nie udało się wyczyścić danych testowych.');
+    setAdminFeedback('Nie udało się wyczyścić danych testowych.', 'error');
+  }
+}
+
+async function extendGameTime() {
+  document.getElementById('btn-extend').disabled = true;
+  setAdminFeedback('Dodaję 10 minut do aktywnej gry...');
+
+  try {
+    const res = await fetch('/api/game-state', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'extend-time', minutes: 10 })
+    });
+    const data = await res.json();
+
+    if (!res.ok || data.error) {
+      throw new Error(data.error || 'Nie udało się wydłużyć gry.');
+    }
+
+    await loadGameState();
+    setAdminFeedback('Czas gry został wydłużony o 10 minut.', 'success');
+  } catch (e) {
+    console.error(e);
+    setAdminFeedback(e.message || 'Nie udało się wydłużyć gry.', 'error');
+    syncActionButtons(gamePhase);
+  }
+}
+
+async function sendAnnouncement() {
+  const message = document.getElementById('admin-message').value.trim();
+  if (!message) {
+    setAdminFeedback('Najpierw wpisz treść komunikatu dla graczy.', 'error');
+    return;
+  }
+
+  setAdminFeedback('Wysyłam komunikat do graczy...');
+
+  try {
+    const res = await fetch('/api/game-state', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'set-announcement', message })
+    });
+    const data = await res.json();
+
+    if (!res.ok || data.error) {
+      throw new Error(data.error || 'Nie udało się wysłać komunikatu.');
+    }
+
+    await loadGameState();
+    setAdminFeedback('Komunikat został zapisany i trafi do graczy przy najbliższym odświeżeniu.', 'success');
+  } catch (e) {
+    console.error(e);
+    setAdminFeedback(e.message || 'Nie udało się wysłać komunikatu.', 'error');
+  }
+}
+
+async function runQuickTest() {
+  const button = document.getElementById('btn-quick-test');
+  button.disabled = true;
+  setAdminFeedback('Trwa szybki test systemu...');
+
+  try {
+    const [stateRes, adminRes, homeRes] = await Promise.all([
+      fetch('/api/game-state'),
+      fetch('/api/admin-results'),
+      fetch('/')
+    ]);
+
+    const [stateData, adminData, homeHtml] = await Promise.all([
+      stateRes.json(),
+      adminRes.json(),
+      homeRes.text()
+    ]);
+
+    const timerMinutes = Number(stateData.duration_minutes || 60);
+    const timerOk = Number.isFinite(timerMinutes) && timerMinutes > 0;
+    const startedOk = !stateData.started_at || !Number.isNaN(new Date(stateData.started_at).getTime());
+    const summaryOk = !stateData.summary_at || !Number.isNaN(new Date(stateData.summary_at).getTime());
+    const dbOk = stateRes.ok && adminRes.ok && Array.isArray(adminData.participants) && Array.isArray(adminData.answers);
+    const questionsOk = Array.isArray(adminData.questionCatalog) && adminData.questionCatalog.length > 0;
+    const bonusesOk = Array.isArray(adminData.bonusCatalog) && adminData.bonusCatalog.length > 0;
+    const linksOk =
+      homeRes.ok &&
+      homeHtml.includes('https://www.instagram.com/fundacjaoneday/') &&
+      homeHtml.includes('https://www.facebook.com/fundacjaoneday');
+
+    renderQuickTestResults([
+      {
+        label: 'Baza danych',
+        status: dbOk ? 'ok' : 'error',
+        badge: dbOk ? 'OK' : 'Błąd',
+        message: dbOk ? 'API zwróciło stan gry oraz dane administratora bez błędów.' : 'Nie udało się poprawnie odczytać danych z backendu.'
+      },
+      {
+        label: 'Timer',
+        status: timerOk && startedOk && summaryOk ? 'ok' : 'error',
+        badge: timerOk && startedOk && summaryOk ? 'OK' : 'Błąd',
+        message: timerOk && startedOk && summaryOk
+          ? `Aktualny czas gry to ${timerMinutes} min, a pola licznika mają poprawny format dat.`
+          : 'W danych stanu gry brakuje poprawnych informacji o czasie.'
+      },
+      {
+        label: 'Pytania',
+        status: questionsOk ? 'ok' : 'error',
+        badge: questionsOk ? 'OK' : 'Błąd',
+        message: questionsOk
+          ? `Panel widzi ${adminData.questionCatalog.length} pytań w katalogu.`
+          : 'Nie udało się odczytać katalogu pytań.'
+      },
+      {
+        label: 'Bonusy',
+        status: bonusesOk ? 'ok' : 'error',
+        badge: bonusesOk ? 'OK' : 'Błąd',
+        message: bonusesOk
+          ? `Panel widzi ${adminData.bonusCatalog.length} bonusów gotowych do użycia.`
+          : 'Nie udało się odczytać katalogu bonusów.'
+      },
+      {
+        label: 'Linki społecznościowe',
+        status: linksOk ? 'ok' : 'error',
+        badge: linksOk ? 'OK' : 'Błąd',
+        message: linksOk
+          ? 'Strona główna zawiera poprawne linki do Instagrama i Facebooka.'
+          : 'Na stronie głównej nie znaleziono oczekiwanych linków społecznościowych.'
+      }
+    ]);
+
+    setAdminFeedback(
+      dbOk && timerOk && startedOk && summaryOk && questionsOk && bonusesOk && linksOk
+        ? 'Szybki test zakończył się powodzeniem. System wygląda na gotowy do startu.'
+        : 'Szybki test wykrył problem. Sprawdź listę po prawej stronie.',
+      dbOk && timerOk && startedOk && summaryOk && questionsOk && bonusesOk && linksOk ? 'success' : 'error'
+    );
+  } catch (e) {
+    console.error(e);
+    renderQuickTestResults([
+      {
+        label: 'Szybki test',
+        status: 'error',
+        badge: 'Błąd',
+        message: 'Nie udało się zakończyć testu. Sprawdź połączenie z API albo konfigurację projektu.'
+      }
+    ]);
+    setAdminFeedback('Nie udało się zakończyć szybkiego testu systemu.', 'error');
+  } finally {
+    button.disabled = false;
   }
 }
 
 async function loadData() {
+  if (isDataLoading) {
+    pendingDataReload = true;
+    return;
+  }
+
+  isDataLoading = true;
   try {
     const res = await fetch('/api/admin-results');
     const data = await res.json();
@@ -1390,18 +2309,21 @@ async function loadData() {
     allParticipants = data.participants || [];
     allAnswers = data.answers || [];
     allBonuses = data.bonuses || [];
+    questionCatalog = data.questionCatalog || [];
     bonusCatalog = data.bonusCatalog || [];
     liveActivity = data.liveActivity || { liveParticipants: [], hottestQuestions: [], recentActivity: [] };
     questionStats = computeQuestionStats(allAnswers);
 
-    updateStats();
-    populateAnswerFilters();
-    renderLiveActivity();
-    renderLeaderboard();
-    renderAnswers();
-    renderQuestionStats();
+    renderVisibleData();
+    renderPlayerPreview();
   } catch (e) {
     console.error(e);
+  } finally {
+    isDataLoading = false;
+    if (pendingDataReload) {
+      pendingDataReload = false;
+      loadData();
+    }
   }
 }
 
@@ -1893,13 +2815,23 @@ async function adjustParticipant(action) {
   }
 }
 
+function setPreviewMode(mode, element) {
+  previewMode = mode;
+  document.querySelectorAll('[data-preview-tab]').forEach((tab) => {
+    tab.classList.toggle('active', tab === element);
+  });
+  renderPlayerPreview();
+}
+
 function showTab(tab, element) {
+  currentTab = tab;
   document.getElementById('tab-live').style.display = tab === 'live' ? 'block' : 'none';
   document.getElementById('tab-leaderboard').style.display = tab === 'leaderboard' ? 'block' : 'none';
   document.getElementById('tab-answers').style.display = tab === 'answers' ? 'block' : 'none';
   document.getElementById('tab-question-stats').style.display = tab === 'question-stats' ? 'block' : 'none';
   document.querySelectorAll('.tab').forEach(tabButton => tabButton.classList.remove('active'));
   element.classList.add('active');
+  renderVisibleData();
 }
 
 function exportCSV() {
@@ -1949,8 +2881,12 @@ function escapeAttr(value) {
 
 loadGameState();
 loadData();
-setInterval(loadData, 10000);
-setInterval(loadGameState, 10000);
+setInterval(() => {
+  if (!document.hidden) loadData();
+}, 12000);
+setInterval(() => {
+  if (!document.hidden) loadGameState();
+}, 12000);
 </script>
 </body>
 </html>

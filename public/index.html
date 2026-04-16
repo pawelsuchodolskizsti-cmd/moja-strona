@@ -21,7 +21,7 @@
 * { box-sizing:border-box; margin:0; padding:0; }
 
 body {
-  background: url('/tĹ‚odogry.png') no-repeat center center fixed;
+  background: url('/tlo-gry.png') no-repeat center center fixed;
   background-size: cover;
   font-family:'DM Sans',sans-serif;
   min-height:100vh;
@@ -54,13 +54,15 @@ body {
 .logo {
   font-family:'Syne';
   font-weight:800;
-  font-size:18px;
-  line-height:1.25;
-  letter-spacing:.2em;
+  font-size:clamp(15px, 4.8vw, 18px);
+  line-height:1.15;
+  letter-spacing:.14em;
   text-transform:uppercase;
   text-align:center;
   margin-bottom:18px;
   padding: 4px 8px;
+  max-width:100%;
+  overflow-wrap:anywhere;
   background: linear-gradient(135deg, var(--pink), var(--purple));
   -webkit-background-clip:text;
   -webkit-text-fill-color:transparent;
@@ -184,6 +186,37 @@ h1 {
   margin-bottom:16px;
 }
 
+.announcement-box {
+  display:none;
+  margin-bottom:16px;
+  padding:14px 16px;
+  border-radius:16px;
+  background: linear-gradient(135deg, rgba(124,106,247,0.12), rgba(255,61,107,0.08));
+  border:1px solid rgba(124,106,247,0.18);
+  color:#30295c;
+  box-shadow:0 12px 24px rgba(67, 46, 143, 0.08);
+}
+
+.announcement-box.show {
+  display:block;
+}
+
+.announcement-label {
+  display:block;
+  font-size:11px;
+  font-weight:700;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  color:#6b6288;
+  margin-bottom:6px;
+}
+
+.announcement-text {
+  font-size:14px;
+  line-height:1.55;
+  font-weight:600;
+}
+
 .status-finale {
   background: linear-gradient(180deg, rgba(255,255,255,0.97), rgba(245,240,255,0.92));
   border: 1px solid rgba(124,106,247,0.2);
@@ -212,10 +245,13 @@ h1 {
 
 .status-finale h2 {
   font-family: 'Syne';
-  font-size: 28px;
+  font-size: clamp(22px, 7vw, 28px);
   font-weight: 800;
+  line-height: 1.12;
+  letter-spacing: -.02em;
   color: #201a42;
   margin-bottom: 10px;
+  overflow-wrap: anywhere;
 }
 
 .status-finale p {
@@ -223,14 +259,17 @@ h1 {
   font-size: 15px;
   line-height: 1.6;
   margin-bottom: 12px;
+  overflow-wrap: anywhere;
 }
 
 .status-finale-place {
   font-family: 'Syne';
-  font-size: 18px;
+  font-size: clamp(16px, 5.6vw, 18px);
   font-weight: 800;
+  line-height: 1.18;
   color: #241c4d;
   margin-bottom: 14px;
+  overflow-wrap: anywhere;
 }
 
 .status-finale-countdown {
@@ -688,7 +727,7 @@ textarea {
 
   .player-stat-label {
     font-size: 10px;
-  */
+  }
 }
 </style>
 </head>
@@ -697,15 +736,15 @@ textarea {
 <!-- === LOGIN SCREEN === -->
 <div class="card" id="login-screen">
 
-  <div class="logo">â­ Gwiazdka One Day 2026</div>
+  <div class="logo">Gwiazdka One Day 2026</div>
 
   <div class="event-bar">Odliczaj razem z nami</div>
 
   <div class="countdown">
-    <div class="cd-block"><div class="cd-num" id="cd-months">â€”</div><span class="cd-label">mies.</span></div>
-    <div class="cd-block"><div class="cd-num" id="cd-days">â€”</div><span class="cd-label">dni</span></div>
-    <div class="cd-block"><div class="cd-num" id="cd-hours">â€”</div><span class="cd-label">godz.</span></div>
-    <div class="cd-block"><div class="cd-num" id="cd-mins">â€”</div><span class="cd-label">min.</span></div>
+    <div class="cd-block"><div class="cd-num" id="cd-months">—</div><span class="cd-label">mies.</span></div>
+    <div class="cd-block"><div class="cd-num" id="cd-days">—</div><span class="cd-label">dni</span></div>
+    <div class="cd-block"><div class="cd-num" id="cd-hours">—</div><span class="cd-label">godz.</span></div>
+    <div class="cd-block"><div class="cd-num" id="cd-mins">—</div><span class="cd-label">min.</span></div>
   </div>
 
   <div class="socials-wrap">
@@ -718,6 +757,11 @@ textarea {
         <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
       </a>
     </div>
+  </div>
+
+  <div class="announcement-box" data-announcement>
+    <span class="announcement-label">Komunikat organizatora</span>
+    <div class="announcement-text"></div>
   </div>
 
   <div id="game-status-box"></div>
@@ -744,12 +788,12 @@ textarea {
     <button class="btn intro-btn" type="button" onclick="openLoginForm()">Gram!</button>
   </div>
 
-  <!-- Login form â€” shown only when game started -->
+  <!-- Login form shown only when game started -->
   <div id="login-form" style="display:none">
-    <h1>Witaj! đź‘‹</h1>
-    <p class="subtitle">Podaj dane, aby doĹ‚Ä…czyÄ‡ do gry</p>
+    <h1>Witaj!</h1>
+    <p class="subtitle">Podaj dane, aby dołączyć do gry</p>
 
-    <label>ImiÄ™</label>
+    <label>Imię</label>
     <input type="text" id="fname" placeholder="np. Anna">
 
     <label>Nazwisko</label>
@@ -758,7 +802,7 @@ textarea {
     <label>Miasto</label>
     <input type="text" id="city" placeholder="np. Warszawa">
 
-    <button class="btn" id="login-btn" onclick="doLogin()">DoĹ‚Ä…cz do gry â†’</button>
+    <button class="btn" id="login-btn" onclick="doLogin()">Dołącz do gry</button>
     <div class="msg error" id="login-msg"></div>
   </div>
 
@@ -766,26 +810,30 @@ textarea {
 
 <!-- === QUESTION SCREEN === -->
 <div class="card" id="question-screen">
-  <div class="logo">â­ Gwiazdka One Day</div>
-  <div class="q-badge">âšˇ Pytanie</div>
+  <div class="logo">Gwiazdka One Day</div>
+  <div class="announcement-box" data-announcement>
+    <span class="announcement-label">Komunikat organizatora</span>
+    <div class="announcement-text"></div>
+  </div>
+  <div class="q-badge">Pytanie</div>
   <div class="q-text" id="q-text"></div>
 
   <div id="answer-area">
-    <label>Twoja odpowiedĹş</label>
-    <textarea id="answer-input" placeholder="Wpisz odpowiedĹş..."></textarea>
-    <button class="btn" id="submit-btn" onclick="submitAnswer()">WyĹ›lij odpowiedĹş</button>
+    <label>Twoja odpowiedź</label>
+    <textarea id="answer-input" placeholder="Wpisz odpowiedź..."></textarea>
+    <button class="btn" id="submit-btn" onclick="submitAnswer()">Wyślij odpowiedź</button>
     <div class="msg" id="q-msg"></div>
   </div>
 
   <div id="result-area"></div>
   <div class="game-remaining">
-    <span class="game-remaining-label">Do koĹ„ca gry zostaĹ‚o</span>
+    <span class="game-remaining-label">Do końca gry zostało</span>
     <div class="game-remaining-value" data-game-remaining>--:--</div>
   </div>
 
   <div class="player-stats" id="player-stats-question">
-    <div class="player-stats-title">TwĂłj postÄ™p</div>
-    <div class="player-stats-summary">OdpowiedziaĹ‚eĹ› juĹĽ na <strong data-stat-summary="answers">0</strong> pytaĹ„.</div>
+    <div class="player-stats-title">Twój postęp</div>
+    <div class="player-stats-summary">Odpowiedziałeś już na <strong data-stat-summary="answers">0</strong> pytań.</div>
     <div class="player-stats-grid">
       <div class="player-stat">
         <div class="player-stat-value" data-stat-value="answers">0</div>
@@ -805,18 +853,22 @@ textarea {
 
 <!-- === NO QR SCREEN (logged in but no ?q param) === -->
 <div class="card" id="no-q-screen">
-  <div class="logo">â­ Gwiazdka One Day</div>
+  <div class="logo">Gwiazdka One Day</div>
+  <div class="announcement-box" data-announcement>
+    <span class="announcement-label">Komunikat organizatora</span>
+    <div class="announcement-text"></div>
+  </div>
   <h1>Zeskanuj kod QR</h1>
   <div class="info-box">
-    <p>ZnajdĹş kod QR w terenie<br>i zeskanuj go, aby zobaczyÄ‡ pytanie.</p>
+    <p>Znajdź kod QR w terenie<br>i zeskanuj go, aby zobaczyć pytanie.</p>
   </div>
   <div class="game-remaining">
-    <span class="game-remaining-label">Do koĹ„ca gry zostaĹ‚o</span>
+    <span class="game-remaining-label">Do końca gry zostało</span>
     <div class="game-remaining-value" data-game-remaining>--:--</div>
   </div>
   <div class="player-stats" id="player-stats-noq">
-    <div class="player-stats-title">TwĂłj postÄ™p</div>
-    <div class="player-stats-summary">OdpowiedziaĹ‚eĹ› juĹĽ na <strong data-stat-summary="answers">0</strong> pytaĹ„.</div>
+    <div class="player-stats-title">Twój postęp</div>
+    <div class="player-stats-summary">Odpowiedziałeś już na <strong data-stat-summary="answers">0</strong> pytań.</div>
     <div class="player-stats-grid">
       <div class="player-stat">
         <div class="player-stat-value" data-stat-value="answers">0</div>
@@ -835,7 +887,11 @@ textarea {
 </div>
 
 <div class="card" id="end-screen" style="display:none">
-  <div class="logo">â­ Gwiazdka One Day</div>
+  <div class="logo">Gwiazdka One Day</div>
+  <div class="announcement-box" data-announcement>
+    <span class="announcement-label">Komunikat organizatora</span>
+    <div class="announcement-text"></div>
+  </div>
   <div class="status-finale">
     <div class="status-finale-badge">Fina&#322; gry</div>
     <h2>Zapraszamy na podsumowanie</h2>
@@ -858,11 +914,23 @@ let currentQuestion = null;
 let hasOpenedLogin = false;
 let participantStats = { answers: 0, bonuses: 0 };
 let deviceToken = null;
-let activeGameState = { startedAt: null, endedAt: null, summaryAt: null, durationMinutes: 60 };
+let activeGameState = {
+  startedAt: null,
+  endedAt: null,
+  summaryAt: null,
+  durationMinutes: 60,
+  announcementText: '',
+  announcementUpdatedAt: null
+};
+let gameStateLoadPromise = null;
+let participantStatsLoadPromise = null;
+let gameRemainingElements = [];
+let summaryRemainingElements = [];
+let announcementElements = [];
 
 const EVENT_DATE = new Date('2026-12-13T10:00:00+01:00');
 
-/* â”€â”€ COUNTDOWN â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* COUNTDOWN */
 function updateCountdown() {
   const diff = EVENT_DATE - new Date();
   if (diff <= 0) {
@@ -914,12 +982,16 @@ function formatRemainingTime(milliseconds) {
 }
 
 function renderGameRemaining() {
-  const targets = document.querySelectorAll('[data-game-remaining]');
+  const targets = gameRemainingElements.length
+    ? gameRemainingElements
+    : document.querySelectorAll('[data-game-remaining]');
   const { startedAt, durationMinutes } = activeGameState;
 
   if (!startedAt) {
     targets.forEach((el) => {
-      el.innerText = 'Gra nieaktywna';
+      if (el.innerText !== 'Gra nieaktywna') {
+        el.innerText = 'Gra nieaktywna';
+      }
     });
     return;
   }
@@ -929,7 +1001,9 @@ function renderGameRemaining() {
   const label = remaining > 0 ? formatRemainingTime(remaining) : '00:00';
 
   targets.forEach((el) => {
-    el.innerText = label;
+    if (el.innerText !== label) {
+      el.innerText = label;
+    }
   });
 }
 
@@ -940,12 +1014,16 @@ function getSummaryCountdownTarget() {
 }
 
 function renderSummaryCountdown() {
-  const targets = document.querySelectorAll('[data-summary-remaining]');
+  const targets = summaryRemainingElements.length
+    ? summaryRemainingElements
+    : document.querySelectorAll('[data-summary-remaining]');
   const summaryTarget = getSummaryCountdownTarget();
 
   if (!summaryTarget) {
     targets.forEach((el) => {
-      el.innerText = '00:00';
+      if (el.innerText !== '00:00') {
+        el.innerText = '00:00';
+      }
     });
     return;
   }
@@ -953,7 +1031,28 @@ function renderSummaryCountdown() {
   const remaining = summaryTarget - Date.now();
   const label = remaining > 0 ? formatRemainingTime(remaining) : '00:00';
   targets.forEach((el) => {
-    el.innerText = label;
+    if (el.innerText !== label) {
+      el.innerText = label;
+    }
+  });
+}
+
+function renderAnnouncement() {
+  const boxes = announcementElements.length
+    ? announcementElements
+    : document.querySelectorAll('[data-announcement]');
+  const text = String(activeGameState.announcementText || '').trim();
+
+  boxes.forEach((box) => {
+    const textEl = box.querySelector('.announcement-text');
+    if (!text) {
+      box.classList.remove('show');
+      if (textEl) textEl.innerText = '';
+      return;
+    }
+
+    box.classList.add('show');
+    if (textEl) textEl.innerText = text;
   });
 }
 
@@ -1004,7 +1103,7 @@ async function restoreParticipantSession() {
   }
 }
 
-/* â”€â”€ GAME STATE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* GAME STATE */
 function openLoginForm() {
   hasOpenedLogin = true;
   document.getElementById('howto-panel').style.display = 'none';
@@ -1044,23 +1143,23 @@ function getParticipantBadges() {
     badges.push({
       icon: 'O',
       name: 'Odkrywca',
-      text: 'Masz juz minimum 5 odpowiedzi, wiec swietnie idziesz przez trase.'
+      text: 'Masz już minimum 5 odpowiedzi, więc świetnie idziesz przez trasę.'
     });
   }
 
   if (participantStats.bonuses >= 1) {
     badges.push({
       icon: 'B',
-      name: 'Lowca bonusow',
-      text: 'Odkryles przynajmniej jeden bonus i wyciskasz z gry cos ekstra.'
+      name: 'Łowca bonusów',
+      text: 'Odkryłeś przynajmniej jeden bonus i wyciskasz z gry coś ekstra.'
     });
   }
 
   if (remainingMs !== null && remainingMs <= 15 * 60000 && participantStats.answers >= 1) {
     badges.push({
       icon: 'S',
-      name: 'Sprint finalowy',
-      text: 'Grasz do samego konca i nadal zbierasz odpowiedzi w ostatnich minutach.'
+      name: 'Sprint finałowy',
+      text: 'Grasz do samego końca i nadal zbierasz odpowiedzi w ostatnich minutach.'
     });
   }
 
@@ -1073,7 +1172,7 @@ function renderParticipantBadges() {
 
   badgeLists.forEach((list) => {
     if (badges.length === 0) {
-      list.innerHTML = '<div class="badge-empty">Jeszcze chwila i pojawia sie tutaj pierwsza odznaka.</div>';
+      list.innerHTML = '<div class="badge-empty">Jeszcze chwila i pojawi się tutaj pierwsza odznaka.</div>';
       return;
     }
 
@@ -1091,76 +1190,94 @@ function renderParticipantBadges() {
 
 async function refreshParticipantStats() {
   if (!participantId) return;
+  if (participantStatsLoadPromise) return participantStatsLoadPromise;
 
-  try {
-    const res = await fetch(`/api/participant-stats?pid=${participantId}`);
-    const data = await res.json();
-    if (!data.error) {
-      renderParticipantStats(data);
+  participantStatsLoadPromise = (async () => {
+    try {
+      const res = await fetch(`/api/participant-stats?pid=${participantId}`);
+      const data = await res.json();
+      if (!data.error) {
+        renderParticipantStats(data);
+      }
+    } catch (e) {
+      // Keep the last known stats visible if refresh fails.
+    } finally {
+      participantStatsLoadPromise = null;
     }
-  } catch (e) {
-    // Keep the last known stats visible if refresh fails.
-  }
+  })();
+
+  return participantStatsLoadPromise;
 }
 
 async function loadGameState() {
-  try {
-    const res  = await fetch('/api/game-state');
-    const data = await res.json();
+  if (gameStateLoadPromise) return gameStateLoadPromise;
 
-    activeGameState = {
-      startedAt: data.started_at || null,
-      endedAt: data.ended_at || null,
-      summaryAt: data.summary_at || null,
-      durationMinutes: Number(data.duration_minutes || 60)
-    };
-    renderGameRemaining();
-    renderSummaryCountdown();
-    renderParticipantBadges();
+  gameStateLoadPromise = (async () => {
+    try {
+      const res  = await fetch('/api/game-state');
+      const data = await res.json();
 
-    const phase = getGamePhase();
+      activeGameState = {
+        startedAt: data.started_at || null,
+        endedAt: data.ended_at || null,
+        summaryAt: data.summary_at || null,
+        durationMinutes: Number(data.duration_minutes || 60),
+        announcementText: data.announcement_text || '',
+        announcementUpdatedAt: data.announcement_updated_at || null
+      };
+      renderGameRemaining();
+      renderSummaryCountdown();
+      renderAnnouncement();
+      renderParticipantBadges();
 
-    if (phase === 'ended') {
-      showEndScreen();
-      return phase;
-    }
+      const phase = getGamePhase();
 
-    if (phase === 'idle') {
-      if (participantId) {
-        localStorage.removeItem('participantId');
-        participantId = null;
+      if (phase === 'ended') {
+        showEndScreen();
+        return phase;
       }
 
-      const loginForm  = document.getElementById('login-form');
-      const statusBox  = document.getElementById('game-status-box');
-      const howtoPanel = document.getElementById('howto-panel');
-      hideAllScreens();
-      document.getElementById('login-screen').style.display = 'block';
-      hasOpenedLogin = false;
-      howtoPanel.style.display = 'none';
-      loginForm.style.display = 'none';
-      statusBox.innerHTML = '<div class="status-waiting">Gra jeszcze nie wystartowala</div>';
+      if (phase === 'idle') {
+        if (participantId) {
+          localStorage.removeItem('participantId');
+          participantId = null;
+        }
+
+        const loginForm  = document.getElementById('login-form');
+        const statusBox  = document.getElementById('game-status-box');
+        const howtoPanel = document.getElementById('howto-panel');
+        hideAllScreens();
+        document.getElementById('login-screen').style.display = 'block';
+        hasOpenedLogin = false;
+        howtoPanel.style.display = 'none';
+        loginForm.style.display = 'none';
+        statusBox.innerHTML = '<div class="status-waiting">Gra jeszcze nie wystartowała</div>';
+        return phase;
+      }
+
+      if (!participantId) {
+        hideAllScreens();
+        document.getElementById('login-screen').style.display = 'block';
+        const loginForm  = document.getElementById('login-form');
+        const statusBox  = document.getElementById('game-status-box');
+        const howtoPanel = document.getElementById('howto-panel');
+        howtoPanel.style.display = hasOpenedLogin ? 'none' : 'block';
+        loginForm.style.display = hasOpenedLogin ? 'block' : 'none';
+        statusBox.innerHTML = '';
+      }
+
       return phase;
+    } catch(e) {
+      return 'idle';
+    } finally {
+      gameStateLoadPromise = null;
     }
+  })();
 
-    if (!participantId) {
-      hideAllScreens();
-      document.getElementById('login-screen').style.display = 'block';
-      const loginForm  = document.getElementById('login-form');
-      const statusBox  = document.getElementById('game-status-box');
-      const howtoPanel = document.getElementById('howto-panel');
-      howtoPanel.style.display = hasOpenedLogin ? 'none' : 'block';
-      loginForm.style.display = hasOpenedLogin ? 'block' : 'none';
-      statusBox.innerHTML = '';
-    }
-
-    return phase;
-  } catch(e) {
-    return 'idle';
-  }
+  return gameStateLoadPromise;
 }
 
-/* â”€â”€ LOGIN â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* LOGIN */
 async function doLogin() {
   const fn   = document.getElementById('fname').value.trim();
   const ln   = document.getElementById('lname').value.trim();
@@ -1168,7 +1285,7 @@ async function doLogin() {
   const msg  = document.getElementById('login-msg');
 
   if (!fn || !ln || !city) {
-    msg.innerText = 'UzupeĹ‚nij wszystkie pola';
+    msg.innerText = 'Uzupełnij wszystkie pola';
     return;
   }
 
@@ -1188,7 +1305,7 @@ async function doLogin() {
         await loadGameState();
         return;
       }
-      msg.innerText = data.error || 'BĹ‚Ä…d logowania';
+      msg.innerText = data.error || 'Błąd logowania';
       document.getElementById('login-btn').disabled = false;
       return;
     }
@@ -1198,12 +1315,12 @@ async function doLogin() {
 
     showQuestionScreen();
   } catch(e) {
-    msg.innerText = 'BĹ‚Ä…d poĹ‚Ä…czenia';
+    msg.innerText = 'Błąd połączenia';
     document.getElementById('login-btn').disabled = false;
   }
 }
 
-/* â”€â”€ QUESTION â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* QUESTION */
 async function showQuestionScreen() {
   const q = new URLSearchParams(window.location.search).get('q');
 
@@ -1247,14 +1364,14 @@ async function showQuestionScreen() {
     document.getElementById('submit-btn').disabled = false;
 
     if (data.alreadyAnswered) {
-      showAnsweredState(data.previousAnswer, 'OdpowiedĹş do tego pytania zostaĹ‚a juĹĽ wczeĹ›niej wysĹ‚ana.');
+      showAnsweredState(data.previousAnswer, 'Odpowiedź do tego pytania została już wcześniej wysłana.');
     }
   } catch(e) {
-    document.getElementById('login-msg').innerText = 'BĹ‚Ä…d poĹ‚Ä…czenia';
+    document.getElementById('login-msg').innerText = 'Błąd połączenia';
   }
 }
 
-/* â”€â”€ ANSWER â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ANSWER */
 async function submitAnswer() {
   const ansInput = document.getElementById('answer-input');
   const ans      = ansInput.value.trim();
@@ -1262,7 +1379,7 @@ async function submitAnswer() {
 
   if (!ans) {
     msg.className = 'msg error';
-    msg.innerText = 'Wpisz odpowiedĹş';
+    msg.innerText = 'Wpisz odpowiedź';
     return;
   }
 
@@ -1282,7 +1399,7 @@ async function submitAnswer() {
     });
     const data = await res.json();
     if (!res.ok || data.error) {
-      throw new Error(data.error || 'Nie udalo sie zapisac odpowiedzi.');
+      throw new Error(data.error || 'Nie udało się zapisać odpowiedzi.');
     }
     if (data.stats) {
       renderParticipantStats(data.stats);
@@ -1292,7 +1409,7 @@ async function submitAnswer() {
 
     // Hide input area, show result
     document.getElementById('answer-area').style.display = 'none';
-    showAnsweredState(data.answer || ans, data.message || 'Odpowiedz zostala wyslana.');
+    showAnsweredState(data.answer || ans, data.message || 'Odpowiedź została wysłana.');
 
   } catch(e) {
     if (/zakonczona|wystartowala/i.test(String(e.message || ''))) {
@@ -1300,7 +1417,7 @@ async function submitAnswer() {
       return;
     }
     msg.className = 'msg error';
-    msg.innerText = 'BĹ‚Ä…d poĹ‚Ä…czenia â€” sprĂłbuj ponownie';
+    msg.innerText = 'Błąd połączenia — spróbuj ponownie';
     document.getElementById('submit-btn').disabled = false;
     ansInput.disabled = false;
   }
@@ -1312,32 +1429,32 @@ function showAnsweredState(answer, message) {
   const area = document.getElementById('result-area');
   area.innerHTML = `
     <div class="answered-box">
-      <div class="check">âś‰ď¸Ź</div>
-      <p>${escHtml(message || 'Odpowiedz zostala wyslana.')}</p>
-      <div class="prev">Twoja odpowiedĹş: <strong>${escHtml(answer || 'â€”')}</strong></div>
+      <div class="check">Wysłane</div>
+      <p>${escHtml(message || 'Odpowiedź została wysłana.')}</p>
+      <div class="prev">Twoja odpowiedź: <strong>${escHtml(answer || '—')}</strong></div>
     </div>`;
   return;
   /*
     area.innerHTML = `
       <div class="answered-box">
-        <div class="check">âś…</div>
-        <p>Poprawna odpowiedĹş! +1 punkt</p>
-        <div class="prev">Twoja odpowiedĹş: <strong>${escHtml(answer)}</strong></div>
+      <div class="check">OK</div>
+      <p>Poprawna odpowiedź! +1 punkt</p>
+      <div class="prev">Twoja odpowiedź: <strong>${escHtml(answer)}</strong></div>
       </div>`;
   } else if (correct === false) {
     area.innerHTML = `
       <div class="wrong-box">
-        <div class="x">âťŚ</div>
-        <p>Niepoprawna odpowiedĹş</p>
-        <div class="prev" style="color:var(--muted);font-size:12px;margin-top:4px;">Twoja odpowiedĹş: <strong>${escHtml(answer)}</strong></div>
+        <div class="x">X</div>
+        <p>Niepoprawna odpowiedź</p>
+        <div class="prev" style="color:var(--muted);font-size:12px;margin-top:4px;">Twoja odpowiedź: <strong>${escHtml(answer)}</strong></div>
       </div>`;
   } else {
-    // Already answered before â€” unknown result
+    // Already answered before — unknown result
     area.innerHTML = `
       <div class="answered-box">
-        <div class="check">đź”’</div>
-        <p>JuĹĽ odpowiedziaĹ‚eĹ›/aĹ› na to pytanie</p>
-        <div class="prev">Twoja odpowiedĹş: <strong>${escHtml(answer || 'â€”')}</strong></div>
+        <div class="check">Wysłane</div>
+        <p>Już wysłałeś odpowiedź do tego pytania</p>
+        <div class="prev">Twoja odpowiedź: <strong>${escHtml(answer || '—')}</strong></div>
       </div>`;
   */
 }
@@ -1346,12 +1463,16 @@ function escHtml(s) {
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
-/* â”€â”€ INIT â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* INIT */
 window.onload = async () => {
   updateCountdown();
   setInterval(updateCountdown, 30000);
   deviceToken = getDeviceToken();
+  gameRemainingElements = Array.from(document.querySelectorAll('[data-game-remaining]'));
+  summaryRemainingElements = Array.from(document.querySelectorAll('[data-summary-remaining]'));
+  announcementElements = Array.from(document.querySelectorAll('[data-announcement]'));
   renderGameRemaining();
+  renderAnnouncement();
   renderParticipantBadges();
   setInterval(renderGameRemaining, 1000);
 
@@ -1382,7 +1503,9 @@ window.onload = async () => {
 
   renderSummaryCountdown();
   setInterval(renderSummaryCountdown, 1000);
-  setInterval(loadGameState, 5000);
+  setInterval(() => {
+    if (!document.hidden) loadGameState();
+  }, 6000);
 };
 </script>
 
