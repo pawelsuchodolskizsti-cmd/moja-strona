@@ -931,21 +931,70 @@ let announcementElements = [];
 const EVENT_DATE = new Date('2026-12-13T10:00:00+01:00');
 
 /* COUNTDOWN */
+function addMonthsSafe(date, monthsToAdd) {
+  const result = new Date(date);
+  const day = result.getDate();
+  result.setDate(1);
+  result.setMonth(result.getMonth() + monthsToAdd);
+  const lastDayOfMonth = new Date(result.getFullYear(), result.getMonth() + 1, 0).getDate();
+  result.setDate(Math.min(day, lastDayOfMonth));
+  return result;
+}
+
+function getCalendarCountdownParts(targetDate) {
+  const now = new Date();
+
+  if (targetDate <= now) {
+    return { months: 0, days: 0, hours: 0, mins: 0 };
+  }
+
+  let months = (targetDate.getFullYear() - now.getFullYear()) * 12 + (targetDate.getMonth() - now.getMonth());
+  let cursor = addMonthsSafe(now, months);
+
+  if (cursor > targetDate) {
+    months -= 1;
+    cursor = addMonthsSafe(now, months);
+  }
+
+  let days = 0;
+  while (days < 31) {
+    const nextDay = new Date(cursor);
+    nextDay.setDate(nextDay.getDate() + 1);
+    if (nextDay > targetDate) break;
+    cursor = nextDay;
+    days += 1;
+  }
+
+  let hours = 0;
+  while (hours < 24) {
+    const nextHour = new Date(cursor);
+    nextHour.setHours(nextHour.getHours() + 1);
+    if (nextHour > targetDate) break;
+    cursor = nextHour;
+    hours += 1;
+  }
+
+  let mins = 0;
+  while (mins < 60) {
+    const nextMinute = new Date(cursor);
+    nextMinute.setMinutes(nextMinute.getMinutes() + 1);
+    if (nextMinute > targetDate) break;
+    cursor = nextMinute;
+    mins += 1;
+  }
+
+  return { months, days, hours, mins };
+}
+
 function updateCountdown() {
-  const diff = EVENT_DATE - new Date();
-  if (diff <= 0) {
+  if (EVENT_DATE <= new Date()) {
     ['cd-months','cd-days','cd-hours','cd-mins'].forEach(id => {
       document.getElementById(id).innerText = '0';
     });
     return;
   }
-  const totalMins  = Math.floor(diff / 60000);
-  const totalHours = Math.floor(totalMins / 60);
-  const totalDays  = Math.floor(totalHours / 24);
-  const months     = Math.floor(totalDays / 30);
-  const days       = totalDays % 30;
-  const hours      = totalHours % 24;
-  const mins       = totalMins % 60;
+
+  const { months, days, hours, mins } = getCalendarCountdownParts(EVENT_DATE);
 
   document.getElementById('cd-months').innerText = months;
   document.getElementById('cd-days').innerText   = days;
