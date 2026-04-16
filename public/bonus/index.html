@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kod bonusowy - Gwiazdka One Day 2025</title>
+<title>Kod bonusowy - Gwiazdka One Day 2026</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -187,6 +187,65 @@ input:focus {
 .msg.error { color:var(--error); }
 .msg.success { color:var(--success); }
 
+.micro-toast-stack {
+  position:fixed;
+  top:16px;
+  left:50%;
+  transform:translateX(-50%);
+  width:min(92vw, 420px);
+  display:grid;
+  gap:10px;
+  z-index:9999;
+  pointer-events:none;
+}
+
+.micro-toast {
+  padding:12px 14px;
+  border-radius:16px;
+  background:rgba(255,255,255,0.96);
+  border:1px solid rgba(124,106,247,0.18);
+  box-shadow:0 18px 34px rgba(40,28,88,0.14);
+  color:#241c4d;
+  opacity:0;
+  transform:translateY(-8px) scale(.98);
+  transition:opacity .2s ease, transform .2s ease;
+}
+
+.micro-toast.show {
+  opacity:1;
+  transform:translateY(0) scale(1);
+}
+
+.micro-toast.bonus {
+  background:linear-gradient(135deg, rgba(255,255,255,0.98), rgba(248,255,225,0.96));
+  border-color:rgba(183,255,72,0.28);
+}
+
+.micro-toast.warning {
+  background:linear-gradient(135deg, rgba(255,255,255,0.98), rgba(255,243,232,0.96));
+  border-color:rgba(255,61,107,0.18);
+}
+
+.micro-toast.info {
+  background:linear-gradient(135deg, rgba(255,255,255,0.98), rgba(245,240,255,0.96));
+}
+
+.micro-toast-title {
+  font-family:'Syne',sans-serif;
+  font-size:12px;
+  font-weight:800;
+  letter-spacing:.1em;
+  text-transform:uppercase;
+  margin-bottom:4px;
+  color:#6b6288;
+}
+
+.micro-toast-text {
+  font-size:14px;
+  line-height:1.45;
+  font-weight:700;
+}
+
 .helper-box {
   margin-top:16px;
   padding:14px 16px;
@@ -265,9 +324,10 @@ input:focus {
 </style>
 </head>
 <body>
+<div class="micro-toast-stack" id="micro-toast-stack"></div>
 
 <div class="card" id="name-screen" style="display:none">
-  <div class="logo">Gwiazdka One Day 2025</div>
+  <div class="logo">Gwiazdka One Day 2026</div>
   <div class="q-badge">Bonus</div>
   <h1>Odbierz dodatkowy punkt</h1>
   <p class="subtitle">Podaj swoje imi&#281; i nazwisko, aby przej&#347;&#263; do has&#322;a bonusowego przypisanego do tego kodu QR.</p>
@@ -293,7 +353,7 @@ input:focus {
 </div>
 
 <div class="card" id="secret-screen" style="display:none">
-  <div class="logo">Gwiazdka One Day 2025</div>
+  <div class="logo">Gwiazdka One Day 2026</div>
   <div class="q-badge">Bonus</div>
   <h1>Wpisz has&#322;o bonusowe</h1>
   <p class="subtitle">Po poprawnym ha&#347;le punkt bonusowy zostanie zapisany od razu na Twoim koncie.</p>
@@ -318,7 +378,7 @@ input:focus {
 </div>
 
 <div class="card" id="success-screen" style="display:none">
-  <div class="logo">Gwiazdka One Day 2025</div>
+  <div class="logo">Gwiazdka One Day 2026</div>
   <div class="q-badge" id="bonus-result-badge">Bonus odebrany</div>
   <div class="success-icon" id="bonus-result-icon">+1</div>
   <h1 id="bonus-result-title">Bonus zapisany</h1>

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Gwiazdka One Day 2025</title>
+<title>Gwiazdka One Day 2026</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
 
@@ -215,6 +215,66 @@ h1 {
   font-size:14px;
   line-height:1.55;
   font-weight:600;
+}
+
+.micro-toast-stack {
+  position:fixed;
+  top:16px;
+  left:50%;
+  transform:translateX(-50%);
+  width:min(92vw, 420px);
+  display:grid;
+  gap:10px;
+  z-index:9999;
+  pointer-events:none;
+}
+
+.micro-toast {
+  padding:12px 14px;
+  border-radius:16px;
+  background:rgba(255,255,255,0.96);
+  border:1px solid rgba(124,106,247,0.18);
+  box-shadow:0 18px 34px rgba(40,28,88,0.14);
+  color:#241c4d;
+  opacity:0;
+  transform:translateY(-8px) scale(.98);
+  transition:opacity .2s ease, transform .2s ease;
+}
+
+.micro-toast.show {
+  opacity:1;
+  transform:translateY(0) scale(1);
+}
+
+.micro-toast.success {
+  background:linear-gradient(135deg, rgba(255,255,255,0.98), rgba(236,255,244,0.96));
+  border-color:rgba(22,163,74,0.18);
+}
+
+.micro-toast.bonus {
+  background:linear-gradient(135deg, rgba(255,255,255,0.98), rgba(248,255,225,0.96));
+  border-color:rgba(183,255,72,0.28);
+}
+
+.micro-toast.warning {
+  background:linear-gradient(135deg, rgba(255,255,255,0.98), rgba(255,243,232,0.96));
+  border-color:rgba(255,61,107,0.18);
+}
+
+.micro-toast-title {
+  font-family:'Syne';
+  font-size:12px;
+  font-weight:800;
+  letter-spacing:.1em;
+  text-transform:uppercase;
+  margin-bottom:4px;
+  color:#6b6288;
+}
+
+.micro-toast-text {
+  font-size:14px;
+  line-height:1.45;
+  font-weight:700;
 }
 
 .status-finale {
@@ -735,11 +795,12 @@ textarea {
 </style>
 </head>
 <body>
+<div class="micro-toast-stack" id="micro-toast-stack"></div>
 
 <!-- === LOGIN SCREEN === -->
 <div class="card" id="login-screen">
 
-  <div class="logo">Gwiazdka One Day 2025</div>
+  <div class="logo">Gwiazdka One Day 2026</div>
 
   <div class="event-bar">Odliczaj razem z nami</div>
 
@@ -813,7 +874,7 @@ textarea {
 
 <!-- === QUESTION SCREEN === -->
 <div class="card" id="question-screen">
-  <div class="logo">Gwiazdka One Day 2025</div>
+  <div class="logo">Gwiazdka One Day 2026</div>
   <div class="announcement-box" data-announcement>
     <span class="announcement-label">Komunikat organizatora</span>
     <div class="announcement-text"></div>
@@ -856,7 +917,7 @@ textarea {
 
 <!-- === NO QR SCREEN (logged in but no ?q param) === -->
 <div class="card" id="no-q-screen">
-  <div class="logo">Gwiazdka One Day 2025</div>
+  <div class="logo">Gwiazdka One Day 2026</div>
   <div class="announcement-box" data-announcement>
     <span class="announcement-label">Komunikat organizatora</span>
     <div class="announcement-text"></div>
@@ -890,7 +951,7 @@ textarea {
 </div>
 
 <div class="card" id="end-screen" style="display:none">
-  <div class="logo">Gwiazdka One Day 2025</div>
+  <div class="logo">Gwiazdka One Day 2026</div>
   <div class="announcement-box" data-announcement>
     <span class="announcement-label">Komunikat organizatora</span>
     <div class="announcement-text"></div>
@@ -930,6 +991,8 @@ let participantStatsLoadPromise = null;
 let gameRemainingElements = [];
 let summaryRemainingElements = [];
 let announcementElements = [];
+let statsHydrated = false;
+let shownMicroToastKeys = new Set();
 
 const EVENT_DATE = new Date('2026-12-13T10:00:00+01:00');
 
@@ -942,6 +1005,48 @@ function addMonthsSafe(date, monthsToAdd) {
   const lastDayOfMonth = new Date(result.getFullYear(), result.getMonth() + 1, 0).getDate();
   result.setDate(Math.min(day, lastDayOfMonth));
   return result;
+}
+
+function formatPolishCount(value, one, few, many) {
+  const abs = Math.abs(Number(value || 0));
+  const mod10 = abs % 10;
+  const mod100 = abs % 100;
+
+  if (abs === 1) return one;
+  if (mod10 >= 2 && mod10 <= 4 && !(mod100 >= 12 && mod100 <= 14)) return few;
+  return many;
+}
+
+function rememberMicroToast(key) {
+  if (!key) return false;
+  if (shownMicroToastKeys.has(key)) return true;
+  shownMicroToastKeys.add(key);
+  return false;
+}
+
+function showMicroToast(message, type = 'info', title = 'Aktualizacja', key = '') {
+  if (!message) return;
+  if (key && rememberMicroToast(key)) return;
+
+  const stack = document.getElementById('micro-toast-stack');
+  if (!stack) return;
+
+  const toast = document.createElement('div');
+  toast.className = `micro-toast ${type}`.trim();
+  toast.innerHTML = `
+    <div class="micro-toast-title">${escHtml(title)}</div>
+    <div class="micro-toast-text">${escHtml(message)}</div>
+  `;
+  stack.appendChild(toast);
+
+  requestAnimationFrame(() => {
+    toast.classList.add('show');
+  });
+
+  setTimeout(() => {
+    toast.classList.remove('show');
+    setTimeout(() => toast.remove(), 220);
+  }, 3200);
 }
 
 function getCalendarCountdownParts(targetDate) {
@@ -1067,6 +1172,15 @@ function renderGameRemaining() {
   const remaining = endTime - Date.now();
   const label = remaining > 0 ? formatRemainingTime(remaining) : '00:00';
 
+  if (remaining > 0 && remaining <= 15 * 60000) {
+    showMicroToast(
+      'Zostało 15 minut do końca gry. To dobry moment na finałowy sprint.',
+      'warning',
+      'Uwaga',
+      `warning-15-${startedAt}`
+    );
+  }
+
   targets.forEach((el) => {
     if (el.innerText !== label) {
       el.innerText = label;
@@ -1179,10 +1293,22 @@ function openLoginForm() {
 }
 
 function renderParticipantStats(stats) {
-  participantStats = {
+  const nextStats = {
     answers: Number(stats?.answers || 0),
     bonuses: Number(stats?.bonuses || 0)
   };
+
+  if (statsHydrated && nextStats.bonuses > participantStats.bonuses) {
+    showMicroToast(
+      `Masz już ${nextStats.bonuses} ${formatPolishCount(nextStats.bonuses, 'bonus', 'bonusy', 'bonusów')}.`,
+      'bonus',
+      'Nowy bonus',
+      `bonus-count-${nextStats.bonuses}`
+    );
+  }
+
+  participantStats = nextStats;
+  statsHydrated = true;
 
   document.querySelectorAll('[data-stat-value="answers"]').forEach(el => {
     el.innerText = participantStats.answers;
@@ -1431,6 +1557,7 @@ async function showQuestionScreen() {
     document.getElementById('submit-btn').disabled = false;
 
     if (data.alreadyAnswered) {
+      showMicroToast('To pytanie masz już za sobą. Szukaj kolejnego kodu QR.', 'info', 'Już wykonane', `question-repeat-${data.id || q}`);
       showAnsweredState('', 'To pytanie masz już wykonane. Szukaj dalej kolejnych kodów QR.');
     }
   } catch(e) {
@@ -1476,6 +1603,9 @@ async function submitAnswer() {
 
     // Hide input area, show result
     document.getElementById('answer-area').style.display = 'none';
+    if (!data.alreadyAnswered) {
+      showMicroToast('Nowe pytanie zapisane. Lecisz dalej!', 'success', 'Świetnie', `answer-sent-${currentQuestion.id}`);
+    }
     showAnsweredState(data.answer || ans, data.message || 'Odpowiedź została wysłana.');
 
   } catch(e) {
