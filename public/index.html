@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Gwiazdka One Day 2026</title>
+<title>Gwiazdka One Day 2025</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
 
@@ -390,6 +390,9 @@ input, textarea {
   outline:none;
   transition: border-color .15s, box-shadow .15s;
 }
+input[data-uppercase-login] {
+  text-transform:uppercase;
+}
 input:focus, textarea:focus {
   border-color: var(--purple);
   box-shadow: 0 0 0 3px rgba(124,106,247,0.12);
@@ -736,7 +739,7 @@ textarea {
 <!-- === LOGIN SCREEN === -->
 <div class="card" id="login-screen">
 
-  <div class="logo">Gwiazdka One Day 2026</div>
+  <div class="logo">Gwiazdka One Day 2025</div>
 
   <div class="event-bar">Odliczaj razem z nami</div>
 
@@ -768,7 +771,7 @@ textarea {
 
   <div id="howto-panel" class="howto-panel">
     <div class="howto-title">Jak to dzia&#322;a?</div>
-    <div class="howto-subtitle">Trzy proste kroki i mo&#380;esz rusza&#263; do gry.</div>
+    <div class="howto-subtitle">Trzy proste kroki i mo&#380;esz rusza&#263; do gry. Bonusy zbierasz za kontakt z wolontariuszami, wystarczy z nimi porozmawia&#263; na dowolny temat.</div>
 
     <div class="howto-steps">
       <div class="howto-step">
@@ -781,7 +784,7 @@ textarea {
       </div>
       <div class="howto-step">
         <div class="howto-step-no">3</div>
-        <div class="howto-step-text">Zbieraj punkty i bonusy</div>
+        <div class="howto-step-text">Zbieraj punkty i bonusy za rozmowy z wolontariuszami</div>
       </div>
     </div>
 
@@ -794,13 +797,13 @@ textarea {
     <p class="subtitle">Podaj dane, aby dołączyć do gry</p>
 
     <label>Imię</label>
-    <input type="text" id="fname" placeholder="np. Anna">
+    <input type="text" id="fname" data-uppercase-login placeholder="np. Anna">
 
     <label>Nazwisko</label>
-    <input type="text" id="lname" placeholder="np. Kowalska">
+    <input type="text" id="lname" data-uppercase-login placeholder="np. Kowalska">
 
     <label>Miasto</label>
-    <input type="text" id="city" placeholder="np. Warszawa">
+    <input type="text" id="city" data-uppercase-login placeholder="np. Warszawa">
 
     <button class="btn" id="login-btn" onclick="doLogin()">Dołącz do gry</button>
     <div class="msg error" id="login-msg"></div>
@@ -810,7 +813,7 @@ textarea {
 
 <!-- === QUESTION SCREEN === -->
 <div class="card" id="question-screen">
-  <div class="logo">Gwiazdka One Day</div>
+  <div class="logo">Gwiazdka One Day 2025</div>
   <div class="announcement-box" data-announcement>
     <span class="announcement-label">Komunikat organizatora</span>
     <div class="announcement-text"></div>
@@ -853,7 +856,7 @@ textarea {
 
 <!-- === NO QR SCREEN (logged in but no ?q param) === -->
 <div class="card" id="no-q-screen">
-  <div class="logo">Gwiazdka One Day</div>
+  <div class="logo">Gwiazdka One Day 2025</div>
   <div class="announcement-box" data-announcement>
     <span class="announcement-label">Komunikat organizatora</span>
     <div class="announcement-text"></div>
@@ -887,7 +890,7 @@ textarea {
 </div>
 
 <div class="card" id="end-screen" style="display:none">
-  <div class="logo">Gwiazdka One Day</div>
+  <div class="logo">Gwiazdka One Day 2025</div>
   <div class="announcement-box" data-announcement>
     <span class="announcement-label">Komunikat organizatora</span>
     <div class="announcement-text"></div>
@@ -1011,6 +1014,21 @@ function getDeviceToken() {
     localStorage.setItem('deviceToken', token);
   }
   return token;
+}
+
+function normalizeLoginValue(value) {
+  return String(value || '').trim().toUpperCase();
+}
+
+function bindUppercaseLoginFields() {
+  document.querySelectorAll('[data-uppercase-login]').forEach((element) => {
+    element.addEventListener('input', () => {
+      const normalized = normalizeLoginValue(element.value);
+      if (element.value !== normalized) {
+        element.value = normalized;
+      }
+    });
+  });
 }
 
 function formatRemainingTime(milliseconds) {
@@ -1328,9 +1346,9 @@ async function loadGameState() {
 
 /* LOGIN */
 async function doLogin() {
-  const fn   = document.getElementById('fname').value.trim();
-  const ln   = document.getElementById('lname').value.trim();
-  const city = document.getElementById('city').value.trim();
+  const fn   = normalizeLoginValue(document.getElementById('fname').value);
+  const ln   = normalizeLoginValue(document.getElementById('lname').value);
+  const city = normalizeLoginValue(document.getElementById('city').value);
   const msg  = document.getElementById('login-msg');
 
   if (!fn || !ln || !city) {
@@ -1413,7 +1431,7 @@ async function showQuestionScreen() {
     document.getElementById('submit-btn').disabled = false;
 
     if (data.alreadyAnswered) {
-      showAnsweredState(data.previousAnswer, 'Odpowiedź do tego pytania została już wcześniej wysłana.');
+      showAnsweredState('', 'To pytanie masz już wykonane. Szukaj dalej kolejnych kodów QR.');
     }
   } catch(e) {
     document.getElementById('login-msg').innerText = 'Błąd połączenia';
@@ -1476,11 +1494,14 @@ function showAnsweredState(answer, message) {
   document.getElementById('answer-area').style.display = 'none';
 
   const area = document.getElementById('result-area');
+  const previousAnswer = answer
+    ? `<div class="prev">Twoja odpowiedź: <strong>${escHtml(answer)}</strong></div>`
+    : '<div class="prev">To zadanie masz już zaliczone. Powodzenia przy kolejnych punktach gry.</div>';
   area.innerHTML = `
     <div class="answered-box">
       <div class="check">Wysłane</div>
       <p>${escHtml(message || 'Odpowiedź została wysłana.')}</p>
-      <div class="prev">Twoja odpowiedź: <strong>${escHtml(answer || '—')}</strong></div>
+      ${previousAnswer}
     </div>`;
   return;
   /*
@@ -1516,6 +1537,7 @@ function escHtml(s) {
 window.onload = async () => {
   updateCountdown();
   setInterval(updateCountdown, 30000);
+  bindUppercaseLoginFields();
   deviceToken = getDeviceToken();
   gameRemainingElements = Array.from(document.querySelectorAll('[data-game-remaining]'));
   summaryRemainingElements = Array.from(document.querySelectorAll('[data-summary-remaining]'));

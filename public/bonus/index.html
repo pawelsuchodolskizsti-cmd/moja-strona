@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kod bonusowy - Gwiazdka One Day</title>
+<title>Kod bonusowy - Gwiazdka One Day 2025</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -140,6 +140,9 @@ input {
   outline:none;
   transition:border-color .15s, box-shadow .15s, transform .15s;
 }
+input[data-uppercase-login] {
+  text-transform:uppercase;
+}
 
 input:focus {
   border-color:rgba(124,106,247,0.55);
@@ -264,7 +267,7 @@ input:focus {
 <body>
 
 <div class="card" id="name-screen" style="display:none">
-  <div class="logo">Gwiazdka One Day</div>
+  <div class="logo">Gwiazdka One Day 2025</div>
   <div class="q-badge">Bonus</div>
   <h1>Odbierz dodatkowy punkt</h1>
   <p class="subtitle">Podaj swoje imi&#281; i nazwisko, aby przej&#347;&#263; do has&#322;a bonusowego przypisanego do tego kodu QR.</p>
@@ -275,10 +278,10 @@ input:focus {
   </div>
 
   <label for="fname">Imi&#281;</label>
-  <input type="text" id="fname" placeholder="Wpisz imi&#281;">
+  <input type="text" id="fname" data-uppercase-login placeholder="Wpisz imi&#281;">
 
   <label for="lname">Nazwisko</label>
-  <input type="text" id="lname" placeholder="Wpisz nazwisko">
+  <input type="text" id="lname" data-uppercase-login placeholder="Wpisz nazwisko">
 
   <button class="btn" id="name-btn" onclick="doNameLogin()">Przejd&#378; dalej</button>
   <div class="msg" id="name-msg"></div>
@@ -290,7 +293,7 @@ input:focus {
 </div>
 
 <div class="card" id="secret-screen" style="display:none">
-  <div class="logo">Gwiazdka One Day</div>
+  <div class="logo">Gwiazdka One Day 2025</div>
   <div class="q-badge">Bonus</div>
   <h1>Wpisz has&#322;o bonusowe</h1>
   <p class="subtitle">Po poprawnym ha&#347;le punkt bonusowy zostanie zapisany od razu na Twoim koncie.</p>
@@ -315,18 +318,18 @@ input:focus {
 </div>
 
 <div class="card" id="success-screen" style="display:none">
-  <div class="logo">Gwiazdka One Day</div>
-  <div class="q-badge">Bonus odebrany</div>
-  <div class="success-icon">+1</div>
-  <h1>Bonus zapisany</h1>
-  <p class="subtitle">Super, dodatkowy punkt zosta&#322; dodany do Twojego wyniku. Mo&#380;esz wr&oacute;ci&#263; do gry i skanowa&#263; kolejne kody QR.</p>
+  <div class="logo">Gwiazdka One Day 2025</div>
+  <div class="q-badge" id="bonus-result-badge">Bonus odebrany</div>
+  <div class="success-icon" id="bonus-result-icon">+1</div>
+  <h1 id="bonus-result-title">Bonus zapisany</h1>
+  <p class="subtitle" id="bonus-result-subtitle">Super, dodatkowy punkt zosta&#322; dodany do Twojego wyniku. Mo&#380;esz wr&oacute;ci&#263; do gry i skanowa&#263; kolejne kody QR.</p>
 
   <div class="bonus-highlight">
     <span class="bonus-highlight-label">Zaliczy&#322;e&#347; bonus</span>
     <div class="bonus-highlight-value" data-bonus-label>Bonus</div>
   </div>
 
-  <div class="success-copy">Je&#347;li gra nadal trwa, sprawd&#378; nast&#281;pne punkty na trasie i wypatruj kolejnych niespodzianek.</div>
+  <div class="success-copy" id="bonus-result-copy">Je&#347;li gra nadal trwa, sprawd&#378; nast&#281;pne punkty na trasie i wypatruj kolejnych niespodzianek.</div>
 
   <div class="game-remaining">
     <span class="game-remaining-label">Do ko&#324;ca gry zosta&#322;o</span>
@@ -357,11 +360,45 @@ function getDeviceToken() {
   return token;
 }
 
+function normalizeLoginValue(value) {
+  return String(value || '').trim().toUpperCase();
+}
+
+function bindUppercaseLoginFields() {
+  document.querySelectorAll('[data-uppercase-login]').forEach((element) => {
+    element.addEventListener('input', () => {
+      const normalized = normalizeLoginValue(element.value);
+      if (element.value !== normalized) {
+        element.value = normalized;
+      }
+    });
+  });
+}
+
 function setBonusLabel(label) {
   const value = label || 'Podaj has\u0142o do tego bonusu.';
   bonusLabelElements.forEach((element) => {
     element.innerText = value;
   });
+}
+
+function showBonusResult(options = {}) {
+  const {
+    title = 'Bonus zapisany',
+    subtitle = 'Super, dodatkowy punkt zosta\u0142 dodany do Twojego wyniku. Mo\u017cesz wr\u00f3ci\u0107 do gry i skanowa\u0107 kolejne kody QR.',
+    copy = 'Je\u015bli gra nadal trwa, sprawd\u017a nast\u0119pne punkty na trasie i wypatruj kolejnych niespodzianek.',
+    badge = 'Bonus odebrany',
+    icon = '+1'
+  } = options;
+
+  document.getElementById('name-screen').style.display = 'none';
+  document.getElementById('secret-screen').style.display = 'none';
+  document.getElementById('success-screen').style.display = 'block';
+  document.getElementById('bonus-result-badge').innerText = badge;
+  document.getElementById('bonus-result-icon').innerText = icon;
+  document.getElementById('bonus-result-title').innerText = title;
+  document.getElementById('bonus-result-subtitle').innerText = subtitle;
+  document.getElementById('bonus-result-copy').innerText = copy;
 }
 
 function formatRemainingTime(milliseconds) {
@@ -436,11 +473,16 @@ async function restoreParticipantSession() {
 
 async function loadBonusLabel() {
   try {
-    const res = await fetch(`/api/bonus?b=${encodeURIComponent(bonusId)}`);
+    const query = participantId
+      ? `/api/bonus?b=${encodeURIComponent(bonusId)}&pid=${encodeURIComponent(participantId)}`
+      : `/api/bonus?b=${encodeURIComponent(bonusId)}`;
+    const res = await fetch(query);
     const data = await res.json();
     setBonusLabel(data.label || 'Podaj has\u0142o do tego bonusu.');
+    return data;
   } catch (e) {
     setBonusLabel('Podaj has\u0142o do tego bonusu.');
+    return null;
   }
 }
 
@@ -453,8 +495,22 @@ async function validateParticipant(id) {
   }
 }
 
-function showSecret() {
+async function showSecret() {
+  const bonusData = await loadBonusLabel();
+
+  if (bonusData?.alreadyRedeemed) {
+    showBonusResult({
+      title: 'Ten bonus masz ju\u017c wykonany',
+      subtitle: 'Nie musisz wpisywa\u0107 has\u0142a jeszcze raz. Ten kod bonusowy jest ju\u017c przypisany do Twojego konta.',
+      copy: 'Szukaj dalej kolejnych punkt\u00f3w i kod\u00f3w QR. Ten etap masz ju\u017c zaliczony.',
+      badge: 'Ju\u017c wykonane',
+      icon: 'OK'
+    });
+    return;
+  }
+
   document.getElementById('name-screen').style.display = 'none';
+  document.getElementById('success-screen').style.display = 'none';
   document.getElementById('secret-screen').style.display = 'block';
 }
 
@@ -465,6 +521,7 @@ window.onload = async () => {
   }
 
   deviceToken = getDeviceToken();
+  bindUppercaseLoginFields();
   renderGameRemaining();
   setInterval(renderGameRemaining, 1000);
   setInterval(loadGameState, 10000);
@@ -473,12 +530,12 @@ window.onload = async () => {
   const saved = localStorage.getItem('participantId');
   if (saved && await validateParticipant(saved)) {
     participantId = saved;
-    showSecret();
+    await showSecret();
     return;
   }
 
   if (await restoreParticipantSession()) {
-    showSecret();
+    await showSecret();
     return;
   }
 
@@ -487,8 +544,8 @@ window.onload = async () => {
 };
 
 async function doNameLogin() {
-  const fn = document.getElementById('fname').value.trim();
-  const ln = document.getElementById('lname').value.trim();
+  const fn = normalizeLoginValue(document.getElementById('fname').value);
+  const ln = normalizeLoginValue(document.getElementById('lname').value);
   const msg = document.getElementById('name-msg');
   const btn = document.getElementById('name-btn');
 
@@ -516,7 +573,7 @@ async function doNameLogin() {
 
     participantId = data.id;
     localStorage.setItem('participantId', String(participantId));
-    showSecret();
+    await showSecret();
   } catch (e) {
     msg.className = 'msg error';
     msg.innerText = e.message || 'B\u0142\u0105d po\u0142\u0105czenia.';
@@ -549,8 +606,24 @@ async function submitSecret() {
     const data = await res.json();
 
     if (data.correct) {
-      document.getElementById('secret-screen').style.display = 'none';
-      document.getElementById('success-screen').style.display = 'block';
+      showBonusResult({
+        title: 'Bonus zapisany',
+        subtitle: 'Super, dodatkowy punkt zosta\u0142 dodany do Twojego wyniku. Mo\u017cesz wr\u00f3ci\u0107 do gry i skanowa\u0107 kolejne kody QR.',
+        copy: 'Je\u015bli gra nadal trwa, sprawd\u017a nast\u0119pne punkty na trasie i wypatruj kolejnych niespodzianek.',
+        badge: 'Bonus odebrany',
+        icon: '+1'
+      });
+      return;
+    }
+
+    if (data.alreadyRedeemed) {
+      showBonusResult({
+        title: 'Ten bonus masz ju\u017c wykonany',
+        subtitle: data.message || 'Nie musisz wpisywa\u0107 has\u0142a jeszcze raz. Ten bonus jest ju\u017c zapisany na Twoim koncie.',
+        copy: 'Szukaj dalej kolejnych kod\u00f3w QR. Tutaj nic nie musisz ju\u017c wysy\u0142a\u0107.',
+        badge: 'Ju\u017c wykonane',
+        icon: 'OK'
+      });
       return;
     }
 

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Panel Organizatora - Gwiazdka One Day</title>
+<title>Panel Organizatora - Gwiazdka One Day 2025</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -38,6 +38,129 @@
   .shell {
     max-width: 1280px;
     margin: 0 auto;
+  }
+
+  .auth-shell {
+    min-height: calc(100vh - 80px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .auth-card {
+    width: 100%;
+    max-width: 460px;
+    padding: 28px 24px 24px;
+    background: linear-gradient(180deg, rgba(18, 23, 34, 0.98), rgba(12, 16, 24, 0.98));
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    box-shadow: var(--shadow);
+  }
+
+  .auth-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 32px;
+    padding: 0 14px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.22), rgba(183, 255, 72, 0.14));
+    border: 1px solid rgba(139, 92, 246, 0.34);
+    color: #e6deff;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+
+  .auth-copy {
+    color: var(--muted);
+    font-size: 15px;
+    line-height: 1.6;
+    margin-bottom: 20px;
+  }
+
+  .auth-form {
+    display: grid;
+    gap: 14px;
+  }
+
+  .auth-field label {
+    display: block;
+    margin-bottom: 7px;
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+  }
+
+  .auth-input {
+    width: 100%;
+    min-height: 46px;
+    border-radius: 14px;
+    border: 1px solid var(--border);
+    background: rgba(10, 14, 21, 0.92);
+    color: var(--text);
+    padding: 0 14px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    outline: none;
+  }
+
+  .auth-input:focus {
+    border-color: var(--purple);
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.12);
+  }
+
+  .auth-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-top: 4px;
+  }
+
+  .auth-feedback {
+    min-height: 22px;
+    color: var(--muted);
+    font-size: 14px;
+  }
+
+  .auth-feedback.error {
+    color: #ffb4c0;
+  }
+
+  .auth-feedback.success {
+    color: var(--success);
+  }
+
+  .header-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    align-items: flex-start;
+    margin-bottom: 14px;
+  }
+
+  .header-main {
+    min-width: 0;
+  }
+
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+
+  .header-note {
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.4;
+    text-align: right;
   }
 
   .logo {
@@ -1223,9 +1346,40 @@
 </style>
 </head>
 <body>
-<div class="shell">
-  <div class="logo">Gwiazdka One Day - Panel Organizatora</div>
-  <h1>Panel administratora</h1>
+<div class="auth-shell" id="admin-login-screen" style="display:none">
+  <div class="auth-card">
+    <div class="logo">Gwiazdka One Day 2025 - Panel Organizatora</div>
+    <div class="auth-badge">Dostęp chroniony</div>
+    <h1>Logowanie administratora</h1>
+    <p class="auth-copy">Wpisz login i hasło organizatora, aby otworzyć panel zarządzania grą, wynikami, bonusami i komunikatami dla uczestników.</p>
+    <div class="auth-form">
+      <div class="auth-field">
+        <label for="admin-login">Login</label>
+        <input class="auth-input" type="text" id="admin-login" autocomplete="username" placeholder="Wpisz login">
+      </div>
+      <div class="auth-field">
+        <label for="admin-password">Hasło</label>
+        <input class="auth-input" type="password" id="admin-password" autocomplete="current-password" placeholder="Wpisz hasło">
+      </div>
+      <div class="auth-actions">
+        <button class="btn primary" type="button" onclick="attemptAdminLogin()">Wejdź do panelu</button>
+        <div class="auth-feedback" id="admin-auth-feedback">Panel jest dostępny dopiero po poprawnym logowaniu.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="shell" id="admin-shell" style="display:none">
+  <div class="header-row">
+    <div class="header-main">
+      <div class="logo">Gwiazdka One Day 2025 - Panel Organizatora</div>
+      <h1>Panel administratora</h1>
+    </div>
+    <div class="header-actions">
+      <div class="header-note">Zalogowano jako: <strong>admin</strong></div>
+      <button class="btn outline" type="button" onclick="logoutAdmin()">Wyloguj</button>
+    </div>
+  </div>
   <p class="sub">Steruj startem i stopem gry, testuj reset danych oraz kontroluj odpowiedzi i statystyki pytań w jednym miejscu.</p>
 
   <div class="hero">
@@ -1640,6 +1794,132 @@ let isStateLoading = false;
 let pendingStateReload = false;
 let isDataLoading = false;
 let pendingDataReload = false;
+let adminUnlocked = false;
+let pollingStarted = false;
+const ADMIN_SESSION_KEY = 'god_admin_authenticated';
+const ADMIN_LOGIN = 'admin';
+const ADMIN_PASSWORD = 'final2026';
+
+function setAuthFeedback(message, type = '') {
+  const el = document.getElementById('admin-auth-feedback');
+  if (!el) return;
+  el.className = `auth-feedback${type ? ` ${type}` : ''}`;
+  el.textContent = message || '';
+}
+
+function closeParticipantModal() {
+  const modal = document.getElementById('participant-modal');
+  if (modal) {
+    modal.classList.remove('show');
+  }
+}
+
+function applyAdminAccessState(isUnlocked) {
+  adminUnlocked = isUnlocked;
+  const loginScreen = document.getElementById('admin-login-screen');
+  const adminShell = document.getElementById('admin-shell');
+
+  if (loginScreen) loginScreen.style.display = isUnlocked ? 'none' : 'flex';
+  if (adminShell) adminShell.style.display = isUnlocked ? 'block' : 'none';
+
+  if (!isUnlocked) {
+    clearTimer();
+    closeParticipantModal();
+    isStateLoading = false;
+    pendingStateReload = false;
+    isDataLoading = false;
+    pendingDataReload = false;
+  }
+}
+
+function isAdminAuthenticated() {
+  try {
+    return sessionStorage.getItem(ADMIN_SESSION_KEY) === '1';
+  } catch (error) {
+    return false;
+  }
+}
+
+function bootAdminPanel() {
+  if (!adminUnlocked) return;
+  loadGameState();
+  loadData();
+
+  if (!pollingStarted) {
+    pollingStarted = true;
+    setInterval(() => {
+      if (adminUnlocked && !document.hidden) loadData();
+    }, 12000);
+    setInterval(() => {
+      if (adminUnlocked && !document.hidden) loadGameState();
+    }, 12000);
+  }
+}
+
+function attemptAdminLogin() {
+  const loginInput = document.getElementById('admin-login');
+  const passwordInput = document.getElementById('admin-password');
+  const login = (loginInput?.value || '').trim();
+  const password = passwordInput?.value || '';
+
+  if (!login || !password) {
+    setAuthFeedback('Wpisz login i hasło administratora.', 'error');
+    return;
+  }
+
+  if (login !== ADMIN_LOGIN || password !== ADMIN_PASSWORD) {
+    setAuthFeedback('Nieprawidłowy login lub hasło.', 'error');
+    if (passwordInput) passwordInput.value = '';
+    return;
+  }
+
+  try {
+    sessionStorage.setItem(ADMIN_SESSION_KEY, '1');
+  } catch (error) {
+    console.error(error);
+  }
+
+  setAuthFeedback('Logowanie poprawne. Otwieram panel...', 'success');
+  applyAdminAccessState(true);
+  bootAdminPanel();
+}
+
+function logoutAdmin() {
+  try {
+    sessionStorage.removeItem(ADMIN_SESSION_KEY);
+  } catch (error) {
+    console.error(error);
+  }
+
+  applyAdminAccessState(false);
+
+  const passwordInput = document.getElementById('admin-password');
+  if (passwordInput) passwordInput.value = '';
+  setAuthFeedback('Panel został wylogowany.', 'success');
+}
+
+function initializeAdminAccess() {
+  applyAdminAccessState(isAdminAuthenticated());
+
+  const passwordInput = document.getElementById('admin-password');
+  const loginInput = document.getElementById('admin-login');
+
+  [loginInput, passwordInput].forEach((element) => {
+    if (!element) return;
+    element.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        attemptAdminLogin();
+      }
+    });
+  });
+
+  if (adminUnlocked) {
+    bootAdminPanel();
+  } else if (loginInput) {
+    loginInput.focus();
+  }
+}
 
 function setAdminFeedback(message, type = '') {
   const el = document.getElementById('admin-feedback');
@@ -1781,7 +2061,7 @@ function renderPlayerPreview() {
     phaseText = 'Podgląd próbki pytania z licznikiem do końca gry i miejscem na komunikat.';
     html = `
       <div class="player-preview-card">
-        <div class="player-preview-logo">Gwiazdka One Day</div>
+        <div class="player-preview-logo">Gwiazdka One Day 2025</div>
         ${banner}
         <div class="player-preview-pill">Pytanie</div>
         <div class="player-preview-title">Gdzie ukrył się kolejny punkt trasy?</div>
@@ -1800,7 +2080,7 @@ function renderPlayerPreview() {
     phaseText = 'Podgląd finału po zatrzymaniu gry, z zaproszeniem do Teatru i drugim licznikiem.';
     html = `
       <div class="player-preview-card">
-        <div class="player-preview-logo">Gwiazdka One Day</div>
+        <div class="player-preview-logo">Gwiazdka One Day 2025</div>
         ${banner}
         <div class="player-preview-pill">Finał gry</div>
         <div class="player-preview-title">Zapraszamy na podsumowanie</div>
@@ -1819,7 +2099,7 @@ function renderPlayerPreview() {
     phaseText = 'Podgląd momentu po zakończeniu odliczania do podsumowania.';
     html = `
       <div class="player-preview-card">
-        <div class="player-preview-logo">Gwiazdka One Day</div>
+        <div class="player-preview-logo">Gwiazdka One Day 2025</div>
         ${banner}
         <div class="player-preview-pill">Teatr</div>
         <div class="player-preview-title">Czekamy na Was w Teatrze</div>
@@ -1841,16 +2121,16 @@ function renderPlayerPreview() {
 
     html = `
       <div class="player-preview-card">
-        <div class="player-preview-logo">Gwiazdka One Day</div>
+        <div class="player-preview-logo">Gwiazdka One Day 2025</div>
         ${banner}
         <div class="player-preview-pill">${gamePhase === 'active' ? 'Start gry' : 'Przed startem'}</div>
         <div class="player-preview-title">${gamePhase === 'active' ? 'Jak to działa?' : 'Gra jeszcze nie wystartowała'}</div>
         <div class="player-preview-copy">${gamePhase === 'active'
-          ? 'Zaloguj się, skanuj kody QR i zbieraj odpowiedzi oraz bonusy.'
+          ? 'Zaloguj się, skanuj kody QR i zbieraj odpowiedzi oraz bonusy za kontakt z wolontariuszami.'
           : 'Na tym ekranie uczestnik czeka na start i widzi odliczanie do wydarzenia oraz linki społecznościowe.'}</div>
         <div class="player-preview-box">
-          <strong>1. Zaloguj się  2. Skanuj QR  3. Zbieraj bonusy</strong>
-          <p>To jest najczęstszy widok wejściowy dla uczestnika przed pierwszym zeskanowaniem pytania.</p>
+          <strong>1. Zaloguj się  2. Skanuj QR  3. Rozmawiaj z wolontariuszami po bonusy</strong>
+          <p>Bonusy uczestnik zbiera za kontakt z wolontariuszami. Wystarczy krótka rozmowa na dowolny temat.</p>
         </div>
         <div class="player-preview-timer">
           <span class="player-preview-timer-label">Do końca gry zostało</span>
@@ -1865,6 +2145,7 @@ function renderPlayerPreview() {
 }
 
 async function loadGameState() {
+  if (!adminUnlocked) return;
   if (isStateLoading) {
     pendingStateReload = true;
     return;
@@ -2334,6 +2615,7 @@ async function runQuickTest() {
 }
 
 async function loadData() {
+  if (!adminUnlocked) return;
   if (isDataLoading) {
     pendingDataReload = true;
     return;
@@ -3002,14 +3284,7 @@ function escapeAttr(value) {
     .replace(/>/g, '&gt;');
 }
 
-loadGameState();
-loadData();
-setInterval(() => {
-  if (!document.hidden) loadData();
-}, 12000);
-setInterval(() => {
-  if (!document.hidden) loadGameState();
-}, 12000);
+initializeAdminAccess();
 </script>
 </body>
 </html>
