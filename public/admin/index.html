@@ -791,6 +791,13 @@
     font-weight: 700;
   }
 
+  .score-note {
+    display: block;
+    margin-top: 4px;
+    font-size: 11px;
+    color: var(--muted);
+  }
+
   .correct-ans { color: var(--success); }
   .wrong-ans { color: var(--danger); }
   .muted { color: var(--muted); }
@@ -1307,6 +1314,7 @@
   <div class="stats-row">
     <div class="stat"><div class="stat-val" id="s-participants">—</div><div class="stat-lbl">Uczestników</div></div>
     <div class="stat"><div class="stat-val" id="s-answers">—</div><div class="stat-lbl">Odpowiedzi</div></div>
+    <div class="stat"><div class="stat-val" id="s-bonuses">—</div><div class="stat-lbl">Bonusów</div></div>
     <div class="stat"><div class="stat-val" id="s-correct">—</div><div class="stat-lbl">Poprawnych</div></div>
     <div class="stat"><div class="stat-val" id="s-wrong">—</div><div class="stat-lbl">Błędnych</div></div>
     <div class="stat"><div class="stat-val" id="s-avg">—</div><div class="stat-lbl">Śr. punktów</div></div>
@@ -1348,6 +1356,7 @@
     <button class="tab" onclick="showTab('live', this)">Na żywo</button>
     <button class="tab active" onclick="showTab('leaderboard', this)">Ranking</button>
     <button class="tab" onclick="showTab('answers', this)">Odpowiedzi</button>
+    <button class="tab" onclick="showTab('bonuses', this)">Bonusy</button>
     <button class="tab" onclick="showTab('question-stats', this)">Statystyki pytań</button>
   </div>
 
@@ -1407,7 +1416,7 @@
             <th>#</th>
             <th>Imię i nazwisko</th>
             <th>Miasto</th>
-            <th>Punkty</th>
+            <th>Punkty łącznie</th>
             <th>Odpowiedzi</th>
             <th>Ostatnia aktywność</th>
           </tr>
@@ -1448,6 +1457,35 @@
         </thead>
         <tbody id="ans-body">
           <tr><td colspan="6" class="empty">Ładowanie...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div id="tab-bonuses" style="display:none">
+    <div class="toolbar">
+      <input type="text" id="search-bonuses" placeholder="Szukaj po uczestniku, mieście lub bonusie..." oninput="renderBonuses()">
+      <select id="filter-bonus-id" onchange="renderBonuses()">
+        <option value="all">Wszystkie bonusy</option>
+      </select>
+      <select id="filter-bonus-city" onchange="renderBonuses()">
+        <option value="all">Wszystkie miasta</option>
+      </select>
+      <div class="toolbar-meta" id="bonus-meta">Pokazano 0 bonusów</div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Uczestnik</th>
+            <th>Miasto</th>
+            <th>Bonus</th>
+            <th>Punkt</th>
+            <th>Czas</th>
+          </tr>
+        </thead>
+        <tbody id="bonus-body">
+          <tr><td colspan="5" class="empty">Ładowanie...</td></tr>
         </tbody>
       </table>
     </div>
@@ -1678,6 +1716,12 @@ function renderVisibleData() {
   if (currentTab === 'answers') {
     populateAnswerFilters();
     renderAnswers();
+    return;
+  }
+
+  if (currentTab === 'bonuses') {
+    populateBonusFilters();
+    renderBonuses();
     return;
   }
 
@@ -2330,6 +2374,7 @@ async function loadData() {
 function updateStats() {
   document.getElementById('s-participants').textContent = allParticipants.length;
   document.getElementById('s-answers').textContent = allAnswers.length;
+  document.getElementById('s-bonuses').textContent = allBonuses.length;
   document.getElementById('s-correct').textContent = allAnswers.filter(a => a.correct).length;
   document.getElementById('s-wrong').textContent = allAnswers.filter(a => !a.correct).length;
 
@@ -2370,6 +2415,31 @@ function populateAnswerFilters() {
 
   questionSelect.value = [...questionSelect.options].some(option => option.value === prevQuestion) ? prevQuestion : 'all';
   citySelect.value = [...citySelect.options].some(option => option.value === prevCity) ? prevCity : 'all';
+}
+
+function populateBonusFilters() {
+  const bonusSelect = document.getElementById('filter-bonus-id');
+  const citySelect = document.getElementById('filter-bonus-city');
+  const prevBonus = bonusSelect.value;
+  const prevCity = citySelect.value;
+
+  const cities = [...new Set(
+    allBonuses
+      .map((bonus) => {
+        const participant = allParticipants.find((item) => Number(item.id) === Number(bonus.participantId));
+        return (participant?.city || '').trim();
+      })
+      .filter(Boolean)
+  )].sort((a, b) => a.localeCompare(b, 'pl'));
+
+  bonusSelect.innerHTML = '<option value="all">Wszystkie bonusy</option>' +
+    bonusCatalog.map((bonus) => `<option value="${escapeAttr(bonus.id)}">${escHtml(bonus.label)}</option>`).join('');
+
+  citySelect.innerHTML = '<option value="all">Wszystkie miasta</option>' +
+    cities.map((city) => `<option value="${escapeAttr(city)}">${escHtml(city)}</option>`).join('');
+
+  bonusSelect.value = [...bonusSelect.options].some((option) => option.value === prevBonus) ? prevBonus : 'all';
+  citySelect.value = [...citySelect.options].some((option) => option.value === prevCity) ? prevCity : 'all';
 }
 
 function formatSecondsToLabel(seconds) {
@@ -2507,7 +2577,10 @@ function renderLeaderboard() {
         <td class="rank ${rankClass}">${index + 1}</td>
         <td>${escHtml(participant.firstName)} ${escHtml(participant.lastName)}</td>
         <td class="muted">${escHtml(city)}</td>
-        <td><span class="score-pill">${participant.score || 0} pkt</span></td>
+        <td>
+          <span class="score-pill">${participant.score || 0} pkt</span>
+          <span class="score-note">pytania + bonusy</span>
+        </td>
         <td class="muted">${participant.answeredCount || 0} / 30</td>
         <td class="muted">${lastActivity}</td>
       </tr>
@@ -2566,6 +2639,55 @@ function renderAnswers() {
         <td style="max-width:260px;word-break:break-word">${escHtml(questionLabel)}</td>
         <td style="max-width:220px;word-break:break-word">${escHtml(answer.answer || '')}</td>
         <td class="${answer.correct ? 'correct-ans' : 'wrong-ans'}">${answer.correct ? 'Tak' : 'Nie'}</td>
+        <td class="muted">${createdAt}</td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function renderBonuses() {
+  const query = document.getElementById('search-bonuses').value.toLowerCase();
+  const bonusFilter = document.getElementById('filter-bonus-id').value;
+  const cityFilter = document.getElementById('filter-bonus-city').value;
+  const body = document.getElementById('bonus-body');
+  const meta = document.getElementById('bonus-meta');
+
+  const list = [...allBonuses]
+    .map((bonus) => {
+      const participant = allParticipants.find((item) => Number(item.id) === Number(bonus.participantId)) || {};
+      return {
+        ...bonus,
+        participantName: `${participant.firstName || ''} ${participant.lastName || ''}`.trim() || '—',
+        participantCity: participant.city || '—'
+      };
+    })
+    .filter((bonus) => {
+      const searchable = `${bonus.participantName} ${bonus.participantCity} ${bonus.bonusLabel || bonus.bonusId}`.toLowerCase();
+      const matchesQuery = !query || searchable.includes(query);
+      const matchesBonus = bonusFilter === 'all' || bonus.bonusId === bonusFilter;
+      const matchesCity = cityFilter === 'all' || bonus.participantCity === cityFilter;
+      return matchesQuery && matchesBonus && matchesCity;
+    })
+    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+  meta.textContent = `Pokazano ${list.length} z ${allBonuses.length} odebranych bonusów. Każdy bonus daje 1 punkt do wyniku.`;
+
+  if (!list.length) {
+    body.innerHTML = '<tr><td colspan="5" class="empty">Brak bonusów dla wybranych filtrów.</td></tr>';
+    return;
+  }
+
+  body.innerHTML = list.map((bonus) => {
+    const createdAt = bonus.createdAt
+      ? new Date(bonus.createdAt).toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+      : '—';
+
+    return `
+      <tr>
+        <td>${escHtml(bonus.participantName)}</td>
+        <td class="muted">${escHtml(bonus.participantCity)}</td>
+        <td>${escHtml(bonus.bonusLabel || bonus.bonusId)}</td>
+        <td><span class="score-pill">+1 pkt</span></td>
         <td class="muted">${createdAt}</td>
       </tr>
     `;
@@ -2828,6 +2950,7 @@ function showTab(tab, element) {
   document.getElementById('tab-live').style.display = tab === 'live' ? 'block' : 'none';
   document.getElementById('tab-leaderboard').style.display = tab === 'leaderboard' ? 'block' : 'none';
   document.getElementById('tab-answers').style.display = tab === 'answers' ? 'block' : 'none';
+  document.getElementById('tab-bonuses').style.display = tab === 'bonuses' ? 'block' : 'none';
   document.getElementById('tab-question-stats').style.display = tab === 'question-stats' ? 'block' : 'none';
   document.querySelectorAll('.tab').forEach(tabButton => tabButton.classList.remove('active'));
   element.classList.add('active');
