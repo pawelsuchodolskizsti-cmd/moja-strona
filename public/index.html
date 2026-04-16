@@ -246,14 +246,19 @@ h1 {
   transform:translateY(0) scale(1);
 }
 
+.micro-toast.celebrate {
+  animation:toastGlow .75s ease;
+}
+
 .micro-toast.success {
   background:linear-gradient(135deg, rgba(255,255,255,0.98), rgba(236,255,244,0.96));
   border-color:rgba(22,163,74,0.18);
 }
 
 .micro-toast.bonus {
-  background:linear-gradient(135deg, rgba(255,255,255,0.98), rgba(248,255,225,0.96));
-  border-color:rgba(183,255,72,0.28);
+  background:linear-gradient(135deg, rgba(255,255,255,0.99), rgba(249,255,217,0.98), rgba(255,243,196,0.96));
+  border-color:rgba(194,255,61,0.34);
+  box-shadow:0 20px 36px rgba(84, 97, 18, 0.14);
 }
 
 .micro-toast.warning {
@@ -275,6 +280,18 @@ h1 {
   font-size:14px;
   line-height:1.45;
   font-weight:700;
+}
+
+@keyframes toastGlow {
+  0% {
+    box-shadow:0 18px 34px rgba(40,28,88,0.14);
+  }
+  45% {
+    box-shadow:0 24px 44px rgba(124,106,247,0.2), 0 0 0 8px rgba(183,255,72,0.12);
+  }
+  100% {
+    box-shadow:0 18px 34px rgba(40,28,88,0.14);
+  }
 }
 
 .status-finale {
@@ -305,13 +322,17 @@ h1 {
 
 .status-finale h2 {
   font-family: 'Syne';
-  font-size: clamp(22px, 7vw, 28px);
+  font-size: clamp(20px, 6.2vw, 24px);
   font-weight: 800;
-  line-height: 1.12;
-  letter-spacing: -.02em;
+  line-height: 1.06;
+  letter-spacing: -.015em;
   color: #201a42;
-  margin-bottom: 10px;
-  overflow-wrap: anywhere;
+  margin: 0 auto 10px;
+  max-width: 280px;
+  overflow-wrap: normal;
+  word-break: normal;
+  hyphens: none;
+  text-wrap: balance;
 }
 
 .status-finale p {
@@ -354,6 +375,100 @@ h1 {
   font-size: 30px;
   font-weight: 800;
   color: #241c4d;
+}
+
+.status-thanks {
+  background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(244,251,255,0.94));
+  border: 1px solid rgba(124,106,247,0.18);
+  border-radius: 20px;
+  padding: 22px 20px;
+  text-align: center;
+  box-shadow: 0 18px 34px rgba(40,28,88,0.1);
+  margin-bottom: 16px;
+}
+
+.status-thanks-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #c7ff64, #7c6af7);
+  color: #241c4d;
+  font-family: 'Syne';
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  margin-bottom: 14px;
+}
+
+.status-thanks h2 {
+  font-family: 'Syne';
+  font-size: clamp(22px, 6.2vw, 28px);
+  font-weight: 800;
+  line-height: 1.08;
+  letter-spacing: -.015em;
+  color: #1f1a43;
+  margin: 0 auto 10px;
+  max-width: 290px;
+  text-wrap: balance;
+}
+
+.status-thanks p {
+  color: #5f5877;
+  font-size: 15px;
+  line-height: 1.6;
+  margin-bottom: 14px;
+}
+
+.status-thanks-note {
+  padding: 14px 16px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, rgba(199,255,100,0.18), rgba(124,106,247,0.08));
+  border: 1px solid rgba(124,106,247,0.16);
+  color: #312b56;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.55;
+  margin-bottom: 14px;
+}
+
+.thanks-links {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.thanks-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 0 16px;
+  border-radius: 14px;
+  text-decoration: none;
+  font-family: 'Syne';
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: .05em;
+  color: #fff;
+  background: linear-gradient(135deg, var(--pink), var(--purple));
+  box-shadow: 0 12px 24px rgba(124,106,247,0.24);
+  transition: transform .15s, box-shadow .15s, opacity .15s;
+}
+
+.thanks-link:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 28px rgba(124,106,247,0.32);
+}
+
+.thanks-socials {
+  margin-bottom: 14px;
+}
+
+.thanks-socials .socials-note {
+  font-size: 14px;
 }
 
 .howto-panel {
@@ -578,6 +693,37 @@ textarea {
   color:#635d7c;
 }
 
+.player-stat.bonus-stat {
+  position:relative;
+  overflow:hidden;
+  background:linear-gradient(135deg, rgba(255,255,255,0.98), rgba(246,255,214,0.96), rgba(255,246,214,0.92));
+  border-color:rgba(190,255,49,0.34);
+  box-shadow:0 14px 28px rgba(129, 156, 24, 0.12);
+}
+
+.player-stat.bonus-stat::before {
+  content:'Extra';
+  position:absolute;
+  top:8px;
+  right:10px;
+  font-size:9px;
+  font-weight:800;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  color:#6b6a30;
+  opacity:.92;
+}
+
+.player-stat.bonus-stat .player-stat-value {
+  background:linear-gradient(135deg, #92c400, #d4ff54 52%, #ffbe2e);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+
+.player-stat.bonus-stat .player-stat-label {
+  color:#5e6230;
+}
+
 .badge-board {
   margin-top: 14px;
   padding: 14px;
@@ -689,6 +835,43 @@ textarea {
 .answered-box p { font-size:13px; color:#4a3f86; font-weight:700; }
 .answered-box .prev { font-size:12px; color:var(--muted); margin-top:4px; }
 
+.answered-box.is-success {
+  animation:successCardPulse .78s ease;
+}
+
+.answered-box.is-success .check {
+  animation:successCheckPop .55s ease;
+}
+
+@keyframes successCardPulse {
+  0% {
+    transform:scale(.985);
+    box-shadow:0 0 0 0 rgba(183,255,72,0);
+  }
+  40% {
+    transform:scale(1.012);
+    box-shadow:0 0 0 10px rgba(183,255,72,0.16);
+  }
+  100% {
+    transform:scale(1);
+    box-shadow:0 0 0 0 rgba(183,255,72,0);
+  }
+}
+
+@keyframes successCheckPop {
+  0% {
+    transform:scale(.82);
+    opacity:.7;
+  }
+  55% {
+    transform:scale(1.12);
+    opacity:1;
+  }
+  100% {
+    transform:scale(1);
+  }
+}
+
 .wrong-box {
   background: rgba(220,38,38,0.07);
   border: 1.5px solid rgba(220,38,38,0.2);
@@ -790,6 +973,45 @@ textarea {
 
   .player-stat-label {
     font-size: 10px;
+  }
+
+  .status-finale {
+    padding: 20px 16px;
+  }
+
+  .status-finale-badge {
+    padding: 7px 12px;
+    font-size: 11px;
+    margin-bottom: 12px;
+  }
+
+  .status-finale h2 {
+    font-size: 18px;
+    line-height: 1.08;
+    max-width: 248px;
+  }
+
+  .status-finale p {
+    font-size: 14px;
+  }
+
+  .status-finale-place {
+    font-size: 17px;
+  }
+
+  .status-thanks {
+    padding: 20px 16px;
+  }
+
+  .status-thanks h2 {
+    font-size: 20px;
+    max-width: 248px;
+  }
+
+  .status-thanks p,
+  .status-thanks-note,
+  .thanks-socials .socials-note {
+    font-size: 14px;
   }
 }
 </style>
@@ -903,7 +1125,7 @@ textarea {
         <div class="player-stat-value" data-stat-value="answers">0</div>
         <div class="player-stat-label">Odpowiedzi</div>
       </div>
-      <div class="player-stat">
+      <div class="player-stat bonus-stat">
         <div class="player-stat-value" data-stat-value="bonuses">0</div>
         <div class="player-stat-label">Bonusy</div>
       </div>
@@ -938,7 +1160,7 @@ textarea {
         <div class="player-stat-value" data-stat-value="answers">0</div>
         <div class="player-stat-label">Odpowiedzi</div>
       </div>
-      <div class="player-stat">
+      <div class="player-stat bonus-stat">
         <div class="player-stat-value" data-stat-value="bonuses">0</div>
         <div class="player-stat-label">Bonusy</div>
       </div>
@@ -967,6 +1189,39 @@ textarea {
     </div>
     <div class="badge-board" style="margin-top:14px;">
       <div class="badge-board-title">Zdobyte odznaki</div>
+      <div class="badge-list" data-badge-list></div>
+    </div>
+  </div>
+</div>
+
+<div class="card" id="thanks-screen" style="display:none">
+  <div class="logo">Gwiazdka One Day 2026</div>
+  <div class="announcement-box" data-announcement>
+    <span class="announcement-label">Komunikat organizatora</span>
+    <div class="announcement-text"></div>
+  </div>
+  <div class="status-thanks">
+    <div class="status-thanks-badge">Dzi&#281;kujemy</div>
+    <h2>Dzi&#281;kujemy za udzia&#322;</h2>
+    <p>Mamy nadziej&#281;, &#380;e ta trasa da&#322;a Wam sporo rado&#347;ci. Do zobaczenia na kolejnych wydarzeniach Fundacji One Day.</p>
+    <div class="status-thanks-note">Zdj&#281;cia i relacja z fina&#322;u pojawi&#261; si&#281; na naszych social mediach. Warto zajrze&#263; tam jeszcze po wydarzeniu.</div>
+    <div class="thanks-links">
+      <a class="thanks-link" href="https://www.instagram.com/fundacjaoneday/" target="_blank" rel="noopener">Relacja i zdj&#281;cia na Instagramie</a>
+      <a class="thanks-link" href="https://www.facebook.com/fundacjaoneday" target="_blank" rel="noopener">Aktualno&#347;ci na Facebooku</a>
+    </div>
+    <div class="socials-wrap thanks-socials">
+      <div class="socials-note">&#346;led&#378; nas po finale, tam pojawi si&#281; relacja i kolejne informacje</div>
+      <div class="socials">
+        <a href="https://www.instagram.com/fundacjaoneday/" target="_blank" rel="noopener" aria-label="Instagram">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+        </a>
+        <a href="https://www.facebook.com/fundacjaoneday" target="_blank" rel="noopener" aria-label="Facebook">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+        </a>
+      </div>
+    </div>
+    <div class="badge-board">
+      <div class="badge-board-title">Twoje odznaki</div>
       <div class="badge-list" data-badge-list></div>
     </div>
   </div>
@@ -1040,6 +1295,9 @@ function showMicroToast(message, type = 'info', title = 'Aktualizacja', key = ''
   stack.appendChild(toast);
 
   requestAnimationFrame(() => {
+    if (type === 'success' || type === 'bonus') {
+      toast.classList.add('celebrate');
+    }
     toast.classList.add('show');
   });
 
@@ -1047,6 +1305,13 @@ function showMicroToast(message, type = 'info', title = 'Aktualizacja', key = ''
     toast.classList.remove('show');
     setTimeout(() => toast.remove(), 220);
   }, 3200);
+}
+
+function playSuccessMotion(element) {
+  if (!element) return;
+  element.classList.remove('is-success');
+  void element.offsetWidth;
+  element.classList.add('is-success');
 }
 
 function getCalendarCountdownParts(targetDate) {
@@ -1216,6 +1481,10 @@ function renderSummaryCountdown() {
       el.innerText = label;
     }
   });
+
+  if (remaining <= 0 && document.getElementById('end-screen').style.display !== 'none') {
+    showThanksScreen();
+  }
 }
 
 function renderAnnouncement() {
@@ -1239,14 +1508,17 @@ function renderAnnouncement() {
 
 function getGamePhase() {
   const { startedAt, endedAt, durationMinutes } = activeGameState;
+  const summaryTarget = getSummaryCountdownTarget();
 
   if (startedAt) {
     const endTime = new Date(startedAt).getTime() + (Number(durationMinutes || 60) * 60000);
     if (Date.now() < endTime) return 'active';
+    if (summaryTarget && Date.now() >= summaryTarget) return 'thanks';
     return 'ended';
   }
 
-  if (endedAt || getSummaryCountdownTarget()) {
+  if (endedAt || summaryTarget) {
+    if (summaryTarget && Date.now() >= summaryTarget) return 'thanks';
     return 'ended';
   }
 
@@ -1258,12 +1530,18 @@ function hideAllScreens() {
   document.getElementById('question-screen').style.display = 'none';
   document.getElementById('no-q-screen').style.display = 'none';
   document.getElementById('end-screen').style.display = 'none';
+  document.getElementById('thanks-screen').style.display = 'none';
 }
 
 function showEndScreen() {
   hideAllScreens();
   document.getElementById('end-screen').style.display = 'block';
   renderSummaryCountdown();
+}
+
+function showThanksScreen() {
+  hideAllScreens();
+  document.getElementById('thanks-screen').style.display = 'block';
 }
 
 async function restoreParticipantSession() {
@@ -1282,6 +1560,20 @@ async function restoreParticipantSession() {
   } catch (e) {
     return null;
   }
+}
+
+function clearParticipantAccess(message = 'To konto jest przypisane do innego urządzenia. Zaloguj się ponownie.') {
+  participantId = null;
+  currentQuestion = null;
+  localStorage.removeItem('participantId');
+  hideAllScreens();
+  document.getElementById('login-screen').style.display = 'block';
+  hasOpenedLogin = true;
+  document.getElementById('howto-panel').style.display = 'none';
+  document.getElementById('login-form').style.display = 'block';
+  document.getElementById('game-status-box').innerHTML = '';
+  document.getElementById('login-btn').disabled = false;
+  document.getElementById('login-msg').innerText = message;
 }
 
 /* GAME STATE */
@@ -1387,7 +1679,12 @@ async function refreshParticipantStats() {
 
   participantStatsLoadPromise = (async () => {
     try {
-      const res = await fetch(`/api/participant-stats?pid=${participantId}`);
+      const res = await fetch(`/api/participant-stats?pid=${participantId}&token=${encodeURIComponent(deviceToken)}`);
+      if (res.status === 403) {
+        const data = await res.json();
+        clearParticipantAccess(data.error || 'To konto jest przypisane do innego urządzenia. Zaloguj się ponownie.');
+        return;
+      }
       const data = await res.json();
       if (!data.error) {
         renderParticipantStats(data);
@@ -1427,6 +1724,11 @@ async function loadGameState() {
 
       if (phase === 'ended') {
         showEndScreen();
+        return phase;
+      }
+
+      if (phase === 'thanks') {
+        showThanksScreen();
         return phase;
       }
 
@@ -1527,10 +1829,14 @@ async function showQuestionScreen() {
   }
 
   try {
-    const res  = await fetch(`/api/question?q=${q}&pid=${participantId}`);
+    const res  = await fetch(`/api/question?q=${q}&pid=${participantId}&token=${encodeURIComponent(deviceToken)}`);
     const data = await res.json();
 
     if (data.error) {
+      if (res.status === 403 && /urzadzen|urządzen|przypisane/i.test(String(data.error || ''))) {
+        clearParticipantAccess(data.error);
+        return;
+      }
       if (res.status === 403) {
         await loadGameState();
         return;
@@ -1588,10 +1894,15 @@ async function submitAnswer() {
       body: JSON.stringify({
         participantId,
         questionId: currentQuestion.id,
-        answer:     ans
+        answer:     ans,
+        deviceToken
       })
     });
     const data = await res.json();
+    if (res.status === 403 && /urzadzen|urządzen|przypisane/i.test(String(data.error || ''))) {
+      clearParticipantAccess(data.error);
+      return;
+    }
     if (!res.ok || data.error) {
       throw new Error(data.error || 'Nie udało się zapisać odpowiedzi.');
     }
@@ -1606,7 +1917,7 @@ async function submitAnswer() {
     if (!data.alreadyAnswered) {
       showMicroToast('Nowe pytanie zapisane. Lecisz dalej!', 'success', 'Świetnie', `answer-sent-${currentQuestion.id}`);
     }
-    showAnsweredState(data.answer || ans, data.message || 'Odpowiedź została wysłana.');
+    showAnsweredState(data.answer || ans, data.message || 'Odpowiedź została wysłana.', !data.alreadyAnswered);
 
   } catch(e) {
     if (/zakonczona|wystartowala/i.test(String(e.message || ''))) {
@@ -1620,7 +1931,7 @@ async function submitAnswer() {
   }
 }
 
-function showAnsweredState(answer, message) {
+function showAnsweredState(answer, message, animate = false) {
   document.getElementById('answer-area').style.display = 'none';
 
   const area = document.getElementById('result-area');
@@ -1633,6 +1944,9 @@ function showAnsweredState(answer, message) {
       <p>${escHtml(message || 'Odpowiedź została wysłana.')}</p>
       ${previousAnswer}
     </div>`;
+  if (animate) {
+    playSuccessMotion(area.querySelector('.answered-box'));
+  }
   return;
   /*
     area.innerHTML = `
@@ -1706,7 +2020,7 @@ window.onload = async () => {
   setInterval(renderSummaryCountdown, 1000);
   setInterval(() => {
     if (!document.hidden) loadGameState();
-  }, 6000);
+  }, 10000);
 };
 </script>
 

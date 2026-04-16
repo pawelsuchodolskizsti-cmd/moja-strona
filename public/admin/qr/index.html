@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kody QR - Gwiazdka One Day 2026</title>
+<style>
+:root {
+  --bg:#09111c;
+  --panel:#101927;
+  --panel-strong:#0d1522;
+  --text:#f5f7ff;
+  --muted:#96a2bb;
+  --line:rgba(180, 198, 255, 0.14);
+  --lime:#c8ff49;
+  --pink:#ff4f9b;
+  --violet:#8c63ff;
+  --shadow:0 26px 70px rgba(2, 8, 20, 0.42);
+}
+
+* { box-sizing:border-box; }
+
+body {
+  margin:0;
+  min-height:100vh;
+  font-family: "Segoe UI", Arial, sans-serif;
+  color:var(--text);
+  background:
+    radial-gradient(circle at top left, rgba(255, 79, 155, 0.18), transparent 28%),
+    radial-gradient(circle at top right, rgba(140, 99, 255, 0.14), transparent 24%),
+    linear-gradient(180deg, #0b1220 0%, #09111c 100%);
+}
+
+.page {
+  width:min(1440px, calc(100% - 32px));
+  margin:0 auto;
+  padding:28px 0 48px;
+}
+
+.hero {
+  display:grid;
+  grid-template-columns:1.15fr .85fr;
+  gap:18px;
+  margin-bottom:22px;
+}
+
+.panel {
+  padding:24px;
+  border-radius:28px;
+  background:linear-gradient(180deg, rgba(18, 26, 40, 0.98), rgba(11, 18, 29, 0.98));
+  border:1px solid var(--line);
+  box-shadow:var(--shadow);
+}
+
+.eyebrow {
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  min-height:36px;
+  padding:0 16px;
+  border-radius:999px;
+  background:rgba(200, 255, 73, 0.12);
+  border:1px solid rgba(200, 255, 73, 0.28);
+  color:#efffc4;
+  font-size:12px;
+  font-weight:800;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+}
+
+h1 {
+  margin:16px 0 10px;
+  font-size:40px;
+  line-height:1.02;
+}
+
+.lead {
+  margin:0;
+  color:var(--muted);
+  font-size:16px;
+  line-height:1.6;
+}
+
+.stats {
+  display:grid;
+  grid-template-columns:repeat(3, minmax(0, 1fr));
+  gap:12px;
+  margin-top:18px;
+}
+
+.stat {
+  padding:16px;
+  border-radius:20px;
+  background:rgba(255, 255, 255, 0.03);
+  border:1px solid var(--line);
+}
+
+.stat-value {
+  font-size:34px;
+  font-weight:900;
+  color:var(--lime);
+  line-height:1;
+}
+
+.stat-label {
+  margin-top:8px;
+  font-size:12px;
+  font-weight:700;
+  color:var(--muted);
+  letter-spacing:.06em;
+  text-transform:uppercase;
+}
+
+.toolbar {
+  display:flex;
+  flex-wrap:wrap;
+  gap:12px;
+  align-items:end;
+}
+
+.field {
+  flex:1 1 300px;
+}
+
+.field label {
+  display:block;
+  margin-bottom:8px;
+  color:var(--muted);
+  font-size:12px;
+  font-weight:700;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+}
+
+.field input {
+  width:100%;
+  min-height:48px;
+  border-radius:16px;
+  border:1px solid var(--line);
+  background:rgba(5, 10, 17, 0.76);
+  color:var(--text);
+  padding:0 16px;
+  font-size:15px;
+  outline:none;
+}
+
+.actions {
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+}
+
+.btn {
+  min-height:48px;
+  padding:0 18px;
+  border-radius:16px;
+  border:1px solid transparent;
+  font-size:14px;
+  font-weight:800;
+  cursor:pointer;
+  text-decoration:none;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease, background .18s ease;
+}
+
+.btn:hover {
+  transform:translateY(-1px);
+}
+
+.btn.primary {
+  background:linear-gradient(135deg, var(--pink), var(--violet));
+  color:#fff;
+  box-shadow:0 18px 36px rgba(126, 72, 255, 0.28);
+}
+
+.btn.lime {
+  background:linear-gradient(135deg, #b8ff4d, #e8ff9b);
+  color:#11210c;
+  box-shadow:0 18px 34px rgba(185, 255, 77, 0.22);
+}
+
+.btn.ghost {
+  background:rgba(255, 255, 255, 0.03);
+  color:var(--text);
+  border-color:var(--line);
+}
+
+.toolbar-note,
+.download-status {
+  margin-top:14px;
+  color:var(--muted);
+  font-size:13px;
+  line-height:1.55;
+}
+
+.download-status.success { color:#d9ff94; }
+.download-status.error { color:#ff9cbc; }
+
+.section {
+  margin-top:28px;
+}
+
+.section-head {
+  display:flex;
+  justify-content:space-between;
+  gap:14px;
+  align-items:end;
+  margin-bottom:14px;
+}
+
+.section-title {
+  margin:0;
+  font-size:24px;
+}
+
+.section-copy {
+  margin:6px 0 0;
+  color:var(--muted);
+  font-size:14px;
+  line-height:1.55;
+}
+
+.section-count {
+  min-height:40px;
+  padding:0 14px;
+  border-radius:999px;
+  background:rgba(140, 99, 255, 0.12);
+  border:1px solid rgba(140, 99, 255, 0.22);
+  color:#dccdff;
+  display:inline-flex;
+  align-items:center;
+  font-size:13px;
+  font-weight:800;
+}
+
+.grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fill, minmax(220px, 1fr));
+  gap:16px;
+}
+
+.qr-card {
+  padding:18px;
+  border-radius:24px;
+  background:linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(247, 249, 255, 0.96));
+  color:#132033;
+  border:1px solid rgba(191, 204, 255, 0.42);
+  box-shadow:0 18px 42px rgba(4, 12, 24, 0.18);
+}
+
+.qr-card.bonus {
+  background:linear-gradient(180deg, rgba(255, 251, 233, 0.98), rgba(247, 255, 226, 0.98));
+  border-color:rgba(196, 255, 73, 0.45);
+}
+
+.qr-card-head {
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  align-items:start;
+  margin-bottom:14px;
+}
+
+.qr-card-title {
+  font-size:20px;
+  font-weight:900;
+  line-height:1.05;
+}
+
+.qr-card-chip {
+  min-width:64px;
+  min-height:34px;
+  padding:0 12px;
+  border-radius:999px;
+  background:#19263b;
+  color:#fff;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  font-size:12px;
+  font-weight:800;
+}
+
+.qr-card.bonus .qr-card-chip {
+  background:linear-gradient(135deg, #b5ff3c, #ffe87c);
+  color:#1e240b;
+}
+
+.qr-image-wrap {
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:14px;
+  border-radius:22px;
+  background:#fff;
+  border:1px solid rgba(20, 34, 58, 0.08);
+}
+
+.qr-image {
+  width:100%;
+  max-width:192px;
+  aspect-ratio:1;
+  object-fit:contain;
+  display:block;
+}
+
+.qr-path {
+  margin:14px 0 6px;
+  font-size:13px;
+  font-weight:800;
+  color:#5c6581;
+  word-break:break-all;
+}
+
+.qr-copy {
+  margin:0 0 14px;
+  color:#58647d;
+  font-size:13px;
+  line-height:1.55;
+}
+
+.qr-actions {
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+}
+
+.qr-btn {
+  flex:1 1 0;
+  min-height:40px;
+  border:none;
+  border-radius:14px;
+  background:#1a2740;
+  color:#fff;
+  font-size:13px;
+  font-weight:800;
+  cursor:pointer;
+}
+
+.qr-btn.secondary {
+  background:linear-gradient(135deg, #ff4f9b, #8c63ff);
+}
+
+.print-note {
+  margin-top:10px;
+  font-size:12px;
+  color:var(--muted);
+}
+
+@media (max-width: 980px) {
+  .hero {
+    grid-template-columns:1fr;
+  }
+}
+
+@media (max-width: 700px) {
+  .page {
+    width:min(100% - 20px, 100%);
+    padding:18px 0 36px;
+  }
+
+  h1 {
+    font-size:30px;
+  }
+
+  .stats {
+    grid-template-columns:1fr;
+  }
+
+  .section-head {
+    flex-direction:column;
+    align-items:start;
+  }
+}
+
+@media print {
+  body {
+    background:#fff;
+  }
+
+  .page {
+    width:100%;
+    padding:0;
+  }
+
+  .hero,
+  .toolbar-note,
+  .download-status,
+  .print-note {
+    display:none !important;
+  }
+
+  .panel {
+    padding:0;
+    border:none;
+    box-shadow:none;
+    background:transparent;
+  }
+
+  .section {
+    margin-top:18px;
+    page-break-inside:avoid;
+  }
+
+  .grid {
+    grid-template-columns:repeat(3, 1fr);
+  }
+
+  .qr-card {
+    break-inside:avoid;
+    box-shadow:none;
+  }
+}
+</style>
+</head>
+<body>
+  <div class="page">
+    <div class="hero">
+      <section class="panel">
+        <div class="eyebrow">Stałe kody QR</div>
+        <h1>Generator i magazyn kodów QR dla całej gry</h1>
+        <p class="lead">Tutaj masz w jednym miejscu gotowe, stałe kody do strony głównej, tablicy wyników, 30 pytań i 10 bonusów. Możesz je otworzyć, pobrać jako JPG albo od razu wydrukować do PDF.</p>
+        <div class="stats">
+          <div class="stat">
+            <div class="stat-value" id="stat-all">42</div>
+            <div class="stat-label">Łącznie kodów</div>
+          </div>
+          <div class="stat">
+            <div class="stat-value" id="stat-questions">30</div>
+            <div class="stat-label">Pytań</div>
+          </div>
+          <div class="stat">
+            <div class="stat-value" id="stat-bonuses">10</div>
+            <div class="stat-label">Bonusów</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="toolbar">
+          <div class="field">
+            <label for="base-origin">Adres strony</label>
+            <input id="base-origin" type="text" placeholder="https://twoja-gra.vercel.app">
+          </div>
+          <div class="actions">
+            <button class="btn primary" type="button" onclick="renderCatalog()">Odśwież kody</button>
+            <button class="btn lime" type="button" onclick="downloadAllAsJpg()">Wszystkie JPG</button>
+            <button class="btn ghost" type="button" onclick="window.print()">PDF / Drukuj</button>
+          </div>
+        </div>
+        <div class="toolbar-note">Końcówki są stałe: `/?q=1...30`, `/bonus/?b=B01...B10`, `/wyniki/` oraz `/` dla strony głównej. Jeśli przepiszesz domenę wyżej, wszystkie kody od razu przeliczą się na nowy adres.</div>
+        <div class="download-status" id="download-status">Kody są gotowe do podglądu i pobrania.</div>
+        <div class="print-note">Przy pobieraniu wszystkich JPG przeglądarka może poprosić o zgodę na wiele plików naraz.</div>
+      </section>
+    </div>
+
+    <section class="panel section">
+      <div class="section-head">
+        <div>
+          <h2 class="section-title">Ekrany główne</h2>
+          <p class="section-copy">Najważniejsze stałe wejścia dla uczestników i widowni.</p>
+        </div>
+        <div class="section-count" id="count-screens">2 kody</div>
+      </div>
+      <div class="grid" id="grid-screens"></div>
+    </section>
+
+    <section class="panel section">
+      <div class="section-head">
+        <div>
+          <h2 class="section-title">Pytania</h2>
+          <p class="section-copy">Pełny pakiet 30 stałych kodów do rozmieszczenia na trasie gry.</p>
+        </div>
+        <div class="section-count" id="count-questions">30 kodów</div>
+      </div>
+      <div class="grid" id="grid-questions"></div>
+    </section>
+
+    <section class="panel section">
+      <div class="section-head">
+        <div>
+          <h2 class="section-title">Bonusy</h2>
+          <p class="section-copy">10 kodów bonusowych dla wolontariuszy i dodatkowych punktów.</p>
+        </div>
+        <div class="section-count" id="count-bonuses">10 kodów</div>
+      </div>
+      <div class="grid" id="grid-bonuses"></div>
+    </section>
+  </div>
+
+  <script src="/admin/qr-catalog.js"></script>
+  <script>
+  let qrGroups = { screens: [], questions: [], bonuses: [], all: [] };
+
+  function normalizeOrigin(value) {
+    const raw = String(value || '').trim();
+    if (!raw) return window.location.origin;
+    return raw.replace(/\/+$/, '');
+  }
+
+  function getProxyQrUrl(item, format, download) {
+    const params = new URLSearchParams({
+      data: item.url,
+      size: format === 'jpg' ? '900x900' : '480x480',
+      format: format || 'png'
+    });
+
+    if (download) {
+      params.set('download', download);
+    }
+
+    return `/api/qr-proxy?${params.toString()}`;
+  }
+
+  function setDownloadStatus(message, tone) {
+    const el = document.getElementById('download-status');
+    el.textContent = message;
+    el.className = 'download-status' + (tone ? ` ${tone}` : '');
+  }
+
+  function renderQrCard(item) {
+    const cssClass = item.type === 'bonus' ? 'qr-card bonus' : 'qr-card';
+    return `
+      <article class="${cssClass}">
+        <div class="qr-card-head">
+          <div class="qr-card-title">${item.label}</div>
+          <div class="qr-card-chip">${item.shortLabel}</div>
+        </div>
+        <div class="qr-image-wrap">
+          <img class="qr-image" src="${getProxyQrUrl(item, 'png')}" alt="${item.label}">
+        </div>
+        <div class="qr-path">${item.path}</div>
+        <p class="qr-copy">${item.description}</p>
+        <div class="qr-actions">
+          <button class="qr-btn" type="button" onclick="window.open('${item.url}', '_blank', 'noopener')">Otwórz</button>
+          <button class="qr-btn secondary" type="button" onclick="downloadOneJpg('${item.id}')">Pobierz JPG</button>
+        </div>
+      </article>
+    `;
+  }
+
+  function updateCounters() {
+    document.getElementById('stat-all').textContent = qrGroups.all.length;
+    document.getElementById('stat-questions').textContent = qrGroups.questions.length;
+    document.getElementById('stat-bonuses').textContent = qrGroups.bonuses.length;
+    document.getElementById('count-screens').textContent = `${qrGroups.screens.length} kody`;
+    document.getElementById('count-questions').textContent = `${qrGroups.questions.length} kodów`;
+    document.getElementById('count-bonuses').textContent = `${qrGroups.bonuses.length} kodów`;
+  }
+
+  function renderCatalog() {
+    const origin = normalizeOrigin(document.getElementById('base-origin').value);
+    document.getElementById('base-origin').value = origin;
+    qrGroups = window.groupQrCatalog(origin);
+
+    document.getElementById('grid-screens').innerHTML = qrGroups.screens.map(renderQrCard).join('');
+    document.getElementById('grid-questions').innerHTML = qrGroups.questions.map(renderQrCard).join('');
+    document.getElementById('grid-bonuses').innerHTML = qrGroups.bonuses.map(renderQrCard).join('');
+    updateCounters();
+    setDownloadStatus('Kody zostały przeliczone dla aktualnego adresu strony.', 'success');
+  }
+
+  function findQrItem(id) {
+    return qrGroups.all.find((item) => item.id === id);
+  }
+
+  function triggerDownload(url) {
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.rel = 'noopener';
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+  }
+
+  function downloadOneJpg(id) {
+    const item = findQrItem(id);
+    if (!item) {
+      setDownloadStatus('Nie udało się znaleźć wybranego kodu QR.', 'error');
+      return;
+    }
+
+    const fileName = `${item.id}.jpg`;
+    triggerDownload(getProxyQrUrl(item, 'jpg', fileName));
+    setDownloadStatus(`Rozpoczęto pobieranie pliku ${fileName}.`, 'success');
+  }
+
+  function delay(ms) {
+    return new Promise((resolve) => window.setTimeout(resolve, ms));
+  }
+
+  async function downloadAllAsJpg() {
+    if (!qrGroups.all.length) {
+      setDownloadStatus('Najpierw wygeneruj listę kodów QR.', 'error');
+      return;
+    }
+
+    setDownloadStatus('Rozpoczynam pobieranie wszystkich kodów JPG. Przeglądarka może zapytać o zgodę na wiele plików.', 'success');
+
+    for (const item of qrGroups.all) {
+      triggerDownload(getProxyQrUrl(item, 'jpg', `${item.id}.jpg`));
+      await delay(180);
+    }
+  }
+
+  function handleAutostart() {
+    const params = new URLSearchParams(window.location.search);
+    const mode = params.get('download');
+    if (mode === 'jpg') {
+      window.setTimeout(downloadAllAsJpg, 500);
+    }
+    if (mode === 'pdf') {
+      window.setTimeout(() => window.print(), 700);
+    }
+  }
+
+  document.getElementById('base-origin').value = window.location.origin;
+  renderCatalog();
+  handleAutostart();
+  </script>
+</body>
+</html>

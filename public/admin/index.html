@@ -187,6 +187,86 @@
     max-width: 720px;
   }
 
+  .system-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin: -8px 0 20px;
+    padding: 15px 18px;
+    border-radius: 18px;
+    border: 1px solid var(--border);
+    background: rgba(255, 255, 255, 0.04);
+    box-shadow: var(--shadow);
+  }
+
+  .system-bar.ok {
+    background: linear-gradient(135deg, rgba(109, 255, 179, 0.18), rgba(183, 255, 72, 0.14));
+    border-color: rgba(109, 255, 179, 0.34);
+  }
+
+  .system-bar.warning {
+    background: linear-gradient(135deg, rgba(255, 215, 109, 0.18), rgba(183, 255, 72, 0.08));
+    border-color: rgba(255, 215, 109, 0.34);
+  }
+
+  .system-bar.error {
+    background: linear-gradient(135deg, rgba(255, 107, 129, 0.2), rgba(139, 92, 246, 0.08));
+    border-color: rgba(255, 107, 129, 0.36);
+  }
+
+  .system-bar-main {
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .system-bar-badge {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 34px;
+    padding: 0 14px;
+    border-radius: 999px;
+    font-family: 'Syne', sans-serif;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    background: rgba(9, 11, 16, 0.22);
+    color: #f5f8ff;
+  }
+
+  .system-bar-copy {
+    min-width: 0;
+    display: grid;
+    gap: 4px;
+  }
+
+  .system-bar-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--text);
+  }
+
+  .system-bar-text {
+    color: #d9e1f7;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  .system-bar-meta {
+    flex-shrink: 0;
+    color: #eef3ff;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: .04em;
+    text-align: right;
+  }
+
   .hero {
     display: grid;
     grid-template-columns: 1.35fr .95fr;
@@ -592,6 +672,78 @@
     line-height: 1.5;
   }
 
+  .qr-admin-card {
+    position: relative;
+    overflow: hidden;
+    background:
+      radial-gradient(circle at top right, rgba(200, 255, 73, 0.18), transparent 34%),
+      linear-gradient(180deg, rgba(18, 23, 34, 0.98), rgba(12, 16, 24, 0.98));
+  }
+
+  .qr-admin-card::after {
+    content: '';
+    position: absolute;
+    inset: auto -60px -70px auto;
+    width: 180px;
+    height: 180px;
+    border-radius: 36px;
+    background: linear-gradient(135deg, rgba(140, 99, 255, 0.18), rgba(200, 255, 73, 0.08));
+    transform: rotate(18deg);
+    pointer-events: none;
+  }
+
+  .qr-admin-summary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+
+  .qr-admin-pill {
+    min-height: 38px;
+    padding: 0 14px;
+    border-radius: 999px;
+    border: 1px solid rgba(200, 255, 73, 0.24);
+    background: rgba(200, 255, 73, 0.08);
+    color: #efffc4;
+    display: inline-flex;
+    align-items: center;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: .03em;
+  }
+
+  .qr-admin-routes {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+
+  .qr-admin-route {
+    padding: 12px 14px;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .qr-admin-route span {
+    display: block;
+    margin-bottom: 6px;
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+  }
+
+  .qr-admin-route strong {
+    display: block;
+    font-size: 14px;
+    color: var(--text);
+    word-break: break-all;
+  }
+
   .preview-tabs {
     display: flex;
     gap: 8px;
@@ -829,6 +981,13 @@
     transition: opacity .2s ease, transform .12s ease, border-color .2s ease, background .2s ease;
   }
 
+  .btn-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+  }
+
   .btn:hover { opacity: .9; transform: translateY(-1px); }
   .btn:active { transform: translateY(0); }
 
@@ -841,6 +1000,244 @@
     background: transparent;
     border-color: var(--border);
     color: var(--text);
+  }
+
+  .event-toggle.active {
+    background: linear-gradient(135deg, rgba(183, 255, 72, 0.22), rgba(109, 255, 179, 0.12));
+    border-color: rgba(183, 255, 72, 0.52);
+    color: #e6ffc0;
+    box-shadow: 0 0 0 1px rgba(183, 255, 72, 0.16), 0 16px 28px rgba(183, 255, 72, 0.08);
+  }
+
+  .event-mode-banner {
+    display: none;
+    align-items: center;
+    gap: 10px;
+    margin: -8px 0 20px;
+    padding: 14px 16px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, rgba(183, 255, 72, 0.16), rgba(139, 92, 246, 0.12));
+    border: 1px solid rgba(183, 255, 72, 0.3);
+    color: #eef9d2;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.5;
+  }
+
+  .event-mode-banner strong {
+    font-family: 'Syne', sans-serif;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    font-size: 13px;
+  }
+
+  body.event-mode .shell {
+    max-width: 1440px;
+  }
+
+  body.event-mode h1 {
+    font-size: 38px;
+  }
+
+  body.event-mode .header-row {
+    align-items: center;
+    margin-bottom: 18px;
+  }
+
+  body.event-mode .logo {
+    font-size: 13px;
+    margin-bottom: 10px;
+  }
+
+  body.event-mode .system-bar {
+    padding: 18px 20px;
+    border-radius: 20px;
+  }
+
+  body.event-mode .system-bar-title {
+    font-size: 19px;
+  }
+
+  body.event-mode .system-bar-text,
+  body.event-mode .system-bar-meta {
+    font-size: 14px;
+  }
+
+  body.event-mode .system-bar-badge {
+    min-height: 40px;
+    padding: 0 16px;
+    font-size: 13px;
+  }
+
+  body.event-mode .sub,
+  body.event-mode .header-note,
+  body.event-mode .notes-panel,
+  body.event-mode .action-btn small,
+  body.event-mode .ops-copy,
+  body.event-mode .toolbar-meta,
+  body.event-mode .preview-phase,
+  body.event-mode .player-preview-copy,
+  body.event-mode .live-card-sub,
+  body.event-mode .insight-sub,
+  body.event-mode .score-note,
+  body.event-mode .check-item-sub,
+  body.event-mode .adjust-copy {
+    display: none !important;
+  }
+
+  body.event-mode .event-mode-banner {
+    display: flex;
+  }
+
+  body.event-mode .hero,
+  body.event-mode .ops-grid {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+
+  body.event-mode .panel,
+  body.event-mode .ops-card,
+  body.event-mode .stat,
+  body.event-mode .table-wrap {
+    border-radius: 22px;
+  }
+
+  body.event-mode .control-panel,
+  body.event-mode .notes-panel,
+  body.event-mode .ops-card {
+    padding: 24px;
+  }
+
+  body.event-mode .status-text {
+    font-size: 24px;
+    margin-bottom: 0;
+  }
+
+  body.event-mode .status-sub {
+    font-size: 15px;
+    line-height: 1.5;
+  }
+
+  body.event-mode .timer-box {
+    min-width: 188px;
+    padding: 16px 18px;
+  }
+
+  body.event-mode .live-timer {
+    font-size: 42px;
+  }
+
+  body.event-mode .action-grid,
+  body.event-mode .utility-grid {
+    gap: 14px;
+  }
+
+  body.event-mode .action-btn {
+    min-height: 92px;
+    font-size: 19px;
+    border-radius: 18px;
+    padding: 16px 18px;
+  }
+
+  body.event-mode .stats-row {
+    gap: 14px;
+  }
+
+  body.event-mode .stat {
+    padding: 22px 20px 18px;
+  }
+
+  body.event-mode .stat-val {
+    font-size: 40px;
+    margin-bottom: 8px;
+  }
+
+  body.event-mode .stat-lbl {
+    font-size: 12px;
+  }
+
+  body.event-mode .ops-chip {
+    min-height: 50px;
+    padding: 0 16px;
+    font-size: 14px;
+    border-radius: 14px;
+  }
+
+  body.event-mode .preview-tab,
+  body.event-mode .tab,
+  body.event-mode .btn {
+    min-height: 50px;
+    font-size: 15px;
+    padding: 0 18px;
+  }
+
+  body.event-mode .tab-row {
+    position: sticky;
+    top: 10px;
+    z-index: 12;
+    margin-bottom: 18px;
+    padding: 10px;
+    border-radius: 18px;
+    background: rgba(9, 11, 16, 0.88);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(57, 67, 93, 0.5);
+  }
+
+  body.event-mode .toolbar {
+    gap: 12px;
+  }
+
+  body.event-mode .toolbar input,
+  body.event-mode .toolbar select,
+  body.event-mode .adjust-card select,
+  body.event-mode .ops-card textarea {
+    min-height: 52px;
+    font-size: 16px;
+  }
+
+  body.event-mode .ops-card textarea {
+    min-height: 132px;
+  }
+
+  body.event-mode table {
+    font-size: 15px;
+  }
+
+  body.event-mode thead th {
+    font-size: 12px;
+    padding: 15px 16px;
+  }
+
+  body.event-mode td {
+    padding: 15px 16px;
+  }
+
+  body.event-mode .rank,
+  body.event-mode .score-pill {
+    font-size: 14px;
+  }
+
+  body.event-mode .detail-col {
+    display: none;
+  }
+
+  body.event-mode .player-preview-card {
+    min-height: 0;
+    padding: 24px 22px;
+  }
+
+  body.event-mode .player-preview-title {
+    font-size: 32px;
+  }
+
+  body.event-mode .player-preview-timer-value {
+    font-size: 34px;
+  }
+
+  body.event-mode .player-preview-box strong,
+  body.event-mode .player-preview-box p,
+  body.event-mode .player-preview-banner {
+    font-size: 14px;
   }
 
   .table-wrap {
@@ -1217,6 +1614,22 @@
     word-break: break-all;
   }
 
+  .device-actions {
+    display: grid;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+
+  .device-actions .btn {
+    width: 100%;
+  }
+
+  .device-reset-note {
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.5;
+  }
+
   .adjust-card {
     margin-top: 12px;
     padding: 14px;
@@ -1322,6 +1735,21 @@
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
+    .system-bar {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .system-bar-main {
+      width: 100%;
+      align-items: flex-start;
+      flex-direction: column;
+    }
+
+    .system-bar-meta {
+      text-align: left;
+    }
+
     .participant-grid,
     .participant-sections,
     .live-grid {
@@ -1377,10 +1805,23 @@
     </div>
     <div class="header-actions">
       <div class="header-note">Zalogowano jako: <strong>admin</strong></div>
+      <a class="btn primary btn-link" href="/wyniki/" target="_blank" rel="noopener noreferrer">Ekran wyników</a>
+      <button class="btn outline event-toggle" id="btn-event-mode" type="button" onclick="toggleEventMode()">Tryb wydarzenia</button>
       <button class="btn outline" type="button" onclick="logoutAdmin()">Wyloguj</button>
     </div>
   </div>
   <p class="sub">Steruj startem i stopem gry, testuj reset danych oraz kontroluj odpowiedzi i statystyki pytań w jednym miejscu.</p>
+  <div class="system-bar warning" id="system-bar">
+    <div class="system-bar-main">
+      <div class="system-bar-badge" id="system-bar-badge">Ostrzeżenia</div>
+      <div class="system-bar-copy">
+        <div class="system-bar-title" id="system-bar-title">Trwa przygotowanie panelu</div>
+        <div class="system-bar-text" id="system-bar-text">Sprawdzam połączenie z backendem i czekam na pierwszy szybki test systemu.</div>
+      </div>
+    </div>
+    <div class="system-bar-meta" id="system-bar-meta">Start panelu</div>
+  </div>
+  <div class="event-mode-banner" id="event-mode-banner"><strong>Tryb wydarzenia</strong> Aktywny jest uproszczony widok z większymi przyciskami, większym tekstem i mniejszą liczbą szczegółów.</div>
 
   <div class="hero">
     <section class="panel control-panel">
@@ -1497,12 +1938,46 @@
         <button class="preview-tab active" data-preview-tab="current" onclick="setPreviewMode('current', this)">Teraz</button>
         <button class="preview-tab" data-preview-tab="question" onclick="setPreviewMode('question', this)">Pytanie</button>
         <button class="preview-tab" data-preview-tab="final" onclick="setPreviewMode('final', this)">Finał</button>
-        <button class="preview-tab" data-preview-tab="theater" onclick="setPreviewMode('theater', this)">Teatr</button>
+        <button class="preview-tab" data-preview-tab="thanks" onclick="setPreviewMode('thanks', this)">Podziękowanie</button>
       </div>
       <div class="preview-phase" id="player-preview-phase">Podgląd dopasowuje się do aktualnego stanu gry.</div>
       <div class="player-preview-shell">
         <div id="player-preview"></div>
       </div>
+    </section>
+
+    <section class="ops-card qr-admin-card">
+      <div class="ops-title">Stałe kody QR</div>
+      <div class="ops-copy">W jednym miejscu przygotujesz QR do strony głównej, publicznej tablicy wyników, 30 pytań i 10 bonusów. Każdy kod ma stałą końcówkę linku i jest gotowy do druku.</div>
+      <div class="qr-admin-summary">
+        <div class="qr-admin-pill" id="qr-admin-total">42 kody łącznie</div>
+        <div class="qr-admin-pill" id="qr-admin-questions">30 pytań</div>
+        <div class="qr-admin-pill" id="qr-admin-bonuses">10 bonusów</div>
+      </div>
+      <div class="qr-admin-routes">
+        <div class="qr-admin-route">
+          <span>Start gry</span>
+          <strong>/</strong>
+        </div>
+        <div class="qr-admin-route">
+          <span>Wyniki</span>
+          <strong>/wyniki/</strong>
+        </div>
+        <div class="qr-admin-route">
+          <span>Pytania</span>
+          <strong>/?q=1...30</strong>
+        </div>
+        <div class="qr-admin-route">
+          <span>Bonusy</span>
+          <strong>/bonus/?b=B01...B10</strong>
+        </div>
+      </div>
+      <div class="ops-actions">
+        <button class="btn primary" type="button" onclick="openQrCenter()">Otwórz generator QR</button>
+        <button class="btn outline" type="button" onclick="downloadQrPdfPack()">Pobierz PDF</button>
+        <button class="btn outline" type="button" onclick="downloadQrJpgPack()">Wszystkie JPG</button>
+      </div>
+      <div class="ops-meta" id="qr-admin-meta">Stały adres generatora: /admin/qr/</div>
     </section>
   </div>
 
@@ -1569,10 +2044,10 @@
           <tr>
             <th>#</th>
             <th>Imię i nazwisko</th>
-            <th>Miasto</th>
+            <th class="detail-col">Miasto</th>
             <th>Punkty łącznie</th>
             <th>Odpowiedzi</th>
-            <th>Ostatnia aktywność</th>
+            <th class="detail-col">Ostatnia aktywność</th>
           </tr>
         </thead>
         <tbody id="lb-body">
@@ -1602,7 +2077,7 @@
         <thead>
           <tr>
             <th>Uczestnik</th>
-            <th>Miasto</th>
+            <th class="detail-col">Miasto</th>
             <th>Pytanie</th>
             <th>Odpowiedź</th>
             <th>Wynik</th>
@@ -1632,7 +2107,7 @@
         <thead>
           <tr>
             <th>Uczestnik</th>
-            <th>Miasto</th>
+            <th class="detail-col">Miasto</th>
             <th>Bonus</th>
             <th>Punkt</th>
             <th>Czas</th>
@@ -1746,6 +2221,10 @@
           <span class="device-label">Ostatnie IP</span>
           <div class="device-value" id="participant-modal-ip">Brak danych</div>
         </div>
+        <div class="device-actions">
+          <button class="btn outline device-reset-btn" id="participant-release-device-btn" type="button" onclick="adjustParticipant('release-device')">Odblokuj logowanie na nowym urządzeniu</button>
+          <div class="device-reset-note" id="participant-release-device-note">Po użyciu tego przycisku stare urządzenie straci przypisanie, a uczestnik zaloguje się ponownie na nowym telefonie.</div>
+        </div>
         <div class="detail-list" id="participant-modal-bonuses"></div>
         <div class="adjust-card">
           <h3>Korekta ręczna</h3>
@@ -1770,6 +2249,7 @@
   </div>
 </div>
 
+<script src="/admin/qr-catalog.js"></script>
 <script>
 let allParticipants = [];
 let allAnswers = [];
@@ -1796,7 +2276,15 @@ let isDataLoading = false;
 let pendingDataReload = false;
 let adminUnlocked = false;
 let pollingStarted = false;
+let systemHealth = {
+  state: 'unknown',
+  data: 'unknown',
+  quickTest: 'unknown',
+  note: 'Sprawdzam połączenie z backendem i czekam na pierwszy szybki test systemu.',
+  updatedAt: null
+};
 const ADMIN_SESSION_KEY = 'god_admin_authenticated';
+const EVENT_MODE_KEY = 'god_admin_event_mode';
 const ADMIN_LOGIN = 'admin';
 const ADMIN_PASSWORD = 'final2026';
 
@@ -1812,6 +2300,35 @@ function closeParticipantModal() {
   if (modal) {
     modal.classList.remove('show');
   }
+}
+
+function isEventModeEnabled() {
+  try {
+    return localStorage.getItem(EVENT_MODE_KEY) === '1';
+  } catch (error) {
+    return false;
+  }
+}
+
+function applyEventMode(isEnabled) {
+  document.body.classList.toggle('event-mode', !!isEnabled);
+
+  const button = document.getElementById('btn-event-mode');
+  if (button) {
+    button.classList.toggle('active', !!isEnabled);
+    button.textContent = isEnabled ? 'Tryb wydarzenia: ON' : 'Tryb wydarzenia';
+    button.setAttribute('aria-pressed', isEnabled ? 'true' : 'false');
+  }
+}
+
+function toggleEventMode() {
+  const nextState = !document.body.classList.contains('event-mode');
+  try {
+    localStorage.setItem(EVENT_MODE_KEY, nextState ? '1' : '0');
+  } catch (error) {
+    // Ignore storage issues and still apply in-memory UI state.
+  }
+  applyEventMode(nextState);
 }
 
 function applyAdminAccessState(isUnlocked) {
@@ -1899,6 +2416,7 @@ function logoutAdmin() {
 }
 
 function initializeAdminAccess() {
+  applyEventMode(isEventModeEnabled());
   applyAdminAccessState(isAdminAuthenticated());
 
   const passwordInput = document.getElementById('admin-password');
@@ -1925,6 +2443,78 @@ function setAdminFeedback(message, type = '') {
   const el = document.getElementById('admin-feedback');
   el.className = `admin-feedback${type ? ` ${type}` : ''}`;
   el.textContent = message || '';
+}
+
+function formatSystemHealthTime(value) {
+  if (!value) return 'Brak pomiaru';
+
+  return new Date(value).toLocaleTimeString('pl-PL', {
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+}
+
+function renderSystemBar() {
+  const bar = document.getElementById('system-bar');
+  const badge = document.getElementById('system-bar-badge');
+  const title = document.getElementById('system-bar-title');
+  const text = document.getElementById('system-bar-text');
+  const meta = document.getElementById('system-bar-meta');
+
+  let level = 'warning';
+  let badgeText = 'Ostrzeżenia';
+  let titleText = 'Są ostrzeżenia';
+  let messageText = systemHealth.note || 'Panel działa, ale warto jeszcze sprawdzić system przed startem.';
+
+  if (systemHealth.state === 'error') {
+    level = 'error';
+    badgeText = 'Problem';
+    titleText = 'Jest problem';
+    messageText = 'Panel nie może odczytać bieżącego stanu gry z backendu.';
+  } else if (systemHealth.data === 'error') {
+    level = 'error';
+    badgeText = 'Problem';
+    titleText = 'Jest problem';
+    messageText = 'Panel nie może pobrać rankingów, odpowiedzi lub bonusów.';
+  } else if (systemHealth.quickTest === 'error') {
+    level = 'error';
+    badgeText = 'Problem';
+    titleText = 'Jest problem';
+    messageText = 'Szybki test wykrył problem. Sprawdź listę po prawej stronie i popraw błędny moduł.';
+  } else if (systemHealth.quickTest === 'ok' && systemHealth.state === 'ok' && systemHealth.data === 'ok') {
+    level = 'ok';
+    badgeText = 'Wszystko działa';
+    titleText = 'Wszystko działa';
+    messageText = 'Backend, dane panelu i szybki test wyglądają poprawnie.';
+  } else if (systemHealth.quickTest === 'running') {
+    level = 'warning';
+    badgeText = 'Sprawdzanie';
+    titleText = 'Trwa sprawdzanie';
+    messageText = 'Trwa szybki test systemu: sprawdzam bazę, timer, pytania, bonusy i linki.';
+  } else if (systemHealth.state === 'ok' && systemHealth.data === 'ok') {
+    level = 'warning';
+    badgeText = 'Ostrzeżenia';
+    titleText = 'Są ostrzeżenia';
+    messageText = 'Panel działa poprawnie, ale przed startem warto uruchomić szybki test systemu.';
+  }
+
+  bar.className = `system-bar ${level}`;
+  badge.textContent = badgeText;
+  title.textContent = titleText;
+  text.textContent = messageText;
+  meta.textContent = systemHealth.updatedAt
+    ? `Ostatnia kontrola: ${formatSystemHealthTime(systemHealth.updatedAt)}`
+    : 'Brak pomiaru';
+}
+
+function updateSystemHealth(patch = {}) {
+  systemHealth = {
+    ...systemHealth,
+    ...patch,
+    updatedAt: patch.updatedAt || new Date().toISOString()
+  };
+
+  renderSystemBar();
 }
 
 function formatDurationLabel(durationMs = gameDurationMs) {
@@ -2035,7 +2625,7 @@ function renderQuickTestResults(items) {
 function getCurrentPreviewMode() {
   if (gamePhase === 'active') return 'start';
   if (gamePhase === 'ended') {
-    return getSummaryRemainingMs() > 0 ? 'final' : 'theater';
+    return getSummaryRemainingMs() > 0 ? 'final' : 'thanks';
   }
   return 'start';
 }
@@ -2095,18 +2685,22 @@ function renderPlayerPreview() {
         </div>
       </div>
     `;
-  } else if (mode === 'theater') {
-    phaseText = 'Podgląd momentu po zakończeniu odliczania do podsumowania.';
+  } else if (mode === 'thanks') {
+    phaseText = 'Podgląd planszy z podziękowaniem po zakończeniu finału i podsumowania.';
     html = `
       <div class="player-preview-card">
         <div class="player-preview-logo">Gwiazdka One Day 2026</div>
         ${banner}
-        <div class="player-preview-pill">Teatr</div>
-        <div class="player-preview-title">Czekamy na Was w Teatrze</div>
-        <div class="player-preview-copy">Licznik dobiegł końca. Gracze widzą już tylko jasny komunikat, gdzie mają przejść na finałowe spotkanie.</div>
+        <div class="player-preview-pill">Dziękujemy</div>
+        <div class="player-preview-title">Dziękujemy za udział</div>
+        <div class="player-preview-copy">Po zakończeniu podsumowania uczestnik widzi spokojną planszę z podziękowaniem oraz linkami do relacji i zdjęć.</div>
         <div class="player-preview-box">
-          <strong>Miejsce: Teatr</strong>
-          <p>To lekki ekran informacyjny, który nie wymaga dalszych zapytań poza zwykłym odczytem stanu gry.</p>
+          <strong>Zdjęcia i relacja po finale</strong>
+          <p>Na tym ekranie warto przypomnieć o Instagramie i Facebooku Fundacji One Day, żeby uczestnicy łatwo wrócili po materiały z wydarzenia.</p>
+        </div>
+        <div class="player-preview-box">
+          <strong>Instagram: fundacjaoneday</strong>
+          <p>Facebook: fundacjaoneday</p>
         </div>
       </div>
     `;
@@ -2115,7 +2709,9 @@ function renderPlayerPreview() {
       ? (gamePhase === 'active'
           ? 'Aktualnie gracz na wejściu widzi ekran startowy i może przejść do logowania.'
           : gamePhase === 'ended'
-            ? 'Aktualnie gracz widzi ekran końcowy związany z finałem lub Teatrem.'
+            ? (getSummaryRemainingMs() > 0
+                ? 'Aktualnie gracz widzi ekran finału z zaproszeniem do Teatru i licznikiem do podsumowania.'
+                : 'Aktualnie gracz widzi planszę z podziękowaniem i linkami do relacji.')
             : 'Aktualnie gracz widzi ekran oczekiwania na start gry.')
       : 'Podgląd ekranu startowego gracza.';
 
@@ -2201,6 +2797,13 @@ async function loadGameState() {
       document.getElementById('live-timer').classList.remove('warning');
     }
 
+    updateSystemHealth({
+      state: 'ok',
+      note: systemHealth.quickTest === 'ok'
+        ? 'Stan gry i dane panelu są dostępne, a szybki test potwierdził gotowość systemu.'
+        : 'Stan gry jest dostępny. Dla pełnej pewności uruchom szybki test systemu przed startem.'
+    });
+
     renderOpsState();
     renderPlayerPreview();
   } catch (e) {
@@ -2208,6 +2811,10 @@ async function loadGameState() {
     gamePhase = 'error';
     setStatus('ended', 'Błąd odczytu stanu gry', 'Nie udało się pobrać aktualnego stanu z backendu.');
     syncActionButtons('error');
+    updateSystemHealth({
+      state: 'error',
+      note: 'Panel nie może odczytać bieżącego stanu gry z backendu.'
+    });
     renderOpsState();
     renderPlayerPreview();
   } finally {
@@ -2525,6 +3132,10 @@ async function runQuickTest() {
   const button = document.getElementById('btn-quick-test');
   button.disabled = true;
   setAdminFeedback('Trwa szybki test systemu...');
+  updateSystemHealth({
+    quickTest: 'running',
+    note: 'Trwa szybki test systemu: sprawdzam bazę, timer, pytania, bonusy i linki.'
+  });
 
   try {
     const [stateRes, adminRes, homeRes] = await Promise.all([
@@ -2598,6 +3209,12 @@ async function runQuickTest() {
         : 'Szybki test wykrył problem. Sprawdź listę po prawej stronie.',
       dbOk && timerOk && startedOk && summaryOk && questionsOk && bonusesOk && linksOk ? 'success' : 'error'
     );
+    updateSystemHealth({
+      quickTest: dbOk && timerOk && startedOk && summaryOk && questionsOk && bonusesOk && linksOk ? 'ok' : 'error',
+      note: dbOk && timerOk && startedOk && summaryOk && questionsOk && bonusesOk && linksOk
+        ? 'Szybki test potwierdził, że baza, timer, pytania, bonusy i linki działają poprawnie.'
+        : 'Szybki test wykrył problem. Sprawdź listę po prawej stronie i popraw błędny moduł.'
+    });
   } catch (e) {
     console.error(e);
     renderQuickTestResults([
@@ -2609,6 +3226,10 @@ async function runQuickTest() {
       }
     ]);
     setAdminFeedback('Nie udało się zakończyć szybkiego testu systemu.', 'error');
+    updateSystemHealth({
+      quickTest: 'error',
+      note: 'Nie udało się zakończyć szybkiego testu systemu.'
+    });
   } finally {
     button.disabled = false;
   }
@@ -2640,10 +3261,21 @@ async function loadData() {
     liveActivity = data.liveActivity || { liveParticipants: [], hottestQuestions: [], recentActivity: [] };
     questionStats = computeQuestionStats(allAnswers);
 
+    updateSystemHealth({
+      data: 'ok',
+      note: systemHealth.quickTest === 'ok'
+        ? 'Dane uczestników i odpowiedzi odświeżyły się poprawnie. System wygląda stabilnie.'
+        : 'Dane panelu odświeżyły się poprawnie. Dla pełnej pewności uruchom szybki test systemu.'
+    });
+
     renderVisibleData();
     renderPlayerPreview();
   } catch (e) {
     console.error(e);
+    updateSystemHealth({
+      data: 'error',
+      note: 'Panel nie może pobrać rankingów, odpowiedzi lub bonusów.'
+    });
   } finally {
     isDataLoading = false;
     if (pendingDataReload) {
@@ -2858,13 +3490,13 @@ function renderLeaderboard() {
       <tr class="clickable-row" onclick="openParticipantModal(${participant.id})">
         <td class="rank ${rankClass}">${index + 1}</td>
         <td>${escHtml(participant.firstName)} ${escHtml(participant.lastName)}</td>
-        <td class="muted">${escHtml(city)}</td>
+        <td class="muted detail-col">${escHtml(city)}</td>
         <td>
           <span class="score-pill">${participant.score || 0} pkt</span>
           <span class="score-note">pytania + bonusy</span>
         </td>
         <td class="muted">${participant.answeredCount || 0} / 30</td>
-        <td class="muted">${lastActivity}</td>
+        <td class="muted detail-col">${lastActivity}</td>
       </tr>
     `;
   }).join('');
@@ -2917,7 +3549,7 @@ function renderAnswers() {
     return `
       <tr>
         <td>${escHtml(answer.participantName || '—')}</td>
-        <td class="muted">${escHtml(city)}</td>
+        <td class="muted detail-col">${escHtml(city)}</td>
         <td style="max-width:260px;word-break:break-word">${escHtml(questionLabel)}</td>
         <td style="max-width:220px;word-break:break-word">${escHtml(answer.answer || '')}</td>
         <td class="${answer.correct ? 'correct-ans' : 'wrong-ans'}">${answer.correct ? 'Tak' : 'Nie'}</td>
@@ -2967,7 +3599,7 @@ function renderBonuses() {
     return `
       <tr>
         <td>${escHtml(bonus.participantName)}</td>
-        <td class="muted">${escHtml(bonus.participantCity)}</td>
+        <td class="muted detail-col">${escHtml(bonus.participantCity)}</td>
         <td>${escHtml(bonus.bonusLabel || bonus.bonusId)}</td>
         <td><span class="score-pill">+1 pkt</span></td>
         <td class="muted">${createdAt}</td>
@@ -3085,7 +3717,7 @@ function setParticipantAdjustFeedback(message, type = '') {
 
 function setParticipantAdjustBusy(isBusy) {
   const modal = document.getElementById('participant-modal');
-  modal.querySelectorAll('.adjust-card button, .adjust-card select').forEach(element => {
+  modal.querySelectorAll('.adjust-card button, .adjust-card select, .device-reset-btn').forEach(element => {
     element.disabled = isBusy;
   });
 }
@@ -3147,6 +3779,19 @@ function openParticipantModal(participantId) {
   document.getElementById('participant-modal-device').textContent = participant.deviceToken || 'Brak danych';
   document.getElementById('participant-modal-user-agent').textContent = participant.lastUserAgent || 'Brak danych';
   document.getElementById('participant-modal-ip').textContent = participant.lastIp || 'Brak danych';
+  const releaseBtn = document.getElementById('participant-release-device-btn');
+  const releaseNote = document.getElementById('participant-release-device-note');
+  if (releaseBtn) {
+    releaseBtn.disabled = !participant.deviceToken;
+    releaseBtn.textContent = participant.deviceToken
+      ? 'Odblokuj logowanie na nowym urządzeniu'
+      : 'Urządzenie już odblokowane';
+  }
+  if (releaseNote) {
+    releaseNote.textContent = participant.deviceToken
+      ? 'Po użyciu tego przycisku stare urządzenie straci przypisanie, a uczestnik zaloguje się ponownie na nowym telefonie.'
+      : 'To konto nie jest teraz przypisane do urządzenia. Następne logowanie uczestnika podepnie nowe urządzenie do tego samego konta.';
+  }
   renderParticipantBonusSelect(participantBonuses);
   setParticipantAdjustBusy(false);
   setParticipantAdjustFeedback('');
@@ -3184,6 +3829,11 @@ async function adjustParticipant(action) {
 
   const bonusSelect = document.getElementById('participant-bonus-select');
   const bonusId = bonusSelect ? bonusSelect.value : '';
+
+  if (action === 'release-device') {
+    const shouldContinue = window.confirm('Odblokować to konto do ponownego logowania na nowym urządzeniu? Stare urządzenie straci przypisanie.');
+    if (!shouldContinue) return;
+  }
 
   if ((action === 'add-bonus' || action === 'remove-bonus') && !bonusId) {
     setParticipantAdjustFeedback('Najpierw wybierz bonus do korekty.', 'error');
@@ -3239,6 +3889,45 @@ function showTab(tab, element) {
   renderVisibleData();
 }
 
+function getQrCenterUrl(mode = '') {
+  const url = new URL('/admin/qr/', window.location.origin);
+  if (mode) {
+    url.searchParams.set('download', mode);
+  }
+  return url.toString();
+}
+
+function refreshQrAdminSummary() {
+  if (typeof window.groupQrCatalog !== 'function') {
+    return;
+  }
+
+  const grouped = window.groupQrCatalog(window.location.origin);
+  const totalEl = document.getElementById('qr-admin-total');
+  const questionsEl = document.getElementById('qr-admin-questions');
+  const bonusesEl = document.getElementById('qr-admin-bonuses');
+  const metaEl = document.getElementById('qr-admin-meta');
+
+  if (totalEl) totalEl.textContent = `${grouped.all.length} kody łącznie`;
+  if (questionsEl) questionsEl.textContent = `${grouped.questions.length} pytań`;
+  if (bonusesEl) bonusesEl.textContent = `${grouped.bonuses.length} bonusów`;
+  if (metaEl) metaEl.textContent = `Stały adres generatora: ${getQrCenterUrl()}`;
+}
+
+function openQrCenter() {
+  window.open(getQrCenterUrl(), '_blank', 'noopener');
+}
+
+function downloadQrPdfPack() {
+  window.open(getQrCenterUrl('pdf'), '_blank', 'noopener');
+  setAdminFeedback('Otworzyłem stronę z kodami QR w trybie PDF. Z nowej karty możesz od razu zapisać cały pakiet do druku.', 'success');
+}
+
+function downloadQrJpgPack() {
+  window.open(getQrCenterUrl('jpg'), '_blank', 'noopener');
+  setAdminFeedback('Uruchomiłem hurtowe pobieranie wszystkich kodów QR jako osobne pliki JPG. Przeglądarka może poprosić o zgodę na wiele pobrań.', 'success');
+}
+
 function exportCSV() {
   let csv = 'Miejsce,Imię,Nazwisko,Miasto,Punkty,Odpowiedzi\n';
 
@@ -3284,6 +3973,7 @@ function escapeAttr(value) {
     .replace(/>/g, '&gt;');
 }
 
+refreshQrAdminSummary();
 initializeAdminAccess();
 </script>
 </body>
