@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pl">
 <head>
 <meta charset="UTF-8">
@@ -864,7 +864,7 @@
 <div class="shell">
   <div class="logo">Gwiazdka One Day - Panel Organizatora</div>
   <h1>Panel administratora</h1>
-  <p class="sub">Steruj startem i stopem gry, testuj reset danych oraz kontroluj odpowiedzi i statystyki pytań w jednym miejscu.</p>
+  <p class="sub">Steruj startem i stopem gry, testuj reset danych oraz kontroluj odpowiedzi i statystyki pytaĹ„ w jednym miejscu.</p>
 
   <div class="hero">
     <section class="panel control-panel">
@@ -872,7 +872,7 @@
         <div class="status-wrap">
           <div class="status-dot" id="status-dot"></div>
           <div>
-            <div class="status-text" id="status-text">Ładowanie...</div>
+            <div class="status-text" id="status-text">Ĺadowanie...</div>
             <div class="status-sub" id="status-sub">Sprawdzam stan gry.</div>
           </div>
         </div>
@@ -885,14 +885,14 @@
       <div class="action-grid">
         <button class="action-btn start" id="btn-start" onclick="startGame()">
           Start gry
-          <small>Uruchamia turę dla uczestników</small>
+          <small>Uruchamia turÄ™ dla uczestnikĂłw</small>
         </button>
         <button class="action-btn stop" id="btn-stop" onclick="stopGame()">
           Stop gry
-          <small>Zamyka turę bez kasowania danych</small>
+          <small>Zamyka turÄ™ bez kasowania danych</small>
         </button>
         <button class="action-btn reset" id="btn-reset" onclick="showResetModal()">
-          Wyczyść dane
+          WyczyĹ›Ä‡ dane
           <small>Usuwa testowe wpisy i odpowiedzi</small>
         </button>
       </div>
@@ -901,29 +901,29 @@
     <aside class="panel notes-panel">
       <div>
         <div class="notes-title">Szybkie testy</div>
-        <div class="notes-copy">Najbezpieczniejszy cykl testowy to: uruchom grę, sprawdź logowanie i odpowiedzi, zatrzymaj grę, a potem wyczyść dane przed kolejną próbą.</div>
+        <div class="notes-copy">Najbezpieczniejszy cykl testowy to: uruchom grÄ™, sprawdĹş logowanie i odpowiedzi, zatrzymaj grÄ™, a potem wyczyĹ›Ä‡ dane przed kolejnÄ… prĂłbÄ….</div>
       </div>
       <div class="checklist">
-        <div class="check-item">Start gry daje natychmiastowy sygnał w panelu i na liczniku.</div>
-        <div class="check-item">Stop gry zostawia wyniki, ale blokuje nowe wejścia do aktywnej tury.</div>
-        <div class="check-item">Wyczyść dane usuwa uczestników, odpowiedzi i bonusy, więc możesz testować od zera.</div>
+        <div class="check-item">Start gry daje natychmiastowy sygnaĹ‚ w panelu i na liczniku.</div>
+        <div class="check-item">Stop gry zostawia wyniki, ale blokuje nowe wejĹ›cia do aktywnej tury.</div>
+        <div class="check-item">WyczyĹ›Ä‡ dane usuwa uczestnikĂłw, odpowiedzi i bonusy, wiÄ™c moĹĽesz testowaÄ‡ od zera.</div>
       </div>
     </aside>
   </div>
 
   <div class="stats-row">
-    <div class="stat"><div class="stat-val" id="s-participants">—</div><div class="stat-lbl">Uczestników</div></div>
-    <div class="stat"><div class="stat-val" id="s-answers">—</div><div class="stat-lbl">Odpowiedzi</div></div>
-    <div class="stat"><div class="stat-val" id="s-correct">—</div><div class="stat-lbl">Poprawnych</div></div>
-    <div class="stat"><div class="stat-val" id="s-wrong">—</div><div class="stat-lbl">Błędnych</div></div>
-    <div class="stat"><div class="stat-val" id="s-avg">—</div><div class="stat-lbl">Śr. punktów</div></div>
+    <div class="stat"><div class="stat-val" id="s-participants">â€”</div><div class="stat-lbl">UczestnikĂłw</div></div>
+    <div class="stat"><div class="stat-val" id="s-answers">â€”</div><div class="stat-lbl">Odpowiedzi</div></div>
+    <div class="stat"><div class="stat-val" id="s-correct">â€”</div><div class="stat-lbl">Poprawnych</div></div>
+    <div class="stat"><div class="stat-val" id="s-wrong">â€”</div><div class="stat-lbl">BĹ‚Ä™dnych</div></div>
+    <div class="stat"><div class="stat-val" id="s-avg">â€”</div><div class="stat-lbl">Ĺšr. punktĂłw</div></div>
   </div>
 
   <div class="tab-row">
-    <button class="tab" onclick="showTab('live', this)">Na żywo</button>
+    <button class="tab" onclick="showTab('live', this)">Na ĹĽywo</button>
     <button class="tab active" onclick="showTab('leaderboard', this)">Ranking</button>
     <button class="tab" onclick="showTab('answers', this)">Odpowiedzi</button>
-    <button class="tab" onclick="showTab('question-stats', this)">Statystyki pytań</button>
+    <button class="tab" onclick="showTab('question-stats', this)">Statystyki pytaĹ„</button>
   </div>
 
   <div id="tab-live" style="display:none">
@@ -931,37 +931,37 @@
       <div class="insight-card">
         <div class="insight-label">Aktywni teraz</div>
         <div class="insight-value" id="live-active-count">0</div>
-        <div class="insight-sub" id="live-active-sub">Brak uczestników na pytaniach w tej chwili.</div>
+        <div class="insight-sub" id="live-active-sub">Brak uczestnikĂłw na pytaniach w tej chwili.</div>
       </div>
       <div class="insight-card">
-        <div class="insight-label">Najczęściej otwierane</div>
-        <div class="insight-value" id="live-hot-question">—</div>
-        <div class="insight-sub" id="live-hot-sub">Czekam na pierwsze wejścia w pytania.</div>
+        <div class="insight-label">NajczÄ™Ĺ›ciej otwierane</div>
+        <div class="insight-value" id="live-hot-question">â€”</div>
+        <div class="insight-sub" id="live-hot-sub">Czekam na pierwsze wejĹ›cia w pytania.</div>
       </div>
       <div class="insight-card">
-        <div class="insight-label">Gdzie robi się korek</div>
-        <div class="insight-value" id="live-bottleneck-question">—</div>
-        <div class="insight-sub" id="live-bottleneck-sub">Na razie nie widać zatorów.</div>
+        <div class="insight-label">Gdzie robi siÄ™ korek</div>
+        <div class="insight-value" id="live-bottleneck-question">â€”</div>
+        <div class="insight-sub" id="live-bottleneck-sub">Na razie nie widaÄ‡ zatorĂłw.</div>
       </div>
     </div>
 
     <div class="live-grid">
       <section class="live-card">
         <h3>Kto odpowiada teraz</h3>
-        <div class="live-card-sub">Uczestnicy, którzy mają właśnie otwarte pytanie. To pomaga szybko wychwycić, kto utknął na dłużej.</div>
+        <div class="live-card-sub">Uczestnicy, ktĂłrzy majÄ… wĹ‚aĹ›nie otwarte pytanie. To pomaga szybko wychwyciÄ‡, kto utknÄ…Ĺ‚ na dĹ‚uĹĽej.</div>
         <div class="live-list" id="live-participants-list"></div>
       </section>
 
       <div class="live-stack">
         <section class="live-card">
-          <h3>Pytania z największym ruchem</h3>
-          <div class="live-card-sub">Łączę bieżących uczestników z ostatnimi otwarciami pytań, żeby było widać, gdzie robi się tłoczno.</div>
+          <h3>Pytania z najwiÄ™kszym ruchem</h3>
+          <div class="live-card-sub">ĹÄ…czÄ™ bieĹĽÄ…cych uczestnikĂłw z ostatnimi otwarciami pytaĹ„, ĹĽeby byĹ‚o widaÄ‡, gdzie robi siÄ™ tĹ‚oczno.</div>
           <div class="live-list" id="live-hot-questions-list"></div>
         </section>
 
         <section class="live-card">
-          <h3>Ostatnie wejścia w pytania</h3>
-          <div class="live-card-sub">Krótki podgląd tego, kto właśnie otworzył pytanie i gdzie przesuwa się ruch.</div>
+          <h3>Ostatnie wejĹ›cia w pytania</h3>
+          <div class="live-card-sub">KrĂłtki podglÄ…d tego, kto wĹ‚aĹ›nie otworzyĹ‚ pytanie i gdzie przesuwa siÄ™ ruch.</div>
           <div class="live-list" id="live-recent-activity-list"></div>
         </section>
       </div>
@@ -970,25 +970,25 @@
 
   <div id="tab-leaderboard">
     <div class="toolbar">
-      <input type="text" id="search-lb" placeholder="Szukaj po imieniu, nazwisku lub mieście..." oninput="renderLeaderboard()">
-      <button class="btn primary" onclick="loadData()">Odśwież</button>
+      <input type="text" id="search-lb" placeholder="Szukaj po imieniu, nazwisku lub mieĹ›cie..." oninput="renderLeaderboard()">
+      <button class="btn primary" onclick="loadData()">OdĹ›wieĹĽ</button>
       <button class="btn outline" onclick="exportCSV()">Eksportuj CSV</button>
-      <div class="toolbar-meta" id="lb-meta">Pokazano 0 z 0 uczestników</div>
+      <div class="toolbar-meta" id="lb-meta">Pokazano 0 z 0 uczestnikĂłw</div>
     </div>
     <div class="table-wrap">
       <table>
         <thead>
           <tr>
             <th>#</th>
-            <th>Imię i nazwisko</th>
+            <th>ImiÄ™ i nazwisko</th>
             <th>Miasto</th>
             <th>Punkty</th>
             <th>Odpowiedzi</th>
-            <th>Ostatnia aktywność</th>
+            <th>Ostatnia aktywnoĹ›Ä‡</th>
           </tr>
         </thead>
         <tbody id="lb-body">
-          <tr><td colspan="6" class="empty">Ładowanie...</td></tr>
+          <tr><td colspan="6" class="empty">Ĺadowanie...</td></tr>
         </tbody>
       </table>
     </div>
@@ -1006,7 +1006,7 @@
       <select id="filter-correct" onchange="renderAnswers()">
         <option value="all">Wszystkie wyniki</option>
         <option value="correct">Tylko poprawne</option>
-        <option value="wrong">Tylko błędne</option>
+        <option value="wrong">Tylko bĹ‚Ä™dne</option>
       </select>
     </div>
     <div class="table-wrap">
@@ -1016,13 +1016,13 @@
             <th>Uczestnik</th>
             <th>Miasto</th>
             <th>Pytanie</th>
-            <th>Odpowiedź</th>
+            <th>OdpowiedĹş</th>
             <th>Wynik</th>
             <th>Czas</th>
           </tr>
         </thead>
         <tbody id="ans-body">
-          <tr><td colspan="6" class="empty">Ładowanie...</td></tr>
+          <tr><td colspan="6" class="empty">Ĺadowanie...</td></tr>
         </tbody>
       </table>
     </div>
@@ -1032,17 +1032,17 @@
     <div class="insight-grid">
       <div class="insight-card">
         <div class="insight-label">Najtrudniejsze pytanie</div>
-        <div class="insight-value" id="hardest-question">—</div>
+        <div class="insight-value" id="hardest-question">â€”</div>
         <div class="insight-sub" id="hardest-question-sub">Brak danych do analizy.</div>
       </div>
       <div class="insight-card">
-        <div class="insight-label">Najczęściej odwiedzane</div>
-        <div class="insight-value" id="most-visited-question">—</div>
+        <div class="insight-label">NajczÄ™Ĺ›ciej odwiedzane</div>
+        <div class="insight-value" id="most-visited-question">â€”</div>
         <div class="insight-sub" id="most-visited-question-sub">Brak danych do analizy.</div>
       </div>
       <div class="insight-card">
-        <div class="insight-label">Średnia skuteczność</div>
-        <div class="insight-value" id="avg-question-success">—</div>
+        <div class="insight-label">Ĺšrednia skutecznoĹ›Ä‡</div>
+        <div class="insight-value" id="avg-question-success">â€”</div>
         <div class="insight-sub" id="avg-question-success-sub">Brak danych do analizy.</div>
       </div>
     </div>
@@ -1057,13 +1057,13 @@
             <th>Pytanie</th>
             <th>Odwiedzin</th>
             <th>Poprawne</th>
-            <th>Błędne</th>
-            <th>% błędnych</th>
+            <th>BĹ‚Ä™dne</th>
+            <th>% bĹ‚Ä™dnych</th>
             <th>% poprawnych</th>
           </tr>
         </thead>
         <tbody id="question-stats-body">
-          <tr><td colspan="6" class="empty">Ładowanie...</td></tr>
+          <tr><td colspan="6" class="empty">Ĺadowanie...</td></tr>
         </tbody>
       </table>
     </div>
@@ -1072,10 +1072,10 @@
 
 <div class="modal-overlay" id="reset-modal">
   <div class="modal">
-    <h2>Wyczyścić dane testowe?</h2>
-    <p>Zostaną usunięci wszyscy uczestnicy, odpowiedzi i bonusy. Stan gry zostanie zresetowany do zera. To jest operacja do testów i nie można jej cofnąć.</p>
+    <h2>WyczyĹ›ciÄ‡ dane testowe?</h2>
+    <p>ZostanÄ… usuniÄ™ci wszyscy uczestnicy, odpowiedzi i bonusy. Stan gry zostanie zresetowany do zera. To jest operacja do testĂłw i nie moĹĽna jej cofnÄ…Ä‡.</p>
     <div class="modal-btns">
-      <button class="btn primary" onclick="confirmReset()">Tak, wyczyść dane</button>
+      <button class="btn primary" onclick="confirmReset()">Tak, wyczyĹ›Ä‡ dane</button>
       <button class="btn outline" onclick="hideResetModal()">Anuluj</button>
     </div>
   </div>
@@ -1169,7 +1169,7 @@ let currentParticipantId = null;
 
 async function loadGameState() {
   try {
-    const res = await fetch('/.netlify/functions/game-state');
+    const res = await fetch('/api/game-state');
     const data = await res.json();
 
     if (data.started_at) {
@@ -1179,7 +1179,7 @@ async function loadGameState() {
       const remaining = gameDurationMs - (Date.now() - gameStartedAt);
 
       if (remaining > 0) {
-        setStatus('active', 'Gra trwa', 'Uczestnicy mogą aktualnie logować się i odpowiadać.');
+        setStatus('active', 'Gra trwa', 'Uczestnicy mogÄ… aktualnie logowaÄ‡ siÄ™ i odpowiadaÄ‡.');
         syncActionButtons('active');
         updateLiveTimer();
         if (!timerInterval) timerInterval = setInterval(updateLiveTimer, 1000);
@@ -1187,7 +1187,7 @@ async function loadGameState() {
         gameStartedAt = null;
         summaryAt = new Date(data.summary_at || (Date.now() + 30 * 60000)).getTime();
         clearTimer();
-        setStatus('ended', 'Gra zakończona', 'Czas gry minął. Możesz uruchomić nową turę lub wyczyścić dane.');
+        setStatus('ended', 'Gra zakoĹ„czona', 'Czas gry minÄ…Ĺ‚. MoĹĽesz uruchomiÄ‡ nowÄ… turÄ™ lub wyczyĹ›ciÄ‡ dane.');
         syncActionButtons('ended');
         updateLiveTimer();
         if (!timerInterval) timerInterval = setInterval(updateLiveTimer, 1000);
@@ -1204,14 +1204,14 @@ async function loadGameState() {
       gameStartedAt = null;
       summaryAt = null;
       clearTimer();
-      setStatus('idle', 'Gra zatrzymana', 'Możesz uruchomić start gry albo wyczyścić dane testowe.');
+      setStatus('idle', 'Gra zatrzymana', 'MoĹĽesz uruchomiÄ‡ start gry albo wyczyĹ›ciÄ‡ dane testowe.');
       syncActionButtons('idle');
       document.getElementById('live-timer').textContent = '--:--';
       document.getElementById('live-timer').classList.remove('warning');
     }
   } catch (e) {
     console.error(e);
-    setStatus('ended', 'Błąd odczytu stanu gry', 'Nie udało się pobrać aktualnego stanu z backendu.');
+    setStatus('ended', 'BĹ‚Ä…d odczytu stanu gry', 'Nie udaĹ‚o siÄ™ pobraÄ‡ aktualnego stanu z backendu.');
     syncActionButtons('error');
   }
 }
@@ -1279,7 +1279,7 @@ function updateLiveTimer() {
     summaryAt = Date.now() + 30 * 60000;
     timerEl.textContent = 'TEATR';
     timerEl.classList.add('warning');
-    setStatus('ended', 'Gra zakończona', 'Czas gry minął. Możesz uruchomić nową turę lub wyczyścić dane.');
+    setStatus('ended', 'Gra zakoĹ„czona', 'Czas gry minÄ…Ĺ‚. MoĹĽesz uruchomiÄ‡ nowÄ… turÄ™ lub wyczyĹ›ciÄ‡ dane.');
     syncActionButtons('ended');
     return;
   }
@@ -1298,13 +1298,13 @@ function updateLiveTimer() {
 async function startGame() {
   document.getElementById('btn-start').disabled = true;
   try {
-    const res = await fetch('/.netlify/functions/game-state', {
+    const res = await fetch('/api/game-state', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ action: 'start' })
     });
 
-    if (!res.ok) throw new Error('Start gry nie powiódł się.');
+    if (!res.ok) throw new Error('Start gry nie powiĂłdĹ‚ siÄ™.');
 
     const data = await res.json();
     gameStartedAt = new Date(data.started_at).getTime();
@@ -1315,7 +1315,7 @@ async function startGame() {
     await loadGameState();
   } catch (e) {
     console.error(e);
-    alert('Nie udało się uruchomić gry.');
+    alert('Nie udaĹ‚o siÄ™ uruchomiÄ‡ gry.');
     syncActionButtons('idle');
   }
 }
@@ -1323,18 +1323,18 @@ async function startGame() {
 async function stopGame() {
   document.getElementById('btn-stop').disabled = true;
   try {
-    const res = await fetch('/.netlify/functions/game-state', {
+    const res = await fetch('/api/game-state', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ action: 'stop' })
     });
 
-    if (!res.ok) throw new Error('Stop gry nie powiódł się.');
+    if (!res.ok) throw new Error('Stop gry nie powiĂłdĹ‚ siÄ™.');
 
     await loadGameState();
   } catch (e) {
     console.error(e);
-    alert('Nie udało się zatrzymać gry.');
+    alert('Nie udaĹ‚o siÄ™ zatrzymaÄ‡ gry.');
     syncActionButtons('active');
   }
 }
@@ -1351,13 +1351,13 @@ async function confirmReset() {
   hideResetModal();
 
   try {
-    const res = await fetch('/.netlify/functions/game-state', {
+    const res = await fetch('/api/game-state', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ action: 'reset' })
     });
 
-    if (!res.ok) throw new Error('Reset danych nie powiódł się.');
+    if (!res.ok) throw new Error('Reset danych nie powiĂłdĹ‚ siÄ™.');
 
     allParticipants = [];
     allAnswers = [];
@@ -1372,13 +1372,13 @@ async function confirmReset() {
     await loadData();
   } catch (e) {
     console.error(e);
-    alert('Nie udało się wyczyścić danych testowych.');
+    alert('Nie udaĹ‚o siÄ™ wyczyĹ›ciÄ‡ danych testowych.');
   }
 }
 
 async function loadData() {
   try {
-    const res = await fetch('/.netlify/functions/admin-results');
+    const res = await fetch('/api/admin-results');
     const data = await res.json();
 
     if (data.answers && data.answers.length > prevAnswersCount) {
@@ -1413,7 +1413,7 @@ function updateStats() {
 
   const avg = allParticipants.length
     ? (allParticipants.reduce((sum, p) => sum + (p.score || 0), 0) / allParticipants.length).toFixed(1)
-    : '—';
+    : 'â€”';
 
   document.getElementById('s-avg').textContent = avg;
 }
@@ -1479,14 +1479,14 @@ function renderLiveActivity() {
 
   activeCountEl.textContent = liveParticipants.length;
   activeSubEl.textContent = liveParticipants.length
-    ? `Najdłużej otwarte pytanie trwa teraz ${formatSecondsToLabel(liveParticipants[0].secondsOpen)}.`
-    : 'Brak uczestników na pytaniach w tej chwili.';
+    ? `NajdĹ‚uĹĽej otwarte pytanie trwa teraz ${formatSecondsToLabel(liveParticipants[0].secondsOpen)}.`
+    : 'Brak uczestnikĂłw na pytaniach w tej chwili.';
 
   const hottest = hottestQuestions[0];
-  hotQuestionEl.textContent = hottest ? `Pyt. ${hottest.questionId}` : '—';
+  hotQuestionEl.textContent = hottest ? `Pyt. ${hottest.questionId}` : 'â€”';
   hotSubEl.textContent = hottest
-    ? `${hottest.opensLast20m} otwarć w ostatnich 20 minutach.`
-    : 'Czekam na pierwsze wejścia w pytania.';
+    ? `${hottest.opensLast20m} otwarÄ‡ w ostatnich 20 minutach.`
+    : 'Czekam na pierwsze wejĹ›cia w pytania.';
 
   const bottleneck = [...hottestQuestions]
     .sort((a, b) =>
@@ -1494,10 +1494,10 @@ function renderLiveActivity() {
       b.longestOpenSeconds - a.longestOpenSeconds ||
       b.opensLast20m - a.opensLast20m
     )[0];
-  bottleneckQuestionEl.textContent = bottleneck && bottleneck.activeCount > 0 ? `Pyt. ${bottleneck.questionId}` : '—';
+  bottleneckQuestionEl.textContent = bottleneck && bottleneck.activeCount > 0 ? `Pyt. ${bottleneck.questionId}` : 'â€”';
   bottleneckSubEl.textContent = bottleneck && bottleneck.activeCount > 0
-    ? `${bottleneck.activeCount} osób jest tam teraz, a najdłuższe otwarcie trwa ${formatSecondsToLabel(bottleneck.longestOpenSeconds)}.`
-    : 'Na razie nie widać zatorów.';
+    ? `${bottleneck.activeCount} osĂłb jest tam teraz, a najdĹ‚uĹĽsze otwarcie trwa ${formatSecondsToLabel(bottleneck.longestOpenSeconds)}.`
+    : 'Na razie nie widaÄ‡ zatorĂłw.';
 
   if (!liveParticipants.length) {
     participantsListEl.innerHTML = '<div class="empty">Nikt nie ma teraz otwartego pytania.</div>';
@@ -1508,14 +1508,14 @@ function renderLiveActivity() {
           <div class="live-item-title">${escHtml(participant.firstName || '')} ${escHtml(participant.lastName || '')}</div>
           <div class="live-item-badge">${formatSecondsToLabel(participant.secondsOpen)}</div>
         </div>
-        <div class="live-item-sub">Pytanie ${participant.currentQuestionId}: ${escHtml(participant.currentQuestionText || 'Brak treści pytania')}</div>
+        <div class="live-item-sub">Pytanie ${participant.currentQuestionId}: ${escHtml(participant.currentQuestionText || 'Brak treĹ›ci pytania')}</div>
         <div class="live-item-sub">${escHtml(participant.city || 'Bez miasta')} | Odpowiedzi: ${participant.answeredCount || 0}</div>
       </div>
     `).join('');
   }
 
   if (!hottestQuestions.length) {
-    hotQuestionsListEl.innerHTML = '<div class="empty">Brak danych o otwarciach pytań.</div>';
+    hotQuestionsListEl.innerHTML = '<div class="empty">Brak danych o otwarciach pytaĹ„.</div>';
   } else {
     hotQuestionsListEl.innerHTML = hottestQuestions.map((question) => `
       <div class="live-item">
@@ -1523,14 +1523,14 @@ function renderLiveActivity() {
           <div class="live-item-title">Pytanie ${question.questionId}</div>
           <div class="live-item-badge">${question.activeCount} aktywnych</div>
         </div>
-        <div class="live-item-sub">${escHtml(question.questionText || 'Brak treści pytania')}</div>
-        <div class="live-item-sub">Otwarcia 20 min: ${question.opensLast20m} | Najdłuższe bieżące otwarcie: ${formatSecondsToLabel(question.longestOpenSeconds)}</div>
+        <div class="live-item-sub">${escHtml(question.questionText || 'Brak treĹ›ci pytania')}</div>
+        <div class="live-item-sub">Otwarcia 20 min: ${question.opensLast20m} | NajdĹ‚uĹĽsze bieĹĽÄ…ce otwarcie: ${formatSecondsToLabel(question.longestOpenSeconds)}</div>
       </div>
     `).join('');
   }
 
   if (!recentActivity.length) {
-    recentActivityListEl.innerHTML = '<div class="empty">Brak świeżej aktywności.</div>';
+    recentActivityListEl.innerHTML = '<div class="empty">Brak Ĺ›wieĹĽej aktywnoĹ›ci.</div>';
   } else {
     recentActivityListEl.innerHTML = recentActivity.map((activity) => `
       <div class="live-item">
@@ -1538,7 +1538,7 @@ function renderLiveActivity() {
           <div class="live-item-title">${escHtml(activity.participantName || 'Uczestnik')}</div>
           <div class="live-item-badge">${formatDateTime(activity.createdAt)}</div>
         </div>
-        <div class="live-item-sub">Otworzył pytanie ${activity.questionId}: ${escHtml(activity.questionText || 'Brak treści pytania')}</div>
+        <div class="live-item-sub">OtworzyĹ‚ pytanie ${activity.questionId}: ${escHtml(activity.questionText || 'Brak treĹ›ci pytania')}</div>
         <div class="live-item-sub">${escHtml(activity.city || 'Bez miasta')}</div>
       </div>
     `).join('');
@@ -1566,10 +1566,10 @@ function renderLeaderboard() {
       new Date(a.lastActivity || 0) - new Date(b.lastActivity || 0)
     );
 
-  meta.textContent = `Pokazano ${list.length} z ${allParticipants.length} uczestników. Kliknij wiersz, aby otworzyć szczegóły.`;
+  meta.textContent = `Pokazano ${list.length} z ${allParticipants.length} uczestnikĂłw. Kliknij wiersz, aby otworzyÄ‡ szczegĂłĹ‚y.`;
 
   if (!list.length) {
-    body.innerHTML = '<tr><td colspan="6" class="empty">Brak wyników.</td></tr>';
+    body.innerHTML = '<tr><td colspan="6" class="empty">Brak wynikĂłw.</td></tr>';
     return;
   }
 
@@ -1577,8 +1577,8 @@ function renderLeaderboard() {
     const rankClass = index === 0 ? 'rank-1' : index === 1 ? 'rank-2' : index === 2 ? 'rank-3' : '';
     const lastActivity = participant.lastActivity
       ? new Date(participant.lastActivity).toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' })
-      : '—';
-    const city = participant.city || '—';
+      : 'â€”';
+    const city = participant.city || 'â€”';
 
     return `
       <tr class="clickable-row" onclick="openParticipantModal(${participant.id})">
@@ -1626,20 +1626,20 @@ function renderAnswers() {
     .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
   if (!list.length) {
-    body.innerHTML = '<tr><td colspan="6" class="empty">Brak odpowiedzi dla wybranych filtrów.</td></tr>';
+    body.innerHTML = '<tr><td colspan="6" class="empty">Brak odpowiedzi dla wybranych filtrĂłw.</td></tr>';
     return;
   }
 
   body.innerHTML = list.map(answer => {
     const createdAt = answer.createdAt
       ? new Date(answer.createdAt).toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
-      : '—';
-    const city = answer.participantCity || '—';
+      : 'â€”';
+    const city = answer.participantCity || 'â€”';
     const questionLabel = answer.questionText || `Pytanie ${answer.questionId}`;
 
     return `
       <tr>
-        <td>${escHtml(answer.participantName || '—')}</td>
+        <td>${escHtml(answer.participantName || 'â€”')}</td>
         <td class="muted">${escHtml(city)}</td>
         <td style="max-width:260px;word-break:break-word">${escHtml(questionLabel)}</td>
         <td style="max-width:220px;word-break:break-word">${escHtml(answer.answer || '')}</td>
@@ -1697,7 +1697,7 @@ function renderQuestionStats() {
   renderQuestionInsights();
 
   if (!list.length) {
-    body.innerHTML = '<tr><td colspan="6" class="empty">Brak danych do analizy pytań.</td></tr>';
+    body.innerHTML = '<tr><td colspan="6" class="empty">Brak danych do analizy pytaĹ„.</td></tr>';
     return;
   }
 
@@ -1718,11 +1718,11 @@ function renderQuestionStats() {
 
 function renderQuestionInsights() {
   if (!questionStats.length) {
-    document.getElementById('hardest-question').textContent = '—';
+    document.getElementById('hardest-question').textContent = 'â€”';
     document.getElementById('hardest-question-sub').textContent = 'Brak danych do analizy.';
-    document.getElementById('most-visited-question').textContent = '—';
+    document.getElementById('most-visited-question').textContent = 'â€”';
     document.getElementById('most-visited-question-sub').textContent = 'Brak danych do analizy.';
-    document.getElementById('avg-question-success').textContent = '—';
+    document.getElementById('avg-question-success').textContent = 'â€”';
     document.getElementById('avg-question-success-sub').textContent = 'Brak danych do analizy.';
     return;
   }
@@ -1735,7 +1735,7 @@ function renderQuestionInsights() {
 
   document.getElementById('hardest-question').textContent = `Pyt. ${hardest.questionId}`;
   document.getElementById('hardest-question-sub').textContent =
-    `${hardest.wrongPct}% błędnych odpowiedzi przy ${hardest.visits} odwiedzinach.`;
+    `${hardest.wrongPct}% bĹ‚Ä™dnych odpowiedzi przy ${hardest.visits} odwiedzinach.`;
 
   document.getElementById('most-visited-question').textContent = `Pyt. ${mostVisited.questionId}`;
   document.getElementById('most-visited-question-sub').textContent =
@@ -1743,7 +1743,7 @@ function renderQuestionInsights() {
 
   document.getElementById('avg-question-success').textContent = `${avgSuccess}%`;
   document.getElementById('avg-question-success-sub').textContent =
-    `Średnia skuteczność liczona dla ${questionStats.length} pytań z odpowiedziami.`;
+    `Ĺšrednia skutecznoĹ›Ä‡ liczona dla ${questionStats.length} pytaĹ„ z odpowiedziami.`;
 }
 
 function hideParticipantModal() {
@@ -1868,7 +1868,7 @@ async function adjustParticipant(action) {
   setParticipantAdjustFeedback('Zapisywanie korekty...');
 
   try {
-    const res = await fetch('/.netlify/functions/admin-adjust-participant', {
+    const res = await fetch('/api/admin-adjust-participant', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -1903,7 +1903,7 @@ function showTab(tab, element) {
 }
 
 function exportCSV() {
-  let csv = 'Miejsce,Imię,Nazwisko,Miasto,Punkty,Odpowiedzi\n';
+  let csv = 'Miejsce,ImiÄ™,Nazwisko,Miasto,Punkty,Odpowiedzi\n';
 
   [...allParticipants]
     .sort((a, b) => (b.score || 0) - (a.score || 0))
@@ -1926,7 +1926,7 @@ function normalizeSearch(value) {
     .toLowerCase()
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
-    .replace(/ł/g, 'l')
+    .replace(/Ĺ‚/g, 'l')
     .replace(/[^a-z0-9\s]/g, ' ')
     .replace(/\s+/g, ' ')
     .trim();
@@ -1954,3 +1954,4 @@ setInterval(loadGameState, 10000);
 </script>
 </body>
 </html>
+

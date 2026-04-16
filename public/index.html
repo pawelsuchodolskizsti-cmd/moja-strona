@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pl">
 <head>
 <meta charset="UTF-8">
@@ -21,7 +21,7 @@
 * { box-sizing:border-box; margin:0; padding:0; }
 
 body {
-  background: url('/tłodogry.png') no-repeat center center fixed;
+  background: url('/tĹ‚odogry.png') no-repeat center center fixed;
   background-size: cover;
   font-family:'DM Sans',sans-serif;
   min-height:100vh;
@@ -697,15 +697,15 @@ textarea {
 <!-- === LOGIN SCREEN === -->
 <div class="card" id="login-screen">
 
-  <div class="logo">⭐ Gwiazdka One Day 2026</div>
+  <div class="logo">â­ Gwiazdka One Day 2026</div>
 
   <div class="event-bar">Odliczaj razem z nami</div>
 
   <div class="countdown">
-    <div class="cd-block"><div class="cd-num" id="cd-months">—</div><span class="cd-label">mies.</span></div>
-    <div class="cd-block"><div class="cd-num" id="cd-days">—</div><span class="cd-label">dni</span></div>
-    <div class="cd-block"><div class="cd-num" id="cd-hours">—</div><span class="cd-label">godz.</span></div>
-    <div class="cd-block"><div class="cd-num" id="cd-mins">—</div><span class="cd-label">min.</span></div>
+    <div class="cd-block"><div class="cd-num" id="cd-months">â€”</div><span class="cd-label">mies.</span></div>
+    <div class="cd-block"><div class="cd-num" id="cd-days">â€”</div><span class="cd-label">dni</span></div>
+    <div class="cd-block"><div class="cd-num" id="cd-hours">â€”</div><span class="cd-label">godz.</span></div>
+    <div class="cd-block"><div class="cd-num" id="cd-mins">â€”</div><span class="cd-label">min.</span></div>
   </div>
 
   <div class="socials-wrap">
@@ -744,12 +744,12 @@ textarea {
     <button class="btn intro-btn" type="button" onclick="openLoginForm()">Gram!</button>
   </div>
 
-  <!-- Login form — shown only when game started -->
+  <!-- Login form â€” shown only when game started -->
   <div id="login-form" style="display:none">
-    <h1>Witaj! 👋</h1>
-    <p class="subtitle">Podaj dane, aby dołączyć do gry</p>
+    <h1>Witaj! đź‘‹</h1>
+    <p class="subtitle">Podaj dane, aby doĹ‚Ä…czyÄ‡ do gry</p>
 
-    <label>Imię</label>
+    <label>ImiÄ™</label>
     <input type="text" id="fname" placeholder="np. Anna">
 
     <label>Nazwisko</label>
@@ -758,7 +758,7 @@ textarea {
     <label>Miasto</label>
     <input type="text" id="city" placeholder="np. Warszawa">
 
-    <button class="btn" id="login-btn" onclick="doLogin()">Dołącz do gry →</button>
+    <button class="btn" id="login-btn" onclick="doLogin()">DoĹ‚Ä…cz do gry â†’</button>
     <div class="msg error" id="login-msg"></div>
   </div>
 
@@ -766,26 +766,26 @@ textarea {
 
 <!-- === QUESTION SCREEN === -->
 <div class="card" id="question-screen">
-  <div class="logo">⭐ Gwiazdka One Day</div>
-  <div class="q-badge">⚡ Pytanie</div>
+  <div class="logo">â­ Gwiazdka One Day</div>
+  <div class="q-badge">âšˇ Pytanie</div>
   <div class="q-text" id="q-text"></div>
 
   <div id="answer-area">
-    <label>Twoja odpowiedź</label>
-    <textarea id="answer-input" placeholder="Wpisz odpowiedź..."></textarea>
-    <button class="btn" id="submit-btn" onclick="submitAnswer()">Wyślij odpowiedź</button>
+    <label>Twoja odpowiedĹş</label>
+    <textarea id="answer-input" placeholder="Wpisz odpowiedĹş..."></textarea>
+    <button class="btn" id="submit-btn" onclick="submitAnswer()">WyĹ›lij odpowiedĹş</button>
     <div class="msg" id="q-msg"></div>
   </div>
 
   <div id="result-area"></div>
   <div class="game-remaining">
-    <span class="game-remaining-label">Do końca gry zostało</span>
+    <span class="game-remaining-label">Do koĹ„ca gry zostaĹ‚o</span>
     <div class="game-remaining-value" data-game-remaining>--:--</div>
   </div>
 
   <div class="player-stats" id="player-stats-question">
-    <div class="player-stats-title">Twój postęp</div>
-    <div class="player-stats-summary">Odpowiedziałeś już na <strong data-stat-summary="answers">0</strong> pytań.</div>
+    <div class="player-stats-title">TwĂłj postÄ™p</div>
+    <div class="player-stats-summary">OdpowiedziaĹ‚eĹ› juĹĽ na <strong data-stat-summary="answers">0</strong> pytaĹ„.</div>
     <div class="player-stats-grid">
       <div class="player-stat">
         <div class="player-stat-value" data-stat-value="answers">0</div>
@@ -805,18 +805,18 @@ textarea {
 
 <!-- === NO QR SCREEN (logged in but no ?q param) === -->
 <div class="card" id="no-q-screen">
-  <div class="logo">⭐ Gwiazdka One Day</div>
+  <div class="logo">â­ Gwiazdka One Day</div>
   <h1>Zeskanuj kod QR</h1>
   <div class="info-box">
-    <p>Znajdź kod QR w terenie<br>i zeskanuj go, aby zobaczyć pytanie.</p>
+    <p>ZnajdĹş kod QR w terenie<br>i zeskanuj go, aby zobaczyÄ‡ pytanie.</p>
   </div>
   <div class="game-remaining">
-    <span class="game-remaining-label">Do końca gry zostało</span>
+    <span class="game-remaining-label">Do koĹ„ca gry zostaĹ‚o</span>
     <div class="game-remaining-value" data-game-remaining>--:--</div>
   </div>
   <div class="player-stats" id="player-stats-noq">
-    <div class="player-stats-title">Twój postęp</div>
-    <div class="player-stats-summary">Odpowiedziałeś już na <strong data-stat-summary="answers">0</strong> pytań.</div>
+    <div class="player-stats-title">TwĂłj postÄ™p</div>
+    <div class="player-stats-summary">OdpowiedziaĹ‚eĹ› juĹĽ na <strong data-stat-summary="answers">0</strong> pytaĹ„.</div>
     <div class="player-stats-grid">
       <div class="player-stat">
         <div class="player-stat-value" data-stat-value="answers">0</div>
@@ -835,7 +835,7 @@ textarea {
 </div>
 
 <div class="card" id="end-screen" style="display:none">
-  <div class="logo">⭐ Gwiazdka One Day</div>
+  <div class="logo">â­ Gwiazdka One Day</div>
   <div class="status-finale">
     <div class="status-finale-badge">Fina&#322; gry</div>
     <h2>Zapraszamy na podsumowanie</h2>
@@ -862,7 +862,7 @@ let activeGameState = { startedAt: null, endedAt: null, summaryAt: null, duratio
 
 const EVENT_DATE = new Date('2026-12-13T10:00:00+01:00');
 
-/* ── COUNTDOWN ──────────────────────────────── */
+/* â”€â”€ COUNTDOWN â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 function updateCountdown() {
   const diff = EVENT_DATE - new Date();
   if (diff <= 0) {
@@ -990,7 +990,7 @@ async function restoreParticipantSession() {
   if (!deviceToken) return null;
 
   try {
-    const res = await fetch(`/.netlify/functions/participant-session?token=${encodeURIComponent(deviceToken)}`);
+    const res = await fetch(`/api/participant-session?token=${encodeURIComponent(deviceToken)}`);
     if (!res.ok) return null;
 
     const data = await res.json();
@@ -1004,7 +1004,7 @@ async function restoreParticipantSession() {
   }
 }
 
-/* ── GAME STATE ─────────────────────────────── */
+/* â”€â”€ GAME STATE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 function openLoginForm() {
   hasOpenedLogin = true;
   document.getElementById('howto-panel').style.display = 'none';
@@ -1093,7 +1093,7 @@ async function refreshParticipantStats() {
   if (!participantId) return;
 
   try {
-    const res = await fetch(`/.netlify/functions/participant-stats?pid=${participantId}`);
+    const res = await fetch(`/api/participant-stats?pid=${participantId}`);
     const data = await res.json();
     if (!data.error) {
       renderParticipantStats(data);
@@ -1105,7 +1105,7 @@ async function refreshParticipantStats() {
 
 async function loadGameState() {
   try {
-    const res  = await fetch('/.netlify/functions/game-state');
+    const res  = await fetch('/api/game-state');
     const data = await res.json();
 
     activeGameState = {
@@ -1160,7 +1160,7 @@ async function loadGameState() {
   }
 }
 
-/* ── LOGIN ──────────────────────────────────── */
+/* â”€â”€ LOGIN â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 async function doLogin() {
   const fn   = document.getElementById('fname').value.trim();
   const ln   = document.getElementById('lname').value.trim();
@@ -1168,7 +1168,7 @@ async function doLogin() {
   const msg  = document.getElementById('login-msg');
 
   if (!fn || !ln || !city) {
-    msg.innerText = 'Uzupełnij wszystkie pola';
+    msg.innerText = 'UzupeĹ‚nij wszystkie pola';
     return;
   }
 
@@ -1176,7 +1176,7 @@ async function doLogin() {
   msg.innerText = '';
 
   try {
-    const res  = await fetch('/.netlify/functions/login', {
+    const res  = await fetch('/api/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ firstName: fn, lastName: ln, city, deviceToken })
@@ -1188,7 +1188,7 @@ async function doLogin() {
         await loadGameState();
         return;
       }
-      msg.innerText = data.error || 'Błąd logowania';
+      msg.innerText = data.error || 'BĹ‚Ä…d logowania';
       document.getElementById('login-btn').disabled = false;
       return;
     }
@@ -1198,12 +1198,12 @@ async function doLogin() {
 
     showQuestionScreen();
   } catch(e) {
-    msg.innerText = 'Błąd połączenia';
+    msg.innerText = 'BĹ‚Ä…d poĹ‚Ä…czenia';
     document.getElementById('login-btn').disabled = false;
   }
 }
 
-/* ── QUESTION ───────────────────────────────── */
+/* â”€â”€ QUESTION â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 async function showQuestionScreen() {
   const q = new URLSearchParams(window.location.search).get('q');
 
@@ -1217,7 +1217,7 @@ async function showQuestionScreen() {
   }
 
   try {
-    const res  = await fetch(`/.netlify/functions/question?q=${q}&pid=${participantId}`);
+    const res  = await fetch(`/api/question?q=${q}&pid=${participantId}`);
     const data = await res.json();
 
     if (data.error) {
@@ -1247,14 +1247,14 @@ async function showQuestionScreen() {
     document.getElementById('submit-btn').disabled = false;
 
     if (data.alreadyAnswered) {
-      showAnsweredState(data.previousAnswer, 'Odpowiedź do tego pytania została już wcześniej wysłana.');
+      showAnsweredState(data.previousAnswer, 'OdpowiedĹş do tego pytania zostaĹ‚a juĹĽ wczeĹ›niej wysĹ‚ana.');
     }
   } catch(e) {
-    document.getElementById('login-msg').innerText = 'Błąd połączenia';
+    document.getElementById('login-msg').innerText = 'BĹ‚Ä…d poĹ‚Ä…czenia';
   }
 }
 
-/* ── ANSWER ─────────────────────────────────── */
+/* â”€â”€ ANSWER â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 async function submitAnswer() {
   const ansInput = document.getElementById('answer-input');
   const ans      = ansInput.value.trim();
@@ -1262,7 +1262,7 @@ async function submitAnswer() {
 
   if (!ans) {
     msg.className = 'msg error';
-    msg.innerText = 'Wpisz odpowiedź';
+    msg.innerText = 'Wpisz odpowiedĹş';
     return;
   }
 
@@ -1271,7 +1271,7 @@ async function submitAnswer() {
   msg.innerText = '';
 
   try {
-    const res  = await fetch('/.netlify/functions/answer', {
+    const res  = await fetch('/api/answer', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -1300,7 +1300,7 @@ async function submitAnswer() {
       return;
     }
     msg.className = 'msg error';
-    msg.innerText = 'Błąd połączenia — spróbuj ponownie';
+    msg.innerText = 'BĹ‚Ä…d poĹ‚Ä…czenia â€” sprĂłbuj ponownie';
     document.getElementById('submit-btn').disabled = false;
     ansInput.disabled = false;
   }
@@ -1312,32 +1312,32 @@ function showAnsweredState(answer, message) {
   const area = document.getElementById('result-area');
   area.innerHTML = `
     <div class="answered-box">
-      <div class="check">✉️</div>
+      <div class="check">âś‰ď¸Ź</div>
       <p>${escHtml(message || 'Odpowiedz zostala wyslana.')}</p>
-      <div class="prev">Twoja odpowiedź: <strong>${escHtml(answer || '—')}</strong></div>
+      <div class="prev">Twoja odpowiedĹş: <strong>${escHtml(answer || 'â€”')}</strong></div>
     </div>`;
   return;
   /*
     area.innerHTML = `
       <div class="answered-box">
-        <div class="check">✅</div>
-        <p>Poprawna odpowiedź! +1 punkt</p>
-        <div class="prev">Twoja odpowiedź: <strong>${escHtml(answer)}</strong></div>
+        <div class="check">âś…</div>
+        <p>Poprawna odpowiedĹş! +1 punkt</p>
+        <div class="prev">Twoja odpowiedĹş: <strong>${escHtml(answer)}</strong></div>
       </div>`;
   } else if (correct === false) {
     area.innerHTML = `
       <div class="wrong-box">
-        <div class="x">❌</div>
-        <p>Niepoprawna odpowiedź</p>
-        <div class="prev" style="color:var(--muted);font-size:12px;margin-top:4px;">Twoja odpowiedź: <strong>${escHtml(answer)}</strong></div>
+        <div class="x">âťŚ</div>
+        <p>Niepoprawna odpowiedĹş</p>
+        <div class="prev" style="color:var(--muted);font-size:12px;margin-top:4px;">Twoja odpowiedĹş: <strong>${escHtml(answer)}</strong></div>
       </div>`;
   } else {
-    // Already answered before — unknown result
+    // Already answered before â€” unknown result
     area.innerHTML = `
       <div class="answered-box">
-        <div class="check">🔒</div>
-        <p>Już odpowiedziałeś/aś na to pytanie</p>
-        <div class="prev">Twoja odpowiedź: <strong>${escHtml(answer || '—')}</strong></div>
+        <div class="check">đź”’</div>
+        <p>JuĹĽ odpowiedziaĹ‚eĹ›/aĹ› na to pytanie</p>
+        <div class="prev">Twoja odpowiedĹş: <strong>${escHtml(answer || 'â€”')}</strong></div>
       </div>`;
   */
 }
@@ -1346,7 +1346,7 @@ function escHtml(s) {
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
-/* ── INIT ───────────────────────────────────── */
+/* â”€â”€ INIT â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 window.onload = async () => {
   updateCountdown();
   setInterval(updateCountdown, 30000);
@@ -1388,3 +1388,4 @@ window.onload = async () => {
 
 </body>
 </html>
+

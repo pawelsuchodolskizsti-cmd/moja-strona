@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pl">
 <head>
 <meta charset="UTF-8">
@@ -105,9 +105,9 @@ input {
 <div class="card" id="name-screen" style="display:none">
   <div class="logo">Gwiazdka One Day</div>
   <h1>Kod bonusowy</h1>
-  <p class="subtitle">Podaj swoje dane, aby odebrać punkt bonusowy.</p>
+  <p class="subtitle">Podaj swoje dane, aby odebraÄ‡ punkt bonusowy.</p>
 
-  <input type="text" id="fname" placeholder="Imię">
+  <input type="text" id="fname" placeholder="ImiÄ™">
   <input type="text" id="lname" placeholder="Nazwisko">
 
   <button class="btn" id="name-btn" onclick="doNameLogin()">Dalej</button>
@@ -116,10 +116,10 @@ input {
 
 <div class="card" id="secret-screen" style="display:none">
   <div class="logo">Gwiazdka One Day</div>
-  <h1>Wpisz hasło</h1>
-  <p class="subtitle" id="bonus-label">Ładowanie bonusu...</p>
+  <h1>Wpisz hasĹ‚o</h1>
+  <p class="subtitle" id="bonus-label">Ĺadowanie bonusu...</p>
 
-  <input type="text" id="secret-input" placeholder="Hasło">
+  <input type="text" id="secret-input" placeholder="HasĹ‚o">
 
   <button class="btn" id="secret-btn" onclick="submitSecret()">Odbierz punkt</button>
   <div class="msg" id="secret-msg"></div>
@@ -129,7 +129,7 @@ input {
   <div class="logo">Gwiazdka One Day</div>
   <div class="success-big">+1</div>
   <h1>Punkt zdobyty!</h1>
-  <p class="subtitle">Brawo, bonus został zapisany na Twoim koncie.</p>
+  <p class="subtitle">Brawo, bonus zostaĹ‚ zapisany na Twoim koncie.</p>
 </div>
 
 <script>
@@ -152,7 +152,7 @@ async function restoreParticipantSession() {
   if (!deviceToken) return null;
 
   try {
-    const res = await fetch(`/.netlify/functions/participant-session?token=${encodeURIComponent(deviceToken)}`);
+    const res = await fetch(`/api/participant-session?token=${encodeURIComponent(deviceToken)}`);
     if (!res.ok) return null;
 
     const data = await res.json();
@@ -189,7 +189,7 @@ window.onload = async () => {
 
 async function loadBonusLabel() {
   try {
-    const res = await fetch(`/.netlify/functions/bonus?b=${encodeURIComponent(bonusId)}`);
+    const res = await fetch(`/api/bonus?b=${encodeURIComponent(bonusId)}`);
     const data = await res.json();
     document.getElementById('bonus-label').innerText = data.label || 'Podaj haslo do tego bonusu.';
   } catch (e) {
@@ -199,7 +199,7 @@ async function loadBonusLabel() {
 
 async function validateParticipant(id) {
   try {
-    const res = await fetch(`/.netlify/functions/participant-stats?pid=${id}`);
+    const res = await fetch(`/api/participant-stats?pid=${id}`);
     return res.ok;
   } catch (e) {
     return false;
@@ -227,7 +227,7 @@ async function doNameLogin() {
   msg.innerText = '';
 
   try {
-    const res = await fetch('/.netlify/functions/login', {
+    const res = await fetch('/api/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ firstName: fn, lastName: ln, deviceToken })
@@ -263,7 +263,7 @@ async function submitSecret() {
   msg.innerText = '';
 
   try {
-    const res = await fetch('/.netlify/functions/bonus', {
+    const res = await fetch('/api/bonus', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ participantId, bonusId, secret })
@@ -293,3 +293,4 @@ async function submitSecret() {
 </script>
 </body>
 </html>
+
