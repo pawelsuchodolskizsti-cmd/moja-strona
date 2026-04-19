@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pl">
 <head>
 <meta charset="utf-8">
@@ -500,21 +500,21 @@ h1 {
   <div class="page">
     <div class="hero">
       <section class="panel">
-        <div class="eyebrow">Stałe kody QR</div>
-        <h1>Generator i magazyn kodów QR dla całej gry</h1>
-        <p class="lead">Tutaj masz w jednym miejscu gotowe, stałe kody do strony głównej, tablicy wyników, 30 pytań i 10 bonusów. Możesz je otworzyć, pobrać jako JPG albo od razu wydrukować do PDF.</p>
+        <div class="eyebrow">Sta&#322;e kody QR</div>
+        <h1>Generator i magazyn kod&oacute;w QR dla ca&#322;ej gry</h1>
+        <p class="lead">Tutaj masz w jednym miejscu gotowe, sta&#322;e kody do strony g&#322;&oacute;wnej, tablicy wynik&oacute;w, 30 pyta&#324; i 10 bonus&oacute;w. Mo&#380;esz je otworzy&#263;, pobra&#263; jako JPG albo od razu wydrukowa&#263; do PDF.</p>
         <div class="stats">
           <div class="stat">
             <div class="stat-value" id="stat-all">42</div>
-            <div class="stat-label">Łącznie kodów</div>
+            <div class="stat-label">&#321;&#261;cznie kod&oacute;w</div>
           </div>
           <div class="stat">
             <div class="stat-value" id="stat-questions">30</div>
-            <div class="stat-label">Pytań</div>
+            <div class="stat-label">Pyta&#324;</div>
           </div>
           <div class="stat">
             <div class="stat-value" id="stat-bonuses">10</div>
-            <div class="stat-label">Bonusów</div>
+            <div class="stat-label">Bonus&oacute;w</div>
           </div>
         </div>
       </section>
@@ -526,22 +526,22 @@ h1 {
             <input id="base-origin" type="text" placeholder="https://twoja-gra.vercel.app">
           </div>
           <div class="actions">
-            <button class="btn primary" type="button" onclick="renderCatalog()">Odśwież kody</button>
+            <button class="btn primary" type="button" onclick="renderCatalog()">Od&#347;wie&#380; kody</button>
             <button class="btn lime" type="button" onclick="downloadAllAsJpg()">ZIP z JPG</button>
             <button class="btn ghost" type="button" onclick="window.print()">PDF / Drukuj</button>
           </div>
         </div>
-        <div class="toolbar-note">Końcówki są stałe: `/?q=1...30`, `/bonus/?b=B01...B10`, `/wyniki/` oraz `/` dla strony głównej. Jeśli przepiszesz domenę wyżej, wszystkie kody od razu przeliczą się na nowy adres.</div>
-        <div class="download-status" id="download-status">Kody są gotowe do podglądu i pobrania.</div>
-        <div class="print-note">Tryb druku ukrywa przyciski, końcówki linków i opisy, zostawiając wyłącznie same kody QR.</div>
+        <div class="toolbar-note">Ko&#324;c&oacute;wki s&#261; sta&#322;e: `/?q=1...30`, `/bonus/?b=B01...B10`, `/wyniki/` oraz `/` dla strony g&#322;&oacute;wnej. Je&#347;li przepiszesz domen&#281; wy&#380;ej, wszystkie kody od razu przelicz&#261; si&#281; na nowy adres.</div>
+        <div class="download-status" id="download-status">Kody s&#261; gotowe do podgl&#261;du i pobrania.</div>
+        <div class="print-note">Tryb druku ukrywa przyciski, ko&#324;c&oacute;wki link&oacute;w i opisy, zostawiaj&#261;c wy&#322;&#261;cznie same kody QR.</div>
       </section>
     </div>
 
     <section class="panel section">
       <div class="section-head">
         <div>
-          <h2 class="section-title">Ekrany główne</h2>
-          <p class="section-copy">Najważniejsze stałe wejścia dla uczestników i widowni.</p>
+          <h2 class="section-title">Ekrany g&#322;&oacute;wne</h2>
+          <p class="section-copy">Najwa&#380;niejsze sta&#322;e wej&#347;cia dla uczestnik&oacute;w i widowni.</p>
         </div>
         <div class="section-count" id="count-screens">2 kody</div>
       </div>
@@ -552,9 +552,9 @@ h1 {
       <div class="section-head">
         <div>
           <h2 class="section-title">Pytania</h2>
-          <p class="section-copy">Pełny pakiet 30 stałych kodów do rozmieszczenia na trasie gry.</p>
+          <p class="section-copy">Pe&#322;ny pakiet 30 sta&#322;ych kod&oacute;w do rozmieszczenia na trasie gry.</p>
         </div>
-        <div class="section-count" id="count-questions">30 kodów</div>
+        <div class="section-count" id="count-questions">30 kod&oacute;w</div>
       </div>
       <div class="grid" id="grid-questions"></div>
     </section>
@@ -563,9 +563,9 @@ h1 {
       <div class="section-head">
         <div>
           <h2 class="section-title">Bonusy</h2>
-          <p class="section-copy">10 kodów bonusowych dla wolontariuszy i dodatkowych punktów.</p>
+          <p class="section-copy">10 kod&oacute;w bonusowych dla wolontariuszy i dodatkowych punkt&oacute;w.</p>
         </div>
-        <div class="section-count" id="count-bonuses">10 kodów</div>
+        <div class="section-count" id="count-bonuses">10 kod&oacute;w</div>
       </div>
       <div class="grid" id="grid-bonuses"></div>
     </section>
@@ -573,8 +573,8 @@ h1 {
     <section class="panel section">
       <div class="section-head">
         <div>
-          <h2 class="section-title">Lista linków i odpowiedzi</h2>
-          <p class="section-copy">Pełna lista organizacyjna do druku albo przekazania ekipie technicznej.</p>
+          <h2 class="section-title">Lista link&oacute;w i odpowiedzi</h2>
+          <p class="section-copy">Pe&#322;na lista organizacyjna do druku albo przekazania ekipie technicznej.</p>
         </div>
         <div class="details-actions">
           <button class="btn primary" type="button" onclick="downloadCatalogCsv()">Pobierz CSV</button>
@@ -588,11 +588,11 @@ h1 {
               <th>Typ</th>
               <th>Nazwa</th>
               <th>Link</th>
-              <th>Odpowiedź / hasło</th>
+              <th>Odpowied&#378; / has&#322;o</th>
             </tr>
           </thead>
           <tbody id="details-body">
-            <tr><td colspan="4">Ładowanie listy linków...</td></tr>
+            <tr><td colspan="4">&#321;adowanie listy link&oacute;w...</td></tr>
           </tbody>
         </table>
       </div>
@@ -663,7 +663,7 @@ h1 {
         <div class="qr-path">${item.path}</div>
         <p class="qr-copy">${item.description}</p>
         <div class="qr-actions">
-          <button class="qr-btn" type="button" onclick="window.open('${item.url}', '_blank', 'noopener')">Otwórz</button>
+          <button class="qr-btn" type="button" onclick="window.open('${item.url}', '_blank', 'noopener')">Otw&oacute;rz</button>
           <button class="qr-btn secondary" type="button" onclick="downloadOneJpg('${item.id}')">Pobierz JPG</button>
         </div>
       </article>
@@ -675,8 +675,8 @@ h1 {
     document.getElementById('stat-questions').textContent = qrGroups.questions.length;
     document.getElementById('stat-bonuses').textContent = qrGroups.bonuses.length;
     document.getElementById('count-screens').textContent = `${qrGroups.screens.length} kody`;
-    document.getElementById('count-questions').textContent = `${qrGroups.questions.length} kodów`;
-    document.getElementById('count-bonuses').textContent = `${qrGroups.bonuses.length} kodów`;
+    document.getElementById('count-questions').textContent = `${qrGroups.questions.length} kod\u00f3w`;
+    document.getElementById('count-bonuses').textContent = `${qrGroups.bonuses.length} kod\u00f3w`;
   }
 
   function renderCatalog() {
@@ -688,7 +688,7 @@ h1 {
     document.getElementById('grid-questions').innerHTML = qrGroups.questions.map(renderQrCard).join('');
     document.getElementById('grid-bonuses').innerHTML = qrGroups.bonuses.map(renderQrCard).join('');
     updateCounters();
-    setDownloadStatus('Kody zostały przeliczone dla aktualnego adresu strony.', 'success');
+    setDownloadStatus('Kody zosta\u0142y przeliczone dla aktualnego adresu strony.', 'success');
     loadDetailsCatalog();
   }
 
@@ -711,22 +711,22 @@ h1 {
   function downloadOneJpg(id) {
     const item = findQrItem(id);
     if (!item) {
-      setDownloadStatus('Nie udało się znaleźć wybranego kodu QR.', 'error');
+      setDownloadStatus('Nie uda\u0142o si\u0119 znale\u017a\u0107 wybranego kodu QR.', 'error');
       return;
     }
 
     const fileName = `${item.id}.jpg`;
     triggerDownload(getProxyQrUrl(item, 'jpg', fileName));
-    setDownloadStatus(`Rozpoczęto pobieranie pliku ${fileName}.`, 'success');
+    setDownloadStatus(`Rozpocz\u0119to pobieranie pliku ${fileName}.`, 'success');
   }
 
   async function downloadAllAsJpg() {
     if (!qrGroups.all.length) {
-      setDownloadStatus('Najpierw wygeneruj listę kodów QR.', 'error');
+      setDownloadStatus('Najpierw wygeneruj list\u0119 kod\u00f3w QR.', 'error');
       return;
     }
 
-    setDownloadStatus('Przygotowuję jedno archiwum ZIP ze wszystkimi kodami JPG.', 'success');
+    setDownloadStatus('Przygotowuj\u0119 jedno archiwum ZIP ze wszystkimi kodami JPG.', 'success');
 
     try {
       const response = await fetch('/api/qr-proxy', {
@@ -746,16 +746,16 @@ h1 {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || 'Nie udało się przygotować archiwum ZIP.');
+        throw new Error(errorData.error || 'Nie uda\u0142o si\u0119 przygotowa\u0107 archiwum ZIP.');
       }
 
       const blob = await response.blob();
       const blobUrl = URL.createObjectURL(blob);
       triggerDownload(blobUrl, 'kody-qr-gwiazdka-one-day.zip');
       window.setTimeout(() => URL.revokeObjectURL(blobUrl), 1500);
-      setDownloadStatus('Archiwum ZIP z kodami JPG zostało przygotowane.', 'success');
+      setDownloadStatus('Archiwum ZIP z kodami JPG zosta\u0142o przygotowane.', 'success');
     } catch (error) {
-      setDownloadStatus(error.message || 'Nie udało się pobrać archiwum ZIP.', 'error');
+      setDownloadStatus(error.message || 'Nie uda\u0142o si\u0119 pobra\u0107 archiwum ZIP.', 'error');
     }
   }
 
@@ -787,7 +787,7 @@ h1 {
     const body = document.getElementById('details-body');
 
     if (!qrDetailsRows.length) {
-      body.innerHTML = '<tr><td colspan="4">Nie udało się pobrać listy linków i odpowiedzi.</td></tr>';
+      body.innerHTML = '<tr><td colspan="4">Nie uda&#322;o si&#281; pobra&#263; listy link&oacute;w i odpowiedzi.</td></tr>';
       return;
     }
 
@@ -815,7 +815,7 @@ h1 {
 
   function downloadCatalogCsv() {
     if (!qrDetailsRows.length) return;
-    const header = 'Typ,Nazwa,Link,Odpowiedz lub haslo\n';
+    const header = 'Typ,Nazwa,Link,Odpowied\u017a lub has\u0142o\n';
     const rows = qrDetailsRows.map((row) => {
       const safe = [row.type, row.label, row.url, row.answer].map((value) => `"${String(value).replace(/"/g, '""')}"`);
       return safe.join(',');
@@ -825,7 +825,7 @@ h1 {
 
   function downloadCatalogTxt() {
     if (!qrDetailsRows.length) return;
-    const content = qrDetailsRows.map((row) => `${row.type}: ${row.label}\nLink: ${row.url}\nOdpowiedz / haslo: ${row.answer}\n`).join('\n');
+    const content = qrDetailsRows.map((row) => `${row.type}: ${row.label}\nLink: ${row.url}\nOdpowied\u017a / has\u0142o: ${row.answer}\n`).join('\n');
     downloadFile(content, 'lista-linkow-i-odpowiedzi.txt', 'text/plain;charset=utf-8');
   }
 
@@ -835,14 +835,14 @@ h1 {
       const response = await fetch('/api/admin-results');
       const data = await response.json();
       if (!response.ok || data.error) {
-        throw new Error(data.error || 'Nie udało się pobrać listy organizacyjnej.');
+        throw new Error(data.error || 'Nie uda\u0142o si\u0119 pobra\u0107 listy organizacyjnej.');
       }
       qrDetailsRows = buildDetailsRows(origin, data);
       renderDetailsRows();
     } catch (error) {
       qrDetailsRows = [];
       renderDetailsRows();
-      setDownloadStatus(error.message || 'Nie udało się pobrać listy linków i odpowiedzi.', 'error');
+      setDownloadStatus(error.message || 'Nie uda\u0142o si\u0119 pobra\u0107 listy link\u00f3w i odpowiedzi.', 'error');
     }
   }
 
@@ -863,3 +863,4 @@ h1 {
   </script>
 </body>
 </html>
+

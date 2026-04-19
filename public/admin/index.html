@@ -616,6 +616,10 @@
     box-shadow: var(--shadow);
   }
 
+  .ops-card.city-dashboard-card {
+    grid-column: 1 / -1;
+  }
+
   .ops-title {
     font-family: 'Syne', sans-serif;
     font-size: 18px;
@@ -1286,6 +1290,11 @@
 
   .city-summary {
     margin-top: 16px;
+  }
+
+  .city-summary.tight {
+    margin-top: 0;
+    margin-bottom: 0;
   }
 
   .city-summary-head {
@@ -1973,6 +1982,30 @@
   </div>
 
   <div class="ops-grid">
+    <section class="ops-card city-dashboard-card">
+      <div class="ops-title">Punkty miast</div>
+      <div class="ops-copy">Szybki podgląd sumy punktów, liczby uczestników i odpowiedzi dla każdego miasta bez przechodzenia do zakładki rankingu.</div>
+      <div class="table-wrap city-summary tight">
+        <div class="city-summary-head">
+          <div class="city-summary-title">Punkty miast</div>
+          <div class="city-summary-copy" data-city-meta>Ładowanie rankingu miast...</div>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Miasto</th>
+              <th>Punkty</th>
+              <th>Uczestnicy</th>
+              <th>Odpowiedzi</th>
+            </tr>
+          </thead>
+          <tbody data-city-body>
+            <tr><td colspan="4" class="empty">Ładowanie...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
     <section class="ops-card">
       <div class="ops-title">Komunikat i czas gry</div>
       <div class="ops-copy">Wyślij krótką informację do wszystkich graczy. Pojawi się na ich ekranie przy najbliższym odświeżeniu stanu gry.</div>
@@ -2097,6 +2130,7 @@
         <option value="city-score">Sortuj: punkty miasta</option>
       </select>
       <button class="btn primary" onclick="loadData()">Odśwież</button>
+      <button class="btn outline" onclick="exportExcel()">Eksportuj Excel</button>
       <button class="btn outline" onclick="exportCSV()">Eksportuj CSV</button>
       <div class="toolbar-meta" id="lb-meta">Pokazano 0 z 0 uczestników</div>
     </div>
@@ -2120,7 +2154,7 @@
     <div class="table-wrap city-summary">
       <div class="city-summary-head">
         <div class="city-summary-title">Punkty miast</div>
-        <div class="city-summary-copy" id="city-meta">Ładowanie rankingu miast...</div>
+        <div class="city-summary-copy" data-city-meta>Ładowanie rankingu miast...</div>
       </div>
       <table>
         <thead>
@@ -2131,7 +2165,7 @@
             <th>Odpowiedzi</th>
           </tr>
         </thead>
-        <tbody id="city-body">
+        <tbody data-city-body>
           <tr><td colspan="4" class="empty">Ładowanie...</td></tr>
         </tbody>
       </table>
@@ -3585,24 +3619,26 @@ function getCityStats() {
 }
 
 function renderCityRanking() {
-  const body = document.getElementById('city-body');
-  const meta = document.getElementById('city-meta');
+  const bodies = Array.from(document.querySelectorAll('[data-city-body]'));
+  const metas = Array.from(document.querySelectorAll('[data-city-meta]'));
   const cityStats = getCityStats();
 
-  if (meta) {
+  metas.forEach((meta) => {
     meta.textContent = cityStats.length
       ? `Łącznie punktują ${cityStats.length} miasta.`
       : 'Brak miast w aktualnych danych.';
-  }
+  });
 
-  if (!body) return;
+  if (!bodies.length) return;
 
   if (!cityStats.length) {
-    body.innerHTML = '<tr><td colspan="4" class="empty">Brak danych o miastach.</td></tr>';
+    bodies.forEach((body) => {
+      body.innerHTML = '<tr><td colspan="4" class="empty">Brak danych o miastach.</td></tr>';
+    });
     return;
   }
 
-  body.innerHTML = cityStats.map((item) => `
+  const rows = cityStats.map((item) => `
     <tr>
       <td>${escHtml(item.city)}</td>
       <td><span class="score-pill">${item.score} pkt</span></td>
@@ -3610,6 +3646,10 @@ function renderCityRanking() {
       <td>${item.answers}</td>
     </tr>
   `).join('');
+
+  bodies.forEach((body) => {
+    body.innerHTML = rows;
+  });
 }
 
 function renderLeaderboard() {
@@ -4111,17 +4151,66 @@ function downloadQrJpgPack() {
 }
 
 function exportCSV() {
-  let csv = 'Miejsce,Imię,Nazwisko,Miasto,Punkty,Odpowiedzi\n';
+  let csv = 'Miejsce,Imię,Nazwisko,Miasto,E-mail,Punkty,Odpowiedzi\n';
 
   [...allParticipants]
     .sort((a, b) => (b.score || 0) - (a.score || 0))
     .forEach((participant, index) => {
-      csv += `${index + 1},${safeCsv(participant.firstName)},${safeCsv(participant.lastName)},${safeCsv(participant.city || '')},${participant.score || 0},${participant.answeredCount || 0}\n`;
+      csv += `${index + 1},${safeCsv(participant.firstName)},${safeCsv(participant.lastName)},${safeCsv(participant.city || '')},${safeCsv(participant.email || '')},${participant.score || 0},${participant.answeredCount || 0}\n`;
     });
 
   const anchor = document.createElement('a');
   anchor.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
   anchor.download = 'wyniki.csv';
+  anchor.click();
+}
+
+function exportExcel() {
+  const rows = [...allParticipants]
+    .sort((a, b) =>
+      (a.lastName || '').localeCompare(b.lastName || '', 'pl') ||
+      (a.firstName || '').localeCompare(b.firstName || '', 'pl') ||
+      (a.city || '').localeCompare(b.city || '', 'pl')
+    )
+    .map((participant) => `
+      <tr>
+        <td>${escHtml(participant.firstName || '')}</td>
+        <td>${escHtml(participant.lastName || '')}</td>
+        <td>${escHtml(participant.city || '')}</td>
+        <td>${escHtml(participant.email || '')}</td>
+      </tr>
+    `)
+    .join('');
+
+  const html = `<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <style>
+    body { font-family: Arial, sans-serif; }
+    table { border-collapse: collapse; width: 100%; }
+    th, td { border: 1px solid #cfcfcf; padding: 8px 10px; text-align: left; }
+    th { background: #f3f4f6; font-weight: 700; }
+  </style>
+</head>
+<body>
+  <table>
+    <thead>
+      <tr>
+        <th>Imię</th>
+        <th>Nazwisko</th>
+        <th>Miasto</th>
+        <th>E-mail</th>
+      </tr>
+    </thead>
+    <tbody>${rows}</tbody>
+  </table>
+</body>
+</html>`;
+
+  const anchor = document.createElement('a');
+  anchor.href = URL.createObjectURL(new Blob(['\ufeff', html], { type: 'application/vnd.ms-excel;charset=utf-8;' }));
+  anchor.download = 'uczestnicy.xls';
   anchor.click();
 }
 

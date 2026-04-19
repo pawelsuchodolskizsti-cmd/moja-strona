@@ -1455,6 +1455,9 @@ textarea {
     <label>Miasto</label>
     <input type="text" id="city" data-uppercase-login placeholder="np. Warszawa">
 
+    <label>E-mail</label>
+    <input type="email" id="email" data-email-login inputmode="email" autocapitalize="off" autocomplete="email" spellcheck="false" placeholder="np. anna@example.com">
+
     <button class="btn" id="login-btn" onclick="doLogin()">Dołącz do gry</button>
     <div class="msg error" id="login-msg"></div>
   </div>
@@ -1636,6 +1639,7 @@ const loginFormEl = document.getElementById('login-form');
 const statusBoxEl = document.getElementById('game-status-box');
 const howtoPanelEl = document.getElementById('howto-panel');
 const fnameInputEl = document.getElementById('fname');
+const emailInputEl = document.getElementById('email');
 const loginBtnEl = document.getElementById('login-btn');
 const loginMsgEl = document.getElementById('login-msg');
 const qTextEl = document.getElementById('q-text');
@@ -1653,6 +1657,34 @@ gameRemainingLabelElements = Array.from(document.querySelectorAll('[data-game-re
 const EVENT_DATE = new Date('2026-12-13T10:00:00+01:00');
 const memoryStorage = new Map();
 
+function getCookieValue(name) {
+  try {
+    const prefix = `${encodeURIComponent(name)}=`;
+    const entry = document.cookie
+      .split('; ')
+      .find((item) => item.startsWith(prefix));
+    return entry ? decodeURIComponent(entry.slice(prefix.length)) : null;
+  } catch (error) {
+    return null;
+  }
+}
+
+function setCookieValue(name, value, maxAgeSeconds = 60 * 60 * 24 * 30) {
+  try {
+    document.cookie = `${encodeURIComponent(name)}=${encodeURIComponent(String(value))}; path=/; max-age=${maxAgeSeconds}; SameSite=Lax`;
+  } catch (error) {
+    // Ignore cookie issues and keep in-memory fallback.
+  }
+}
+
+function removeCookieValue(name) {
+  try {
+    document.cookie = `${encodeURIComponent(name)}=; path=/; max-age=0; SameSite=Lax`;
+  } catch (error) {
+    // Ignore cookie issues.
+  }
+}
+
 function isSafariBrowser() {
   const ua = navigator.userAgent || '';
   return /Safari/i.test(ua) && !/Chrome|Chromium|CriOS|Edg|EdgiOS|OPR|OPiOS|Android/i.test(ua);
@@ -1661,15 +1693,21 @@ function isSafariBrowser() {
 function storageGet(key, fallback = null) {
   try {
     const value = localStorage.getItem(key);
-    return value === null ? fallback : value;
+    if (value !== null) return value;
   } catch (error) {
-    return memoryStorage.has(key) ? memoryStorage.get(key) : fallback;
+    // Continue to cookie and memory fallback.
   }
+
+  const cookieValue = getCookieValue(key);
+  if (cookieValue !== null) return cookieValue;
+
+  return memoryStorage.has(key) ? memoryStorage.get(key) : fallback;
 }
 
 function storageSet(key, value) {
   const nextValue = String(value);
   memoryStorage.set(key, nextValue);
+  setCookieValue(key, nextValue);
   try {
     localStorage.setItem(key, nextValue);
   } catch (error) {
@@ -1679,6 +1717,7 @@ function storageSet(key, value) {
 
 function storageRemove(key) {
   memoryStorage.delete(key);
+  removeCookieValue(key);
   try {
     localStorage.removeItem(key);
   } catch (error) {
@@ -1857,10 +1896,55 @@ function normalizeLoginValue(value) {
   return String(value || '').trim().toUpperCase();
 }
 
+function normalizeEmailValue(value) {
+  return String(value || '').trim().toLowerCase();
+}
+
+async function readJsonResponse(response) {
+  const raw = await response.text();
+  try {
+    return raw ? JSON.parse(raw) : {};
+  } catch (error) {
+    return { error: raw || 'Nie uda\u0142o si\u0119 odczyta\u0107 odpowiedzi serwera.' };
+  }
+}
+
+async function postJsonWithRetry(url, payload, options = {}) {
+  const { retries = 1, retryDelayMs = 700 } = options;
+  let lastError = null;
+
+  for (let attempt = 0; attempt <= retries; attempt += 1) {
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const data = await readJsonResponse(response);
+      return { response, data };
+    } catch (error) {
+      lastError = error;
+      if (attempt >= retries) break;
+      await new Promise((resolve) => setTimeout(resolve, retryDelayMs));
+    }
+  }
+
+  throw lastError || new Error('B\u0142\u0105d po\u0142\u0105czenia');
+}
+
 function bindUppercaseLoginFields() {
   document.querySelectorAll('[data-uppercase-login]').forEach((element) => {
     element.addEventListener('input', () => {
       const normalized = normalizeLoginValue(element.value);
+      if (element.value !== normalized) {
+        element.value = normalized;
+      }
+    });
+  });
+
+  document.querySelectorAll('[data-email-login]').forEach((element) => {
+    element.addEventListener('input', () => {
+      const normalized = normalizeEmailValue(element.value);
       if (element.value !== normalized) {
         element.value = normalized;
       }
@@ -2309,10 +2393,16 @@ async function doLogin() {
   const fn   = normalizeLoginValue(fnameInputEl.value);
   const ln   = normalizeLoginValue(document.getElementById('lname').value);
   const city = normalizeLoginValue(document.getElementById('city').value);
+  const email = normalizeEmailValue(emailInputEl.value);
   const msg  = loginMsgEl;
 
-  if (!fn || !ln || !city) {
+  if (!fn || !ln || !city || !email) {
     msg.innerText = 'Uzupełnij wszystkie pola';
+    return;
+  }
+
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    msg.innerText = 'Podaj poprawny adres e-mail';
     return;
   }
 
@@ -2320,16 +2410,18 @@ async function doLogin() {
   msg.innerText = '';
 
   try {
-    const res  = await fetch('/api/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ firstName: fn, lastName: ln, city, deviceToken })
+    const { response: res, data } = await postJsonWithRetry('/api/login', {
+      firstName: fn,
+      lastName: ln,
+      city,
+      email,
+      deviceToken
     });
-    const data = await res.json();
 
     if (!data.id) {
       if (res.status === 403) {
         await loadGameState();
+        loginBtnEl.disabled = false;
         return;
       }
       msg.innerText = data.error || 'Błąd logowania';
@@ -2345,7 +2437,7 @@ async function doLogin() {
     triggerHaptic([16, 45, 16]);
     await showQuestionScreen({ force: true });
   } catch(e) {
-    msg.innerText = 'Błąd połączenia';
+    msg.innerText = e?.message || 'Błąd połączenia';
     loginBtnEl.disabled = false;
   }
 }

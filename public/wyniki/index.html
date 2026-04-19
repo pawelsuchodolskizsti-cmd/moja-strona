@@ -13,6 +13,7 @@
     --gold: #ffd45a;
     --text: #191532;
     --muted: #645f7a;
+    --bg-fallback: #e81e63;
     --card: rgba(255, 255, 255, 0.92);
     --card-strong: rgba(255, 255, 255, 0.97);
     --line: rgba(124, 106, 247, 0.16);
@@ -29,6 +30,7 @@
   html {
     min-height: 100%;
     height: -webkit-fill-available;
+    background: var(--bg-fallback);
   }
 
   body {
@@ -39,7 +41,10 @@
     padding: 22px;
     font-family: 'DM Sans', sans-serif;
     color: var(--text);
-    background: url('/tlo-gry.png') no-repeat center center;
+    background-color: var(--bg-fallback);
+    background-image: url('/tlo-gry.png');
+    background-repeat: no-repeat;
+    background-position: center top;
     background-size: cover;
     position: relative;
     overflow-x: hidden;
@@ -193,6 +198,7 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
+    overflow: hidden;
     background:
       radial-gradient(circle at top right, rgba(255, 212, 90, 0.2), transparent 34%),
       linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(255, 245, 225, 0.92));
@@ -226,12 +232,15 @@
   }
 
   .status-value.timer {
-    font-size: clamp(54px, 7vw, 104px);
-    line-height: .94;
+    width: 100%;
+    max-width: 100%;
+    font-size: clamp(38px, 5.4vw, 72px);
+    line-height: .9;
     color: #2f2750;
-    letter-spacing: -.04em;
+    letter-spacing: -.055em;
+    font-variant-numeric: tabular-nums;
     white-space: nowrap;
-    overflow: visible;
+    overflow: hidden;
     text-overflow: clip;
   }
 
@@ -584,7 +593,7 @@
     }
 
     .status-value.timer {
-      font-size: clamp(52px, 18vw, 82px);
+      font-size: clamp(36px, 13vw, 58px);
     }
 
     .list-item {
