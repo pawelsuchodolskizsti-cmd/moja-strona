@@ -16,20 +16,29 @@
   --success:#16a34a;
   --error:#dc2626;
   --card-bg:rgba(255,255,255,0.92);
+  --app-height:100vh;
 }
 
 * { box-sizing:border-box; margin:0; padding:0; }
 
+html {
+  min-height:100%;
+  height:-webkit-fill-available;
+}
+
 body {
-  background: url('/tlo-gry.png') no-repeat center center fixed;
+  background: url('/tlo-gry.png') no-repeat center center;
   background-size: cover;
   font-family:'DM Sans',sans-serif;
   min-height:100vh;
+  min-height:100svh;
   min-height:100dvh;
+  min-height:var(--app-height);
+  min-height:-webkit-fill-available;
   display:flex;
   align-items:center;
   justify-content:center;
-  padding:20px;
+  padding:max(20px, env(safe-area-inset-top)) max(20px, env(safe-area-inset-right)) max(20px, env(safe-area-inset-bottom)) max(20px, env(safe-area-inset-left));
   overflow-x:hidden;
 }
 
@@ -44,6 +53,14 @@ body {
   max-width:430px;
   box-shadow:0 24px 64px rgba(0,0,0,0.22);
   border: 1px solid rgba(255,255,255,0.6);
+}
+
+body.safari-browser {
+  background-attachment: scroll;
+}
+
+body.safari-browser .card {
+  background: rgba(255,255,255,0.96);
 }
 
 #login-screen {
@@ -1463,7 +1480,7 @@ textarea {
 
   <div id="result-area"></div>
   <div class="game-remaining">
-    <span class="game-remaining-label">Do końca gry zostało</span>
+    <span class="game-remaining-label" data-game-remaining-label>Do końca gry zostało</span>
     <div class="game-remaining-value" data-game-remaining>--:--</div>
   </div>
 
@@ -1499,7 +1516,7 @@ textarea {
     <p>Znajdź kod QR w terenie<br>i zeskanuj go, aby zobaczyć pytanie.</p>
   </div>
   <div class="game-remaining">
-    <span class="game-remaining-label">Do końca gry zostało</span>
+    <span class="game-remaining-label" data-game-remaining-label>Do końca gry zostało</span>
     <div class="game-remaining-value" data-game-remaining>--:--</div>
   </div>
   <div class="player-stats" id="player-stats-noq">
@@ -1535,7 +1552,7 @@ textarea {
     <div class="status-finale-place">Miejsce: Teatr</div>
     <div class="status-finale-countdown">
       <span class="status-finale-label">Do podsumowania zosta&#322;o</span>
-      <div class="status-finale-time" data-summary-remaining>30:00</div>
+      <div class="status-finale-time" data-summary-remaining>05:00</div>
     </div>
     <div class="badge-board" style="margin-top:14px;">
       <div class="badge-board-title">Zdobyte odznaki</div>
@@ -1597,6 +1614,7 @@ let participantStatsLoadPromise = null;
 let questionLoadPromise = null;
 let syncPlayerViewPromise = null;
 let gameRemainingElements = [];
+let gameRemainingLabelElements = [];
 let summaryRemainingElements = [];
 let announcementElements = [];
 let statsHydrated = false;
@@ -1630,8 +1648,51 @@ const statAnswerValueElements = Array.from(document.querySelectorAll('[data-stat
 const statAnswerSummaryElements = Array.from(document.querySelectorAll('[data-stat-summary="answers"]'));
 const statBonusValueElements = Array.from(document.querySelectorAll('[data-stat-value="bonuses"]'));
 const badgeListElements = Array.from(document.querySelectorAll('[data-badge-list]'));
+gameRemainingLabelElements = Array.from(document.querySelectorAll('[data-game-remaining-label]'));
 
 const EVENT_DATE = new Date('2026-12-13T10:00:00+01:00');
+const memoryStorage = new Map();
+
+function isSafariBrowser() {
+  const ua = navigator.userAgent || '';
+  return /Safari/i.test(ua) && !/Chrome|Chromium|CriOS|Edg|EdgiOS|OPR|OPiOS|Android/i.test(ua);
+}
+
+function storageGet(key, fallback = null) {
+  try {
+    const value = localStorage.getItem(key);
+    return value === null ? fallback : value;
+  } catch (error) {
+    return memoryStorage.has(key) ? memoryStorage.get(key) : fallback;
+  }
+}
+
+function storageSet(key, value) {
+  const nextValue = String(value);
+  memoryStorage.set(key, nextValue);
+  try {
+    localStorage.setItem(key, nextValue);
+  } catch (error) {
+    // Safari private mode can block storage writes. Memory fallback stays active.
+  }
+}
+
+function storageRemove(key) {
+  memoryStorage.delete(key);
+  try {
+    localStorage.removeItem(key);
+  } catch (error) {
+    // Ignore storage issues in Safari private mode.
+  }
+}
+
+function applyBrowserCompatibility() {
+  document.body.classList.toggle('safari-browser', isSafariBrowser());
+}
+
+function updateViewportHeight() {
+  document.documentElement.style.setProperty('--app-height', `${window.innerHeight}px`);
+}
 
 /* COUNTDOWN */
 function addMonthsSafe(date, monthsToAdd) {
@@ -1782,12 +1843,12 @@ function updateCountdown() {
 }
 
 function getDeviceToken() {
-  let token = localStorage.getItem('deviceToken');
+  let token = storageGet('deviceToken', '');
   if (!token) {
     token = window.crypto?.randomUUID
       ? window.crypto.randomUUID()
       : `device-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
-    localStorage.setItem('deviceToken', token);
+    storageSet('deviceToken', token);
   }
   return token;
 }
@@ -1824,44 +1885,72 @@ function formatRemainingTime(milliseconds) {
   return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
 }
 
+function setGameRemainingLabel(text) {
+  const labels = gameRemainingLabelElements.length
+    ? gameRemainingLabelElements
+    : document.querySelectorAll('[data-game-remaining-label]');
+  labels.forEach((el) => {
+    if (el.innerText !== text) {
+      el.innerText = text;
+    }
+  });
+}
+
 function renderGameRemaining() {
   const targets = gameRemainingElements.length
     ? gameRemainingElements
     : document.querySelectorAll('[data-game-remaining]');
   const { startedAt, durationMinutes } = activeGameState;
+  const summaryTarget = getSummaryCountdownTarget();
 
-  if (!startedAt) {
+  if (startedAt) {
+    const endTime = new Date(startedAt).getTime() + (Number(durationMinutes || 10) * 60000);
+    const remaining = endTime - Date.now();
+    if (remaining > 0) {
+      const label = formatRemainingTime(remaining);
+      setGameRemainingLabel('Do końca gry zostało');
+
+      if (remaining <= 15 * 60000) {
+        showMicroToast(
+          'Zostało 15 minut do końca gry. To dobry moment na finałowy sprint.',
+          'warning',
+          'Uwaga',
+          `warning-15-${startedAt}`
+        );
+      }
+
+      targets.forEach((el) => {
+        if (el.innerText !== label) {
+          el.innerText = label;
+        }
+      });
+      return;
+    }
+  }
+
+  if (summaryTarget) {
+    const remaining = summaryTarget - Date.now();
+    const label = remaining > 0 ? formatRemainingTime(remaining) : '00:00';
+    setGameRemainingLabel('Do podsumowania zostało');
     targets.forEach((el) => {
-      if (el.innerText !== 'Gra nieaktywna') {
-        el.innerText = 'Gra nieaktywna';
+      if (el.innerText !== label) {
+        el.innerText = label;
       }
     });
     return;
   }
 
-  const endTime = new Date(startedAt).getTime() + (Number(durationMinutes || 10) * 60000);
-  const remaining = endTime - Date.now();
-  const label = remaining > 0 ? formatRemainingTime(remaining) : '00:00';
-
-  if (remaining > 0 && remaining <= 15 * 60000) {
-    showMicroToast(
-      'Zostało 15 minut do końca gry. To dobry moment na finałowy sprint.',
-      'warning',
-      'Uwaga',
-      `warning-15-${startedAt}`
-    );
-  }
-
+  setGameRemainingLabel('Do końca gry zostało');
   targets.forEach((el) => {
-    if (el.innerText !== label) {
-      el.innerText = label;
+    if (el.innerText !== 'Gra nieaktywna') {
+      el.innerText = 'Gra nieaktywna';
     }
   });
 }
 
 function getSummaryCountdownTarget() {
   if (activeGameState.summaryAt) return new Date(activeGameState.summaryAt).getTime();
-  if (activeGameState.endedAt) return new Date(activeGameState.endedAt).getTime() + (30 * 60000);
+  if (activeGameState.endedAt) return new Date(activeGameState.endedAt).getTime() + (5 * 60000);
   return null;
 }
 
@@ -1917,7 +2006,7 @@ function getGamePhase() {
   const summaryTarget = getSummaryCountdownTarget();
 
   if (startedAt) {
-  const endTime = new Date(startedAt).getTime() + (Number(durationMinutes || 10) * 60000);
+    const endTime = new Date(startedAt).getTime() + (Number(durationMinutes || 10) * 60000);
     if (Date.now() < endTime) return 'active';
     if (summaryTarget && Date.now() >= summaryTarget) return 'thanks';
     return 'ended';
@@ -1953,14 +2042,15 @@ function hideAllScreens() {
 function showLoginScreen(options = {}) {
   const {
     showForm = false,
-    waitingMessage = ''
+    waitingMessage = '',
+    hidePanels = false
   } = options;
 
   setActiveScreen('login-screen');
   hasOpenedLogin = showForm;
-  howtoPanelEl.style.display = waitingMessage ? 'none' : (showForm ? 'none' : 'block');
-  loginFormEl.style.display = waitingMessage ? 'none' : (showForm ? 'block' : 'none');
-  statusBoxEl.innerHTML = waitingMessage
+  howtoPanelEl.style.display = hidePanels ? 'none' : (waitingMessage ? 'none' : (showForm ? 'none' : 'block'));
+  loginFormEl.style.display = hidePanels ? 'none' : (waitingMessage ? 'none' : (showForm ? 'block' : 'none'));
+  statusBoxEl.innerHTML = !hidePanels && waitingMessage
     ? `<div class="status-waiting">${escHtml(waitingMessage)}</div>`
     : '';
 
@@ -1993,7 +2083,7 @@ async function restoreParticipantSession() {
     if (!data.id) return null;
 
     participantId = Number(data.id);
-    localStorage.setItem('participantId', String(participantId));
+    storageSet('participantId', String(participantId));
     return participantId;
   } catch (e) {
     return null;
@@ -2005,7 +2095,7 @@ function clearParticipantAccess(message = 'To konto jest przypisane do innego ur
   currentQuestion = null;
   participantStatsFetchedAt = 0;
   questionFetchedAt = 0;
-  localStorage.removeItem('participantId');
+  storageRemove('participantId');
   showLoginScreen({ showForm: true });
   loginBtnEl.disabled = false;
   loginMsgEl.innerText = message;
@@ -2157,7 +2247,7 @@ function applyGamePhaseScreen(phase, manageScreens) {
 
   if (phase === 'idle') {
     if (participantId) {
-      localStorage.removeItem('participantId');
+      storageRemove('participantId');
       participantId = null;
       currentQuestion = null;
       questionFetchedAt = 0;
@@ -2165,7 +2255,7 @@ function applyGamePhaseScreen(phase, manageScreens) {
     }
 
     if (manageScreens) {
-      showLoginScreen({ waitingMessage: 'Śledź nas, może Ci się to przydać w dniu finału. Przygotowania do finału to świetny czas — śledź nas, aby nic nie przegapić.' });
+      showLoginScreen({ hidePanels: true });
     }
     return phase;
   }
@@ -2251,7 +2341,7 @@ async function doLogin() {
     participantStatsFetchedAt = 0;
     questionFetchedAt = 0;
     currentQuestion = null;
-    localStorage.setItem('participantId', String(participantId));
+    storageSet('participantId', String(participantId));
     triggerHaptic([16, 45, 16]);
     await showQuestionScreen({ force: true });
   } catch(e) {
@@ -2552,6 +2642,8 @@ function escHtml(s) {
 
 /* INIT */
 window.onload = async () => {
+  applyBrowserCompatibility();
+  updateViewportHeight();
   updateCountdown();
   setInterval(updateCountdown, 30000);
   bindUppercaseLoginFields();
@@ -2564,7 +2656,7 @@ window.onload = async () => {
   renderParticipantBadges();
   setInterval(renderGameRemaining, 1000);
 
-  const saved = localStorage.getItem('participantId');
+  const saved = storageGet('participantId', '');
 
   if (saved) {
     participantId = parseInt(saved, 10);
@@ -2594,7 +2686,10 @@ window.onload = async () => {
       schedulePlayerSync({ force: true });
     }
   });
+  window.addEventListener('resize', updateViewportHeight);
+  window.addEventListener('orientationchange', updateViewportHeight);
   window.addEventListener('pageshow', () => {
+    updateViewportHeight();
     schedulePlayerSync({ force: true });
   });
 };

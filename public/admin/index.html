@@ -20,13 +20,22 @@
     --danger: #ff6b81;
     --success: #6dffb3;
     --shadow: 0 24px 64px rgba(0, 0, 0, 0.34);
+    --app-height: 100vh;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
+  html {
+    min-height: 100%;
+    height: -webkit-fill-available;
+  }
+
   body {
     min-height: 100vh;
-    padding: 32px 22px 48px;
+    min-height: 100svh;
+    min-height: var(--app-height);
+    min-height: -webkit-fill-available;
+    padding: max(32px, env(safe-area-inset-top)) max(22px, env(safe-area-inset-right)) max(48px, env(safe-area-inset-bottom)) max(22px, env(safe-area-inset-left));
     background:
       radial-gradient(circle at top right, rgba(139, 92, 246, 0.16), transparent 28%),
       radial-gradient(circle at top left, rgba(183, 255, 72, 0.08), transparent 22%),
@@ -41,10 +50,17 @@
   }
 
   .auth-shell {
-    min-height: calc(100vh - 80px);
+    min-height: calc(var(--app-height) - 80px);
     display: flex;
     align-items: center;
     justify-content: center;
+  }
+
+  body.safari-browser .auth-card,
+  body.safari-browser .panel,
+  body.safari-browser .toolbar {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
   }
 
   .auth-card {
@@ -1180,6 +1196,7 @@
     border-radius: 18px;
     background: rgba(9, 11, 16, 0.88);
     backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     border: 1px solid rgba(57, 67, 93, 0.5);
   }
 
@@ -1863,6 +1880,15 @@
   </div>
   <div class="event-mode-banner" id="event-mode-banner"><strong>Tryb wydarzenia</strong> Aktywny jest uproszczony widok z większymi przyciskami, większym tekstem i mniejszą liczbą szczegółów.</div>
 
+  <div class="stats-row">
+    <div class="stat"><div class="stat-val" id="s-participants">—</div><div class="stat-lbl">Uczestników</div></div>
+    <div class="stat"><div class="stat-val" id="s-answers">—</div><div class="stat-lbl">Odpowiedzi</div></div>
+    <div class="stat"><div class="stat-val" id="s-bonuses">—</div><div class="stat-lbl">Bonusów</div></div>
+    <div class="stat"><div class="stat-val" id="s-correct">—</div><div class="stat-lbl">Poprawnych</div></div>
+    <div class="stat"><div class="stat-val" id="s-wrong">—</div><div class="stat-lbl">Błędnych</div></div>
+    <div class="stat"><div class="stat-val" id="s-avg">—</div><div class="stat-lbl">Śr. punktów</div></div>
+  </div>
+
   <div class="hero">
     <section class="panel control-panel">
       <div class="control-top">
@@ -1944,15 +1970,6 @@
         </div>
       </div>
     </aside>
-  </div>
-
-  <div class="stats-row">
-    <div class="stat"><div class="stat-val" id="s-participants">—</div><div class="stat-lbl">Uczestników</div></div>
-    <div class="stat"><div class="stat-val" id="s-answers">—</div><div class="stat-lbl">Odpowiedzi</div></div>
-    <div class="stat"><div class="stat-val" id="s-bonuses">—</div><div class="stat-lbl">Bonusów</div></div>
-    <div class="stat"><div class="stat-val" id="s-correct">—</div><div class="stat-lbl">Poprawnych</div></div>
-    <div class="stat"><div class="stat-val" id="s-wrong">—</div><div class="stat-lbl">Błędnych</div></div>
-    <div class="stat"><div class="stat-val" id="s-avg">—</div><div class="stat-lbl">Śr. punktów</div></div>
   </div>
 
   <div class="ops-grid">
@@ -2351,6 +2368,55 @@ const ADMIN_SESSION_KEY = 'god_admin_authenticated';
 const EVENT_MODE_KEY = 'god_admin_event_mode';
 const ADMIN_LOGIN = 'admin';
 const ADMIN_PASSWORD = 'final2026';
+const localMemoryStorage = new Map();
+const sessionMemoryStorage = new Map();
+
+function isSafariBrowser() {
+  const ua = navigator.userAgent || '';
+  return /Safari/i.test(ua) && !/Chrome|Chromium|CriOS|Edg|EdgiOS|OPR|OPiOS|Android/i.test(ua);
+}
+
+function storageGet(kind, key, fallback = null) {
+  const nativeStorage = kind === 'session' ? sessionStorage : localStorage;
+  const memoryStore = kind === 'session' ? sessionMemoryStorage : localMemoryStorage;
+  try {
+    const value = nativeStorage.getItem(key);
+    return value === null ? fallback : value;
+  } catch (error) {
+    return memoryStore.has(key) ? memoryStore.get(key) : fallback;
+  }
+}
+
+function storageSet(kind, key, value) {
+  const nativeStorage = kind === 'session' ? sessionStorage : localStorage;
+  const memoryStore = kind === 'session' ? sessionMemoryStorage : localMemoryStorage;
+  const nextValue = String(value);
+  memoryStore.set(key, nextValue);
+  try {
+    nativeStorage.setItem(key, nextValue);
+  } catch (error) {
+    // Safari private mode can block storage writes. Memory fallback stays active.
+  }
+}
+
+function storageRemove(kind, key) {
+  const nativeStorage = kind === 'session' ? sessionStorage : localStorage;
+  const memoryStore = kind === 'session' ? sessionMemoryStorage : localMemoryStorage;
+  memoryStore.delete(key);
+  try {
+    nativeStorage.removeItem(key);
+  } catch (error) {
+    // Ignore storage issues in Safari private mode.
+  }
+}
+
+function applyBrowserCompatibility() {
+  document.body.classList.toggle('safari-browser', isSafariBrowser());
+}
+
+function updateViewportHeight() {
+  document.documentElement.style.setProperty('--app-height', `${window.innerHeight}px`);
+}
 
 function setAuthFeedback(message, type = '') {
   const el = document.getElementById('admin-auth-feedback');
@@ -2367,11 +2433,7 @@ function closeParticipantModal() {
 }
 
 function isEventModeEnabled() {
-  try {
-    return localStorage.getItem(EVENT_MODE_KEY) === '1';
-  } catch (error) {
-    return false;
-  }
+  return storageGet('local', EVENT_MODE_KEY, '0') === '1';
 }
 
 function applyEventMode(isEnabled) {
@@ -2387,11 +2449,7 @@ function applyEventMode(isEnabled) {
 
 function toggleEventMode() {
   const nextState = !document.body.classList.contains('event-mode');
-  try {
-    localStorage.setItem(EVENT_MODE_KEY, nextState ? '1' : '0');
-  } catch (error) {
-    // Ignore storage issues and still apply in-memory UI state.
-  }
+  storageSet('local', EVENT_MODE_KEY, nextState ? '1' : '0');
   applyEventMode(nextState);
 }
 
@@ -2414,11 +2472,7 @@ function applyAdminAccessState(isUnlocked) {
 }
 
 function isAdminAuthenticated() {
-  try {
-    return sessionStorage.getItem(ADMIN_SESSION_KEY) === '1';
-  } catch (error) {
-    return false;
-  }
+  return storageGet('session', ADMIN_SESSION_KEY, '0') === '1';
 }
 
 function bootAdminPanel() {
@@ -2454,11 +2508,7 @@ function attemptAdminLogin() {
     return;
   }
 
-  try {
-    sessionStorage.setItem(ADMIN_SESSION_KEY, '1');
-  } catch (error) {
-    console.error(error);
-  }
+  storageSet('session', ADMIN_SESSION_KEY, '1');
 
   setAuthFeedback('Logowanie poprawne. Otwieram panel...', 'success');
   applyAdminAccessState(true);
@@ -2466,11 +2516,7 @@ function attemptAdminLogin() {
 }
 
 function logoutAdmin() {
-  try {
-    sessionStorage.removeItem(ADMIN_SESSION_KEY);
-  } catch (error) {
-    console.error(error);
-  }
+  storageRemove('session', ADMIN_SESSION_KEY);
 
   applyAdminAccessState(false);
 
@@ -4110,6 +4156,11 @@ function escapeAttr(value) {
 }
 
 refreshQrAdminSummary();
+applyBrowserCompatibility();
+updateViewportHeight();
+window.addEventListener('resize', updateViewportHeight);
+window.addEventListener('orientationchange', updateViewportHeight);
+window.addEventListener('pageshow', updateViewportHeight);
 initializeAdminAccess();
 </script>
 </body>

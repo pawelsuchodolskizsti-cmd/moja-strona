@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pl">
 <head>
 <meta charset="UTF-8">
@@ -17,20 +17,29 @@
   --success:#16a34a;
   --error:#dc2626;
   --card-bg:rgba(255,255,255,0.92);
+  --app-height:100vh;
 }
 
 * { box-sizing:border-box; margin:0; padding:0; }
 
+html {
+  min-height:100%;
+  height:-webkit-fill-available;
+}
+
 body {
-  background:url('/tlo-gry.png') no-repeat center center fixed;
+  background:url('/tlo-gry.png') no-repeat center center;
   background-size:cover;
   font-family:'DM Sans',sans-serif;
   min-height:100vh;
+  min-height:100svh;
   min-height:100dvh;
+  min-height:var(--app-height);
+  min-height:-webkit-fill-available;
   display:flex;
   align-items:center;
   justify-content:center;
-  padding:20px;
+  padding:max(20px, env(safe-area-inset-top)) max(20px, env(safe-area-inset-right)) max(20px, env(safe-area-inset-bottom)) max(20px, env(safe-area-inset-left));
   position:relative;
   overflow-x:hidden;
 }
@@ -58,6 +67,14 @@ body::before {
   border:1px solid rgba(255,255,255,0.6);
   position:relative;
   z-index:1;
+}
+
+body.safari-browser {
+  background-attachment:scroll;
+}
+
+body.safari-browser .card {
+  background:rgba(255,255,255,0.97);
 }
 
 .bonus-card {
@@ -638,7 +655,7 @@ input:focus {
   <div class="msg" id="name-msg"></div>
 
   <div class="game-remaining">
-    <span class="game-remaining-label">Do ko&#324;ca gry zosta&#322;o</span>
+    <span class="game-remaining-label" data-game-remaining-label>Do ko&#324;ca gry zosta&#322;o</span>
     <div class="game-remaining-value" data-game-remaining>--:--</div>
   </div>
 </div>
@@ -664,7 +681,7 @@ input:focus {
   <div class="helper-box">Masz tylko jedno zaliczenie tego bonusu, wi&#281;c upewnij si&#281;, &#380;e wpisujesz w&#322;a&#347;ciwe has&#322;o.</div>
 
   <div class="game-remaining">
-    <span class="game-remaining-label">Do ko&#324;ca gry zosta&#322;o</span>
+    <span class="game-remaining-label" data-game-remaining-label>Do ko&#324;ca gry zosta&#322;o</span>
     <div class="game-remaining-value" data-game-remaining>--:--</div>
   </div>
 </div>
@@ -684,7 +701,7 @@ input:focus {
   <div class="success-copy" id="bonus-result-copy">Je&#347;li gra nadal trwa, sprawd&#378; nast&#281;pne punkty na trasie i wypatruj kolejnych niespodzianek.</div>
 
   <div class="game-remaining">
-    <span class="game-remaining-label">Do ko&#324;ca gry zosta&#322;o</span>
+    <span class="game-remaining-label" data-game-remaining-label>Do ko&#324;ca gry zosta&#322;o</span>
     <div class="game-remaining-value" data-game-remaining>--:--</div>
   </div>
 </div>
@@ -710,10 +727,12 @@ let cachedBonusLabelData = null;
 let lastBonusSyncAt = 0;
 let bonusLabelCacheKey = '';
 let activeBonusScreenId = '';
+const memoryStorage = new Map();
 
 const bonusId = new URLSearchParams(window.location.search).get('b');
 const bonusLabelElements = Array.from(document.querySelectorAll('[data-bonus-label]'));
 const gameRemainingElements = Array.from(document.querySelectorAll('[data-game-remaining]'));
+const gameRemainingLabelElements = Array.from(document.querySelectorAll('[data-game-remaining-label]'));
 const bonusScreenIds = ['name-screen', 'secret-screen', 'success-screen'];
 const bonusScreenElements = Object.fromEntries(bonusScreenIds.map((id) => [id, document.getElementById(id)]));
 const nameBtnEl = document.getElementById('name-btn');
@@ -727,13 +746,54 @@ const BONUS_LABEL_CACHE_MS = 4000;
 const BONUS_COUNT_CACHE_MS = 4000;
 const BONUS_SYNC_COOLDOWN_MS = 1200;
 
+function isSafariBrowser() {
+  const ua = navigator.userAgent || '';
+  return /Safari/i.test(ua) && !/Chrome|Chromium|CriOS|Edg|EdgiOS|OPR|OPiOS|Android/i.test(ua);
+}
+
+function storageGet(key, fallback = null) {
+  try {
+    const value = localStorage.getItem(key);
+    return value === null ? fallback : value;
+  } catch (error) {
+    return memoryStorage.has(key) ? memoryStorage.get(key) : fallback;
+  }
+}
+
+function storageSet(key, value) {
+  const nextValue = String(value);
+  memoryStorage.set(key, nextValue);
+  try {
+    localStorage.setItem(key, nextValue);
+  } catch (error) {
+    // Safari private mode can block storage writes. Memory fallback stays active.
+  }
+}
+
+function storageRemove(key) {
+  memoryStorage.delete(key);
+  try {
+    localStorage.removeItem(key);
+  } catch (error) {
+    // Ignore storage issues in Safari private mode.
+  }
+}
+
+function applyBrowserCompatibility() {
+  document.body.classList.toggle('safari-browser', isSafariBrowser());
+}
+
+function updateViewportHeight() {
+  document.documentElement.style.setProperty('--app-height', `${window.innerHeight}px`);
+}
+
 function getDeviceToken() {
-  let token = localStorage.getItem('deviceToken');
+  let token = storageGet('deviceToken', '');
   if (!token) {
     token = window.crypto?.randomUUID
       ? window.crypto.randomUUID()
       : `device-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
-    localStorage.setItem('deviceToken', token);
+    storageSet('deviceToken', token);
   }
   return token;
 }
@@ -947,13 +1007,27 @@ function formatRemainingTime(milliseconds) {
   return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
 }
 
+function getSummaryCountdownTarget() {
+  if (activeGameState.summaryAt) return new Date(activeGameState.summaryAt).getTime();
+  if (activeGameState.endedAt) return new Date(activeGameState.endedAt).getTime() + (5 * 60000);
+  return null;
+}
+
+function setGameRemainingLabel(text) {
+  gameRemainingLabelElements.forEach((element) => {
+    if (element.innerText !== text) {
+      element.innerText = text;
+    }
+  });
+}
+
 function clearBonusAccess(message = 'To konto jest przypisane do innego urzadzenia. Zaloguj sie ponownie.') {
   participantId = null;
   bonusLabelFetchedAt = 0;
   bonusCountFetchedAt = 0;
   bonusLabelCacheKey = '';
   cachedBonusLabelData = null;
-  localStorage.removeItem('participantId');
+  storageRemove('participantId');
   showNameLoginScreen();
   nameBtnEl.disabled = false;
   secretBtnEl.disabled = false;
@@ -966,32 +1040,52 @@ function clearBonusAccess(message = 'To konto jest przypisane do innego urzadzen
 
 function renderGameRemaining() {
   const { startedAt, durationMinutes } = activeGameState;
+  const summaryTarget = getSummaryCountdownTarget();
 
-  if (!startedAt) {
+  if (startedAt) {
+    const endTime = new Date(startedAt).getTime() + Number(durationMinutes || 10) * 60000;
+    const remaining = endTime - Date.now();
+    if (remaining > 0) {
+      const label = formatRemainingTime(remaining);
+      setGameRemainingLabel('Do końca gry zostało');
+
+      if (remaining <= 15 * 60000) {
+        showMicroToast(
+          'Zostało 15 minut do końca gry. To dobry moment na finałowy sprint.',
+          'warning',
+          'Uwaga',
+          `warning-15-${startedAt}`
+        );
+      }
+
+      gameRemainingElements.forEach((element) => {
+        if (element.innerText !== label) {
+          element.innerText = label;
+        }
+      });
+      return;
+    }
+  }
+
+  if (summaryTarget) {
+    const remaining = summaryTarget - Date.now();
+    const label = remaining > 0 ? formatRemainingTime(remaining) : '00:00';
+    setGameRemainingLabel('Do podsumowania zostało');
     gameRemainingElements.forEach((element) => {
-      element.innerText = 'Gra nieaktywna';
+      if (element.innerText !== label) {
+        element.innerText = label;
+      }
     });
     return;
   }
 
-  const endTime = new Date(startedAt).getTime() + Number(durationMinutes || 10) * 60000;
-  const remaining = endTime - Date.now();
-  const label = remaining > 0 ? formatRemainingTime(remaining) : '00:00';
-
-  if (remaining > 0 && remaining <= 15 * 60000) {
-    showMicroToast(
-      'Zostało 15 minut do końca gry. To dobry moment na finałowy sprint.',
-      'warning',
-      'Uwaga',
-      `warning-15-${startedAt}`
-    );
-  }
-
+  setGameRemainingLabel('Do końca gry zostało');
   gameRemainingElements.forEach((element) => {
-    element.innerText = label;
+    if (element.innerText !== 'Gra nieaktywna') {
+      element.innerText = 'Gra nieaktywna';
+    }
   });
 }
-
 async function loadGameState(options = {}) {
   const { force = false } = options;
   if (!force && gameStateLoadPromise) return gameStateLoadPromise;
@@ -1036,7 +1130,7 @@ async function restoreParticipantSession() {
     if (!data.id) return null;
 
     participantId = data.id;
-    localStorage.setItem('participantId', String(participantId));
+    storageSet('participantId', String(participantId));
     return participantId;
   } catch (e) {
     return null;
@@ -1063,9 +1157,9 @@ async function loadBonusLabel(options = {}) {
       const data = await res.json();
       if (data?.inactive) {
         showBonusResult({
-          title: 'Bonus będzie aktywny po starcie gry',
-          subtitle: 'Ten kod QR jest już gotowy, ale formularz odblokuje się dopiero po uruchomieniu gry przez organizatora.',
-          copy: data.error || 'Wróć do tego bonusu po starcie gry i spróbuj ponownie.',
+          title: 'Bonus bÄ™dzie aktywny po starcie gry',
+          subtitle: 'Ten kod QR jest juĹĽ gotowy, ale formularz odblokuje siÄ™ dopiero po uruchomieniu gry przez organizatora.',
+          copy: data.error || 'WrĂłÄ‡ do tego bonusu po starcie gry i sprĂłbuj ponownie.',
           badge: 'Jeszcze chwila',
           icon: 'QR',
           animate: false
@@ -1114,9 +1208,9 @@ async function showSecret(existingBonusData = null, options = {}) {
 
   if (bonusData?.alreadyRedeemed) {
     showMicroToast(
-      'Ten bonus masz już zaliczony. Szukaj dalej kolejnych kodów QR.',
+      'Ten bonus masz juĹĽ zaliczony. Szukaj dalej kolejnych kodĂłw QR.',
       'info',
-      'Już wykonane',
+      'JuĹĽ wykonane',
       `bonus-repeat-${bonusId}-${participantId || 'guest'}`
     );
     showBonusResult({
@@ -1135,9 +1229,9 @@ async function showSecret(existingBonusData = null, options = {}) {
 function showBonusPhaseState(phase) {
   if (phase === 'idle') {
     showBonusResult({
-      title: 'Bonus będzie aktywny po starcie gry',
-      subtitle: 'Ten punkt bonusowy odblokuje się dopiero po uruchomieniu gry przez organizatora.',
-      copy: 'Zachowaj ten kod QR i wróć do niego po starcie gry.',
+      title: 'Bonus bÄ™dzie aktywny po starcie gry',
+      subtitle: 'Ten punkt bonusowy odblokuje siÄ™ dopiero po uruchomieniu gry przez organizatora.',
+      copy: 'Zachowaj ten kod QR i wrĂłÄ‡ do niego po starcie gry.',
       badge: 'Jeszcze chwila',
       icon: 'QR',
       animate: false
@@ -1147,10 +1241,10 @@ function showBonusPhaseState(phase) {
 
   if (phase === 'ended') {
     showBonusResult({
-      title: 'Gra została zakończona',
-      subtitle: 'Ten bonus nie jest już aktywny. Trwa odliczanie do podsumowania wydarzenia.',
-      copy: 'Sprawdź komunikaty organizatora i kieruj się do Teatru na finał gry.',
-      badge: 'Finał gry',
+      title: 'Gra zostaĹ‚a zakoĹ„czona',
+      subtitle: 'Ten bonus nie jest juĹĽ aktywny. Trwa odliczanie do podsumowania wydarzenia.',
+      copy: 'SprawdĹş komunikaty organizatora i kieruj siÄ™ do Teatru na finaĹ‚ gry.',
+      badge: 'FinaĹ‚ gry',
       icon: 'TEATR',
       animate: false
     });
@@ -1160,9 +1254,9 @@ function showBonusPhaseState(phase) {
   if (phase === 'thanks') {
     showBonusResult({
       title: 'Czas na podsumowanie',
-      subtitle: 'Gra jest już zamknięta. Dziękujemy za udział i zapraszamy na część finałową wydarzenia.',
-      copy: 'Za chwilę rozpocznie się podsumowanie oraz rozdanie upominków.',
-      badge: 'Dziękujemy',
+      subtitle: 'Gra jest juĹĽ zamkniÄ™ta. DziÄ™kujemy za udziaĹ‚ i zapraszamy na czÄ™Ĺ›Ä‡ finaĹ‚owÄ… wydarzenia.',
+      copy: 'Za chwilÄ™ rozpocznie siÄ™ podsumowanie oraz rozdanie upominkĂłw.',
+      badge: 'DziÄ™kujemy',
       icon: 'OK',
       animate: false
     });
@@ -1224,12 +1318,14 @@ window.onload = async () => {
     return;
   }
 
+  applyBrowserCompatibility();
+  updateViewportHeight();
   deviceToken = getDeviceToken();
   bindUppercaseLoginFields();
   renderGameRemaining();
   setInterval(renderGameRemaining, 1000);
 
-  const saved = localStorage.getItem('participantId');
+  const saved = storageGet('participantId', '');
   if (saved) {
     participantId = saved;
   } else if (!participantId) {
@@ -1251,7 +1347,10 @@ window.onload = async () => {
       scheduleBonusSync({ force: true });
     }
   });
+  window.addEventListener('resize', updateViewportHeight);
+  window.addEventListener('orientationchange', updateViewportHeight);
   window.addEventListener('pageshow', () => {
+    updateViewportHeight();
     scheduleBonusSync({ force: true });
   });
 };
@@ -1289,7 +1388,7 @@ async function doNameLogin() {
     bonusCountFetchedAt = 0;
     bonusLabelCacheKey = '';
     cachedBonusLabelData = null;
-    localStorage.setItem('participantId', String(participantId));
+    storageSet('participantId', String(participantId));
     triggerHaptic([16, 45, 16]);
     await showSecret(null, { force: true });
   } catch (e) {
@@ -1323,7 +1422,7 @@ async function submitSecret() {
 
     const data = await res.json();
 
-    if (res.status === 403 && /urzadzen|urządzen|przypisane/i.test(String(data.error || ''))) {
+    if (res.status === 403 && /urzadzen|urzÄ…dzen|przypisane/i.test(String(data.error || ''))) {
       clearBonusAccess(data.error);
       btn.disabled = false;
       return;
@@ -1342,8 +1441,8 @@ async function submitSecret() {
       };
       showMicroToast(
         bonusCount > 0
-          ? `Masz już ${bonusCount} ${formatPolishCount(bonusCount, 'bonus', 'bonusy', 'bonusów')}.`
-          : 'Nowy bonus został zapisany. Możesz ruszać dalej.',
+          ? `Masz juĹĽ ${bonusCount} ${formatPolishCount(bonusCount, 'bonus', 'bonusy', 'bonusĂłw')}.`
+          : 'Nowy bonus zostaĹ‚ zapisany. MoĹĽesz ruszaÄ‡ dalej.',
         'bonus',
         'Nowy bonus',
         bonusCount > 0 ? `bonus-count-${bonusCount}` : `bonus-saved-${bonusId}`
@@ -1365,9 +1464,9 @@ async function submitSecret() {
         bonusCountFetchedAt = Date.now();
       }
       showMicroToast(
-        'Ten bonus masz już zaliczony. Szukaj dalej kolejnych kodów QR.',
+        'Ten bonus masz juĹĽ zaliczony. Szukaj dalej kolejnych kodĂłw QR.',
         'info',
-        'Już wykonane',
+        'JuĹĽ wykonane',
         `bonus-repeat-${bonusId}-${participantId || 'guest'}`
       );
       showBonusResult({
@@ -1381,7 +1480,7 @@ async function submitSecret() {
     }
 
     if (res.status === 404 && /uczestnika/i.test(data.error || '')) {
-      localStorage.removeItem('participantId');
+      storageRemove('participantId');
     }
 
     msg.className = 'msg error';
@@ -1396,3 +1495,5 @@ async function submitSecret() {
 </script>
 </body>
 </html>
+
+

@@ -16,13 +16,22 @@
   --pink:#ff4f9b;
   --violet:#8c63ff;
   --shadow:0 26px 70px rgba(2, 8, 20, 0.42);
+  --app-height:100vh;
 }
 
 * { box-sizing:border-box; }
 
+html {
+  min-height:100%;
+  height:-webkit-fill-available;
+}
+
 body {
   margin:0;
   min-height:100vh;
+  min-height:100svh;
+  min-height:var(--app-height);
+  min-height:-webkit-fill-available;
   font-family: "Segoe UI", Arial, sans-serif;
   color:var(--text);
   background:
@@ -44,12 +53,16 @@ body {
   margin-bottom:22px;
 }
 
-.panel {
-  padding:24px;
-  border-radius:28px;
-  background:linear-gradient(180deg, rgba(18, 26, 40, 0.98), rgba(11, 18, 29, 0.98));
-  border:1px solid var(--line);
-  box-shadow:var(--shadow);
+  .panel {
+    padding:24px;
+    border-radius:28px;
+    background:linear-gradient(180deg, rgba(18, 26, 40, 0.98), rgba(11, 18, 29, 0.98));
+    border:1px solid var(--line);
+    box-shadow:var(--shadow);
+  }
+
+body.safari-browser .panel {
+  background:rgba(16, 25, 39, 0.98);
 }
 
 .eyebrow {
@@ -588,6 +601,25 @@ h1 {
 
   <script src="/admin/qr-catalog.js"></script>
   <script>
+  function isSafariBrowser() {
+    const ua = navigator.userAgent || '';
+    return /Safari/i.test(ua) && !/Chrome|Chromium|CriOS|Edg|EdgiOS|OPR|OPiOS|Android/i.test(ua);
+  }
+
+  function applyBrowserCompatibility() {
+    document.body.classList.toggle('safari-browser', isSafariBrowser());
+  }
+
+  function updateViewportHeight() {
+    document.documentElement.style.setProperty('--app-height', `${window.innerHeight}px`);
+  }
+
+  applyBrowserCompatibility();
+  updateViewportHeight();
+  window.addEventListener('resize', updateViewportHeight);
+  window.addEventListener('orientationchange', updateViewportHeight);
+  window.addEventListener('pageshow', updateViewportHeight);
+
   let qrGroups = { screens: [], questions: [], bonuses: [], all: [] };
   let qrDetailsRows = [];
 

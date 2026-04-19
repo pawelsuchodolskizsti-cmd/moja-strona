@@ -17,6 +17,7 @@
     --card-strong: rgba(255, 255, 255, 0.97);
     --line: rgba(124, 106, 247, 0.16);
     --shadow: 0 28px 70px rgba(30, 22, 70, 0.22);
+    --app-height: 100vh;
   }
 
   * {
@@ -25,12 +26,20 @@
     padding: 0;
   }
 
+  html {
+    min-height: 100%;
+    height: -webkit-fill-available;
+  }
+
   body {
     min-height: 100vh;
+    min-height: 100svh;
+    min-height: var(--app-height);
+    min-height: -webkit-fill-available;
     padding: 22px;
     font-family: 'DM Sans', sans-serif;
     color: var(--text);
-    background: url('/tlo-gry.png') no-repeat center center fixed;
+    background: url('/tlo-gry.png') no-repeat center center;
     background-size: cover;
     position: relative;
     overflow-x: hidden;
@@ -63,9 +72,17 @@
     -webkit-backdrop-filter: blur(18px);
   }
 
+  body.safari-browser {
+    background-attachment: scroll;
+  }
+
+  body.safari-browser .card {
+    background: rgba(255, 255, 255, 0.97);
+  }
+
   .hero {
     display: grid;
-    grid-template-columns: minmax(0, 1.18fr) minmax(320px, 0.82fr);
+    grid-template-columns: minmax(0, 1.2fr) minmax(360px, 0.8fr);
     gap: 18px;
     margin-bottom: 18px;
   }
@@ -154,20 +171,25 @@
 
   .status-grid {
     display: grid;
-    grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr);
-    gap: 14px;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+    align-items: stretch;
   }
 
   .status-box {
     border-radius: 24px;
-    padding: 18px 18px 16px;
+    padding: 18px 20px 16px;
     background: rgba(255, 255, 255, 0.64);
     border: 1px solid rgba(124, 106, 247, 0.12);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-width: 0;
   }
 
   .status-box.timer-box {
-    grid-row: span 2;
-    min-height: 210px;
+    grid-row: auto;
+    min-height: 200px;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -184,14 +206,17 @@
     text-transform: uppercase;
     color: #73688c;
     margin-bottom: 10px;
+    white-space: nowrap;
   }
 
   .status-value {
     font-family: 'Syne', sans-serif;
-    font-size: clamp(28px, 3.3vw, 42px);
+    font-size: clamp(22px, 2.1vw, 32px);
     font-weight: 800;
     line-height: 1.02;
-    overflow-wrap: anywhere;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .status-value.phase {
@@ -201,10 +226,13 @@
   }
 
   .status-value.timer {
-    font-size: clamp(66px, 7.5vw, 108px);
+    font-size: clamp(54px, 7vw, 104px);
     line-height: .94;
     color: #2f2750;
     letter-spacing: -.04em;
+    white-space: nowrap;
+    overflow: visible;
+    text-overflow: clip;
   }
 
   .status-note {
@@ -353,6 +381,7 @@
     display: grid;
     grid-template-columns: minmax(320px, .9fr) minmax(0, 1.1fr);
     gap: 18px;
+    margin-bottom: 18px;
   }
 
   .board-tools {
@@ -550,6 +579,14 @@
       min-height: 170px;
     }
 
+    .status-value {
+      font-size: clamp(24px, 8vw, 34px);
+    }
+
+    .status-value.timer {
+      font-size: clamp(52px, 18vw, 82px);
+    }
+
     .list-item {
       grid-template-columns: 58px minmax(0, 1fr);
     }
@@ -581,18 +618,47 @@
             <div class="status-label">Status wydarzenia</div>
             <div class="status-value phase" id="phase-text">Ladowanie</div>
           </div>
+          <div class="status-box">
+            <div class="status-label">Lider miast</div>
+            <div class="status-value" id="leader-name">-</div>
+          </div>
           <div class="status-box timer-box">
             <div class="status-label" id="timer-label">Do konca gry</div>
             <div class="status-value timer" id="timer-value">--:--</div>
             <div class="status-note" id="timer-note">Licznik odswieza sie automatycznie przez cale wydarzenie.</div>
           </div>
-          <div class="status-box">
-            <div class="status-label">Lider miast</div>
-            <div class="status-value" id="leader-name">-</div>
-          </div>
         </div>
       </div>
     </section>
+
+    <div class="board">
+      <section class="card board-card">
+        <div class="section-head">
+          <div>
+            <div class="section-title">Top 3 miast</div>
+            <div class="section-copy" id="podium-copy">Podium liczone wedlug sumy punktow zdobytych przez cale miasto.</div>
+          </div>
+        </div>
+        <div class="podium-grid" id="podium"></div>
+      </section>
+
+      <section class="card board-card">
+        <div class="section-head">
+          <div>
+            <div class="section-title">Najlepsi uczestnicy</div>
+            <div class="section-copy">Lista indywidualna pozostaje dostepna, ale podium obok pokazuje miasta zamiast osob.</div>
+          </div>
+          <div class="board-tools">
+            <select class="sort-select" id="leaderboard-sort" onchange="setScoreboardSort(this.value)">
+              <option value="score">Sortowanie: punkty</option>
+              <option value="city">Sortowanie: miasto A-Z</option>
+              <option value="city-score">Sortowanie: punkty miasta</option>
+            </select>
+          </div>
+        </div>
+        <div class="list" id="leaderboard-list"></div>
+      </section>
+    </div>
 
     <section class="card announcement-card">
       <div class="announcement-badge">Komunikat organizatora</div>
@@ -627,35 +693,6 @@
       </div>
       <div class="city-grid" id="city-ranking"></div>
     </section>
-
-    <div class="board">
-      <section class="card board-card">
-        <div class="section-head">
-          <div>
-            <div class="section-title">Top 3 miast</div>
-            <div class="section-copy" id="podium-copy">Podium liczone wedlug sumy punktow zdobytych przez cale miasto.</div>
-          </div>
-        </div>
-        <div class="podium-grid" id="podium"></div>
-      </section>
-
-      <section class="card board-card">
-        <div class="section-head">
-          <div>
-            <div class="section-title">Najlepsi uczestnicy</div>
-            <div class="section-copy">Lista indywidualna pozostaje dostepna, ale podium obok pokazuje miasta zamiast osob.</div>
-          </div>
-          <div class="board-tools">
-            <select class="sort-select" id="leaderboard-sort" onchange="setScoreboardSort(this.value)">
-              <option value="score">Sortowanie: punkty</option>
-              <option value="city">Sortowanie: miasto A-Z</option>
-              <option value="city-score">Sortowanie: punkty miasta</option>
-            </select>
-          </div>
-        </div>
-        <div class="list" id="leaderboard-list"></div>
-      </section>
-    </div>
   </div>
 
 <script>
@@ -689,6 +726,19 @@ let cachedCityLeaders = [];
 const SCOREBOARD_CACHE_MS = 4000;
 const SCOREBOARD_SYNC_COOLDOWN_MS = 1200;
 
+function isSafariBrowser() {
+  const ua = navigator.userAgent || '';
+  return /Safari/i.test(ua) && !/Chrome|Chromium|CriOS|Edg|EdgiOS|OPR|OPiOS|Android/i.test(ua);
+}
+
+function applyBrowserCompatibility() {
+  document.body.classList.toggle('safari-browser', isSafariBrowser());
+}
+
+function updateViewportHeight() {
+  document.documentElement.style.setProperty('--app-height', `${window.innerHeight}px`);
+}
+
 function formatDateTime(value) {
   if (!value) return '--:--';
   const date = new Date(value);
@@ -715,6 +765,10 @@ function getRemainingMs() {
 
   if (scoreboardState.summaryAt) {
     return new Date(scoreboardState.summaryAt).getTime() - Date.now();
+  }
+
+  if (scoreboardState.endedAt) {
+    return new Date(scoreboardState.endedAt).getTime() + (5 * 60000) - Date.now();
   }
 
   return null;
@@ -846,6 +900,12 @@ function renderHeader() {
     phaseText.textContent = 'Final';
     timerLabel.textContent = 'Do podsumowania';
     timerNote.textContent = 'To jest ostatni etap przed specjalnym pokazem i rozdaniem upominkow.';
+  } else if (scoreboardState.phase === 'thanks') {
+    headline.textContent = 'Dziekujemy za udzial';
+    subline.textContent = 'Gra i podsumowanie zostaly zakonczone. Ekran pozostaje w trybie koncowym.';
+    phaseText.textContent = 'Po finale';
+    timerLabel.textContent = 'Wydarzenie zakonczone';
+    timerNote.textContent = 'Dziekujemy wszystkim uczestnikom i widzom za wspolny final.';
   } else {
     headline.textContent = 'Oczekiwanie na start';
     subline.textContent = 'System czeka na uruchomienie gry. Gdy start ruszy, ranking zacznie aktualizowac sie automatycznie.';
@@ -857,12 +917,10 @@ function renderHeader() {
   const remaining = getRemainingMs();
   timerValue.textContent = scoreboardState.phase === 'idle'
     ? '-'
-    : (remaining !== null && remaining > 0 ? formatTimer(remaining) : (scoreboardState.phase === 'ended' ? 'TEATR' : '00:00'));
+    : (remaining !== null && remaining > 0 ? formatTimer(remaining) : '00:00');
 
   if (!cityLeader) {
     leaderName.textContent = '-';
-  } else if (cityPodiumMode === 'average') {
-    leaderName.textContent = `${cityLeader.city} ${cityLeader.averageScore.toFixed(1)} pkt/os`;
   } else {
     leaderName.textContent = cityLeader.city;
   }
@@ -1043,6 +1101,8 @@ function scheduleScoreboardRefresh(force = false) {
 }
 
 window.onload = async () => {
+  applyBrowserCompatibility();
+  updateViewportHeight();
   await loadScoreboard();
   setInterval(() => {
     renderHeader();
@@ -1060,7 +1120,10 @@ window.onload = async () => {
       scheduleScoreboardRefresh(true);
     }
   });
+  window.addEventListener('resize', updateViewportHeight);
+  window.addEventListener('orientationchange', updateViewportHeight);
   window.addEventListener('pageshow', () => {
+    updateViewportHeight();
     scheduleScoreboardRefresh(true);
   });
 };
