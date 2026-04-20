@@ -18,6 +18,10 @@
   --error:#dc2626;
   --card-bg:rgba(255,255,255,0.92);
   --app-height:100vh;
+  --screen-card-width:430px;
+  --screen-card-min-height:580px;
+  --button-glow:0 16px 32px rgba(157,177,31,0.2);
+  --countdown-glow:0 14px 30px rgba(124,106,247,0.12);
 }
 
 * { box-sizing:border-box; margin:0; padding:0; }
@@ -62,11 +66,33 @@ body::before {
   border-radius:24px;
   padding:34px 28px 28px;
   width:100%;
-  max-width:430px;
+  max-width:var(--screen-card-width);
   box-shadow:0 24px 64px rgba(0,0,0,0.22);
   border:1px solid rgba(255,255,255,0.6);
   position:relative;
   z-index:1;
+}
+
+.screen-enter {
+  animation: screenFadeSlideIn .24s cubic-bezier(.22,.9,.28,1);
+  will-change: opacity, transform;
+}
+
+@keyframes screenFadeSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .screen-enter {
+    animation: none;
+  }
 }
 
 body.safari-browser {
@@ -83,6 +109,7 @@ body.safari-browser .card {
     var(--card-bg);
   border:1px solid rgba(200,255,57,0.26);
   box-shadow:0 26px 68px rgba(29,24,59,0.2), 0 0 0 1px rgba(255,212,90,0.12);
+  min-height:var(--screen-card-min-height);
 }
 
 .logo {
@@ -118,6 +145,64 @@ body.safari-browser .card {
   box-shadow:0 12px 24px rgba(180, 190, 46, 0.24);
 }
 
+.bonus-special-tag {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin: -2px auto 14px;
+  padding: 10px 14px;
+  width: fit-content;
+  max-width: 100%;
+  border-radius: 999px;
+  background:
+    radial-gradient(circle at top left, rgba(255,255,255,0.42), transparent 38%),
+    linear-gradient(135deg, rgba(255,212,90,0.98), rgba(200,255,57,0.98));
+  border: 1px solid rgba(152, 176, 28, 0.26);
+  box-shadow: 0 14px 28px rgba(142, 161, 34, 0.2);
+}
+
+.bonus-special-icon {
+  width: 28px;
+  height: 28px;
+  flex: 0 0 28px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: rgba(255,255,255,0.38);
+  color: #495317;
+  font-family: 'Syne', sans-serif;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .04em;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.3);
+}
+
+.bonus-special-copy {
+  min-width: 0;
+  text-align: left;
+}
+
+.bonus-special-title {
+  display: block;
+  font-family: 'Syne', sans-serif;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: #2f360f;
+  line-height: 1.1;
+}
+
+.bonus-special-subtitle {
+  display: block;
+  margin-top: 2px;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.25;
+  color: rgba(47, 54, 15, 0.76);
+}
+
 h1 {
   font-family:'Syne',sans-serif;
   font-size:clamp(24px, 7vw, 31px);
@@ -143,7 +228,7 @@ h1 {
     radial-gradient(circle at top right, rgba(255,212,90,0.22), transparent 34%),
     linear-gradient(180deg, rgba(255,255,255,0.98), rgba(249,255,228,0.92));
   border:1px solid rgba(200,255,57,0.34);
-  box-shadow:0 18px 36px rgba(85, 95, 22, 0.11);
+  box-shadow:0 18px 36px rgba(85, 95, 22, 0.11), 0 0 0 1px rgba(200,255,57,0.06);
   text-align:center;
   position:relative;
   overflow:hidden;
@@ -235,7 +320,7 @@ input:focus {
   font-weight:800;
   letter-spacing:.06em;
   cursor:pointer;
-  box-shadow:0 14px 26px rgba(157, 177, 31, 0.24);
+  box-shadow:var(--button-glow);
   transition:transform .15s, box-shadow .15s, opacity .15s;
 }
 
@@ -248,6 +333,28 @@ input:focus {
   opacity:.6;
   cursor:not-allowed;
   transform:none;
+}
+
+#name-btn,
+#secret-btn {
+  box-shadow:var(--button-glow);
+}
+
+#name-btn:hover:not(:disabled),
+#secret-btn:hover:not(:disabled) {
+  box-shadow:0 18px 34px rgba(157,177,31,0.28);
+}
+
+.btn.secondary {
+  margin-top: 10px;
+  background: linear-gradient(135deg, rgba(124,106,247,0.14), rgba(200,255,57,0.14));
+  color: #3b3f17;
+  border: 1px solid rgba(124,106,247,0.2);
+  box-shadow: none;
+}
+
+.btn.secondary:hover:not(:disabled) {
+  box-shadow: 0 14px 24px rgba(124,106,247,0.18);
 }
 
 .msg {
@@ -370,6 +477,7 @@ input:focus {
   background:linear-gradient(135deg, rgba(124,106,247,0.1), rgba(240,61,120,0.08));
   border:1px solid rgba(124,106,247,0.22);
   text-align:center;
+  box-shadow:var(--countdown-glow);
 }
 
 .game-remaining-label {
@@ -388,6 +496,7 @@ input:focus {
   font-weight:800;
   line-height:1.1;
   color:#221a47;
+  text-shadow:0 2px 14px rgba(124,106,247,0.14);
 }
 
 .status-finale {
@@ -448,6 +557,7 @@ input:focus {
   border-radius: 16px;
   background: rgba(124,106,247,0.08);
   border: 1px solid rgba(124,106,247,0.18);
+  box-shadow: var(--countdown-glow);
 }
 
 .status-finale-label {
@@ -465,6 +575,7 @@ input:focus {
   font-size: 30px;
   font-weight: 800;
   color: #241c4d;
+  text-shadow: 0 2px 16px rgba(124,106,247,0.16);
 }
 
 .status-thanks {
@@ -685,6 +796,54 @@ input:focus {
   line-height:1.55;
 }
 
+.bonus-card.is-completed #bonus-result-default {
+  background: linear-gradient(135deg, rgba(247,255,214,0.86), rgba(255,246,199,0.82));
+  border: 2px solid rgba(168, 198, 45, 0.42);
+  border-radius: 20px;
+  padding: 18px 16px 16px;
+  box-shadow: 0 18px 32px rgba(102, 119, 24, 0.12);
+}
+
+.bonus-card.is-completed #bonus-result-badge {
+  background: linear-gradient(135deg, rgba(199,255,100,0.98), rgba(255,225,85,0.98));
+  color: #2f360f;
+  box-shadow: 0 12px 24px rgba(154, 177, 31, 0.2);
+}
+
+.bonus-card.is-completed #bonus-result-icon {
+  width: 78px;
+  height: 78px;
+  background: linear-gradient(135deg, rgba(199,255,100,0.3), rgba(255,225,85,0.24));
+  color: #495317;
+  border: 2px solid rgba(154, 177, 31, 0.34);
+  box-shadow: none;
+  font-size: 14px;
+  letter-spacing: .12em;
+}
+
+.bonus-card.is-completed #bonus-result-title {
+  font-size: clamp(24px, 7vw, 31px);
+  line-height: 1.02;
+  color: #25310c;
+}
+
+.bonus-card.is-completed #bonus-result-subtitle {
+  font-size: 15px;
+  color: #435028;
+  font-weight: 700;
+}
+
+.bonus-card.is-completed .bonus-highlight {
+  background: linear-gradient(135deg, rgba(255,255,255,0.78), rgba(247,255,214,0.86));
+  border: 1px solid rgba(168, 198, 45, 0.28);
+}
+
+.bonus-card.is-completed #bonus-result-copy {
+  color: #4c5537;
+  font-size: 13px;
+  font-weight: 700;
+}
+
 #success-screen.is-success {
   animation:successCardPulse .82s ease;
 }
@@ -738,6 +897,10 @@ input:focus {
     padding:24px 18px 20px;
   }
 
+  .bonus-card {
+    min-height: auto;
+  }
+
   .logo {
     font-size: 15px;
     letter-spacing: .14em;
@@ -770,6 +933,27 @@ input:focus {
     padding: 10px 12px;
     font-size: 12.5px;
     line-height: 1.4;
+  }
+
+  .bonus-special-tag {
+    gap: 8px;
+    padding: 9px 12px;
+    margin-bottom: 12px;
+  }
+
+  .bonus-special-icon {
+    width: 26px;
+    height: 26px;
+    flex-basis: 26px;
+    font-size: 11px;
+  }
+
+  .bonus-special-title {
+    font-size: 11px;
+  }
+
+  .bonus-special-subtitle {
+    font-size: 10px;
   }
 
   label {
@@ -837,6 +1021,10 @@ input:focus {
     padding:20px 16px 18px;
   }
 
+  .bonus-card {
+    min-height: auto;
+  }
+
   .logo {
     font-size: 14px;
     letter-spacing: .12em;
@@ -864,6 +1052,27 @@ input:focus {
     margin-bottom: 12px;
     padding: 9px 10px;
     font-size: 12px;
+  }
+
+  .bonus-special-tag {
+    padding: 8px 10px;
+    gap: 7px;
+    margin-bottom: 10px;
+  }
+
+  .bonus-special-icon {
+    width: 24px;
+    height: 24px;
+    flex-basis: 24px;
+    font-size: 10px;
+  }
+
+  .bonus-special-title {
+    font-size: 10px;
+  }
+
+  .bonus-special-subtitle {
+    font-size: 9px;
   }
 
   input {
@@ -924,6 +1133,13 @@ input:focus {
 <div class="card bonus-card" id="name-screen" style="display:none">
   <div class="logo">Gwiazdka One Day 2026</div>
   <div class="q-badge">Bonus</div>
+  <div class="bonus-special-tag">
+    <div class="bonus-special-icon">+1</div>
+    <div class="bonus-special-copy">
+      <span class="bonus-special-title">Bonus specjalny</span>
+      <span class="bonus-special-subtitle">Limonkowo-złota okazja poza zwykłym pytaniem</span>
+    </div>
+  </div>
   <h1>Odbierz dodatkowy punkt</h1>
   <p class="subtitle">Podaj imi&#281;, nazwisko, miasto i adres e-mail, aby przej&#347;&#263; do has&#322;a bonusowego przypisanego do tego kodu QR.</p>
   <div class="bonus-note">To specjalna okazja. Bonus daje Ci dodatkowy punkt poza zwyk&#322;ymi pytaniami.</div>
@@ -946,6 +1162,7 @@ input:focus {
   <input type="email" id="email" data-email-login inputmode="email" autocapitalize="off" autocomplete="email" spellcheck="false" placeholder="np. anna@example.com">
 
   <button class="btn" id="name-btn" onclick="doNameLogin()">Przejd&#378; dalej</button>
+  <button class="btn secondary" type="button" onclick="goToHomeFromBonus()">Wr&oacute;&#263; do ekranu g&#322;&oacute;wnego</button>
   <div class="msg" id="name-msg"></div>
 
   <div class="game-remaining">
@@ -957,6 +1174,13 @@ input:focus {
 <div class="card bonus-card" id="secret-screen" style="display:none">
   <div class="logo">Gwiazdka One Day 2026</div>
   <div class="q-badge">Bonus</div>
+  <div class="bonus-special-tag">
+    <div class="bonus-special-icon">+1</div>
+    <div class="bonus-special-copy">
+      <span class="bonus-special-title">Bonus specjalny</span>
+      <span class="bonus-special-subtitle">Ten etap daje dodatkowy punkt za aktywność extra</span>
+    </div>
+  </div>
   <h1>Wpisz has&#322;o bonusowe</h1>
   <p class="subtitle">Po poprawnym ha&#347;le punkt bonusowy zostanie zapisany od razu na Twoim koncie.</p>
   <div class="bonus-note">Bonusy s&#261; rzadsze ni&#380; pytania, wi&#281;c warto wypatrywa&#263; ka&#380;dej takiej okazji.</div>
@@ -970,6 +1194,7 @@ input:focus {
   <input type="text" id="secret-input" placeholder="Wpisz has&#322;o do bonusu">
 
   <button class="btn" id="secret-btn" onclick="submitSecret()">Odbierz punkt</button>
+  <button class="btn secondary" type="button" onclick="goToHomeFromBonus()">Wr&oacute;&#263; do ekranu g&#322;&oacute;wnego</button>
   <div class="msg" id="secret-msg"></div>
 
   <div class="helper-box">Masz tylko jedno zaliczenie tego bonusu, wi&#281;c upewnij si&#281;, &#380;e wpisujesz w&#322;a&#347;ciwe has&#322;o.</div>
@@ -985,6 +1210,13 @@ input:focus {
 
   <div id="bonus-result-default">
     <div class="q-badge" id="bonus-result-badge">Bonus odebrany</div>
+    <div class="bonus-special-tag">
+      <div class="bonus-special-icon">+1</div>
+      <div class="bonus-special-copy">
+        <span class="bonus-special-title">Bonus specjalny</span>
+        <span class="bonus-special-subtitle">To wyróżniony punkt dodatkowy do Twojego wyniku</span>
+      </div>
+    </div>
     <div class="success-icon" id="bonus-result-icon">+1</div>
     <h1 id="bonus-result-title">Bonus zapisany</h1>
     <p class="subtitle" id="bonus-result-subtitle">Super, dodatkowy punkt zosta&#322; dodany do Twojego wyniku. Mo&#380;esz wr&oacute;ci&#263; do gry i skanowa&#263; kolejne kody QR.</p>
@@ -1043,6 +1275,8 @@ input:focus {
       </a>
     </div>
   </div>
+
+  <button class="btn secondary" type="button" onclick="goToHomeFromBonus()">Wr&oacute;&#263; do ekranu g&#322;&oacute;wnego</button>
 </div>
 
 <script>
@@ -1489,7 +1723,19 @@ function setActiveBonusScreen(screenId = '') {
     if (element.style.display !== nextDisplay) {
       element.style.display = nextDisplay;
     }
+    if (id !== screenId) {
+      element.classList.remove('screen-enter');
+    }
   });
+
+  if (screenId) {
+    const nextScreen = bonusScreenElements[screenId];
+    if (nextScreen) {
+      nextScreen.classList.remove('screen-enter');
+      void nextScreen.offsetWidth;
+      nextScreen.classList.add('screen-enter');
+    }
+  }
 
   activeBonusScreenId = screenId;
 }
@@ -1533,7 +1779,8 @@ function showBonusResult(options = {}) {
     icon = '+1',
     animate = false,
     layout = 'default',
-    place = 'Miejsce: Teatr'
+    place = 'Miejsce: Teatr',
+    mode = 'default'
   } = options;
 
   const isFinaleLayout = layout === 'finale';
@@ -1543,6 +1790,9 @@ function showBonusResult(options = {}) {
   const successScreen = document.getElementById('success-screen');
 
   setActiveBonusScreen('success-screen');
+  if (successScreen) {
+    successScreen.classList.toggle('is-completed', mode === 'completed');
+  }
 
   if (defaultSection) {
     defaultSection.style.display = isFinaleLayout ? 'none' : 'block';
@@ -1611,6 +1861,12 @@ function formatRemainingTime(milliseconds) {
 function getSummaryCountdownTarget() {
   if (activeGameState.summaryAt) return new Date(activeGameState.summaryAt).getTime();
   if (activeGameState.endedAt) return new Date(activeGameState.endedAt).getTime() + (5 * 60000);
+  if (activeGameState.startedAt) {
+    const endTime = new Date(activeGameState.startedAt).getTime() + Number(activeGameState.durationMinutes || 10) * 60000;
+    if (Date.now() >= endTime) {
+      return endTime + (5 * 60000);
+    }
+  }
   return null;
 }
 
@@ -1620,6 +1876,11 @@ function setGameRemainingLabel(text) {
       element.innerText = text;
     }
   });
+}
+
+function goToHomeFromBonus() {
+  triggerHaptic(10);
+  window.location.href = '/';
 }
 
 function clearBonusAccess(message = 'To konto jest przypisane do innego urzadzenia. Zaloguj sie ponownie.') {
@@ -1827,10 +2088,11 @@ async function showSecret(existingBonusData = null, options = {}) {
     );
     showBonusResult({
       title: 'Ten bonus masz ju\u017c wykonany',
-      subtitle: 'Nie musisz wpisywa\u0107 has\u0142a jeszcze raz. Ten kod bonusowy jest ju\u017c przypisany do Twojego konta.',
-      copy: 'Szukaj dalej kolejnych punkt\u00f3w i kod\u00f3w QR. Ten etap masz ju\u017c zaliczony.',
+      subtitle: 'Ten bonus jest ju\u017c zapisany na Twoim koncie. Nic nie musisz ju\u017c wpisywa\u0107.',
+      copy: 'Mo\u017cesz od razu wr\u00f3ci\u0107 do gry i szuka\u0107 kolejnych kod\u00f3w QR.',
       badge: 'Ju\u017c wykonane',
-      icon: 'OK'
+      icon: 'GOTOWE',
+      mode: 'completed'
     });
     return;
   }
@@ -2035,7 +2297,7 @@ async function submitSecret() {
 
     const data = await res.json();
 
-    if (res.status === 403 && /urzadzen|urządzen|przypisane/i.test(String(data.error || ''))) {
+    if (res.status === 403 && /urzadzen|urzÄ…dzen|przypisane/i.test(String(data.error || ''))) {
       clearBonusAccess(data.error);
       btn.disabled = false;
       return;
@@ -2108,5 +2370,6 @@ async function submitSecret() {
 </script>
 </body>
 </html>
+
 
 
