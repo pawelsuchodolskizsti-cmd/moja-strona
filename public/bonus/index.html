@@ -467,6 +467,126 @@ input:focus {
   color: #241c4d;
 }
 
+.status-thanks {
+  background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(244,251,255,0.94));
+  border: 1px solid rgba(124,106,247,0.18);
+  border-radius: 20px;
+  padding: 20px 22px 18px;
+  text-align: center;
+  box-shadow: 0 18px 34px rgba(40,28,88,0.08);
+}
+
+.status-thanks-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, rgba(199,255,100,0.95), rgba(255,225,85,0.95));
+  color: #27310c;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  margin-bottom: 14px;
+}
+
+.status-thanks h2 {
+  font-family: 'Syne';
+  font-size: clamp(22px, 6.2vw, 28px);
+  font-weight: 800;
+  line-height: 1.08;
+  letter-spacing: -.02em;
+  color: #201a42;
+  margin: 0 0 12px;
+}
+
+.status-thanks p {
+  color: #5f5877;
+  font-size: 15px;
+  line-height: 1.6;
+  margin-bottom: 12px;
+}
+
+.status-thanks-note {
+  padding: 13px 15px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, rgba(199,255,100,0.18), rgba(124,106,247,0.08));
+  border: 1px solid rgba(124,106,247,0.16);
+  color: #4f4768;
+  font-size: 14px;
+  line-height: 1.55;
+  margin-bottom: 14px;
+}
+
+.thanks-links {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.thanks-link {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 12px;
+  min-height: 52px;
+  padding: 10px 14px;
+  border-radius: 14px;
+  text-decoration: none;
+  font-family: 'Syne';
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .02em;
+  color: #ffffff;
+  background: linear-gradient(135deg, var(--pink), var(--purple));
+  box-shadow: 0 12px 24px rgba(124,106,247,0.26);
+  transition: transform .18s ease, box-shadow .18s ease;
+}
+
+.thanks-link:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 28px rgba(124,106,247,0.32);
+}
+
+.thanks-link-icon {
+  flex: 0 0 36px;
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  background: rgba(255,255,255,0.18);
+  color: inherit;
+}
+
+.thanks-link-icon svg {
+  width: 18px;
+  height: 18px;
+  fill: currentColor;
+}
+
+.thanks-link-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  text-align: left;
+}
+
+.thanks-link-title {
+  display: block;
+  line-height: 1.15;
+}
+
+.thanks-link-subtitle {
+  display: block;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.82);
+}
+
 .badge-board {
   margin-top: 14px;
   padding: 14px;
@@ -775,6 +895,26 @@ input:focus {
     font-size: 13px;
     margin-bottom: 10px;
   }
+
+  .status-thanks {
+    padding: 20px 16px;
+  }
+
+  .status-thanks h2 {
+    font-size: 20px;
+    max-width: 248px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .status-thanks p,
+  .status-thanks-note {
+    font-size: 14px;
+  }
+
+  .thanks-links {
+    grid-template-columns: 1fr;
+  }
 }
 </style>
 </head>
@@ -874,6 +1014,33 @@ input:focus {
     <div class="badge-board">
       <div class="badge-board-title">Zdobyte odznaki</div>
       <div class="badge-list" data-badge-list></div>
+    </div>
+  </div>
+
+  <div class="status-thanks" id="bonus-result-thanks" style="display:none">
+    <div class="status-thanks-badge">Dzi&#281;kujemy</div>
+    <h2>Dzi&#281;kujemy za udzia&#322;</h2>
+    <p>Mamy nadziej&#281;, &#380;e ta trasa da&#322;a Wam sporo rado&#347;ci. Do zobaczenia na kolejnych wydarzeniach Fundacji One Day.</p>
+    <div class="status-thanks-note">Zdj&#281;cia i relacja z fina&#322;u pojawi&#261; si&#281; na naszych social mediach. Warto zajrze&#263; tam jeszcze po wydarzeniu.</div>
+    <div class="thanks-links">
+      <a class="thanks-link" href="https://www.instagram.com/fundacjaoneday/" target="_blank" rel="noopener">
+        <span class="thanks-link-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+        </span>
+        <span class="thanks-link-copy">
+          <span class="thanks-link-title">Relacja i zdj&#281;cia z fina&#322;u</span>
+          <span class="thanks-link-subtitle">Instagram Fundacji One Day</span>
+        </span>
+      </a>
+      <a class="thanks-link" href="https://www.facebook.com/fundacjaoneday" target="_blank" rel="noopener">
+        <span class="thanks-link-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+        </span>
+        <span class="thanks-link-copy">
+          <span class="thanks-link-title">Aktualno&#347;ci na Facebooku</span>
+          <span class="thanks-link-subtitle">Bie&#380;&#261;ce informacje Fundacji One Day</span>
+        </span>
+      </a>
     </div>
   </div>
 </div>
@@ -1372,6 +1539,7 @@ function showBonusResult(options = {}) {
   const isFinaleLayout = layout === 'finale';
   const defaultSection = document.getElementById('bonus-result-default');
   const finaleSection = document.getElementById('bonus-result-finale');
+  const thanksSection = document.getElementById('bonus-result-thanks');
   const successScreen = document.getElementById('success-screen');
 
   setActiveBonusScreen('success-screen');
@@ -1381,6 +1549,9 @@ function showBonusResult(options = {}) {
   }
   if (finaleSection) {
     finaleSection.style.display = isFinaleLayout ? 'block' : 'none';
+  }
+  if (thanksSection) {
+    thanksSection.style.display = 'none';
   }
 
   if (isFinaleLayout) {
@@ -1404,6 +1575,20 @@ function showBonusResult(options = {}) {
   } else {
     successScreen.classList.remove('is-success');
   }
+}
+
+function showBonusThanksScreen() {
+  const defaultSection = document.getElementById('bonus-result-default');
+  const finaleSection = document.getElementById('bonus-result-finale');
+  const thanksSection = document.getElementById('bonus-result-thanks');
+  const successScreen = document.getElementById('success-screen');
+
+  setActiveBonusScreen('success-screen');
+
+  if (defaultSection) defaultSection.style.display = 'none';
+  if (finaleSection) finaleSection.style.display = 'none';
+  if (thanksSection) thanksSection.style.display = 'block';
+  if (successScreen) successScreen.classList.remove('is-success');
 }
 
 function formatRemainingTime(milliseconds) {
@@ -1485,7 +1670,18 @@ function renderGameRemaining() {
 
   if (summaryTarget) {
     const remaining = summaryTarget - Date.now();
-    const label = remaining > 0 ? formatRemainingTime(remaining) : '00:00';
+    if (remaining <= 0) {
+      setGameRemainingLabel('Do podsumowania zostało');
+      gameRemainingElements.forEach((element) => {
+        if (element.innerText !== '00:00') {
+          element.innerText = '00:00';
+        }
+      });
+      showBonusThanksScreen();
+      return;
+    }
+
+    const label = formatRemainingTime(remaining);
     setGameRemainingLabel('Do podsumowania zostało');
     gameRemainingElements.forEach((element) => {
       if (element.innerText !== label) {
@@ -1668,14 +1864,7 @@ function showBonusPhaseState(phase) {
   }
 
   if (phase === 'thanks') {
-    showBonusResult({
-      title: 'Zapraszamy na podsumowanie',
-      subtitle: 'Gra dobieg\u0142a ko\u0144ca. Trwa odliczanie do rozpocz\u0119cia podsumowania wydarzenia w Teatrze.',
-      badge: 'Fina\u0142 gry',
-      layout: 'finale',
-      place: 'Miejsce: Teatr',
-      animate: false
-    });
+    showBonusThanksScreen();
   }
 }
 
