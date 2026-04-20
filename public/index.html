@@ -2345,7 +2345,7 @@ function applyGamePhaseScreen(phase, manageScreens) {
   }
 
   if (!participantId && manageScreens) {
-    showLoginScreen({ showForm: hasOpenedLogin || Boolean(getQuestionParam()) });
+    showLoginScreen({ showForm: true });
   }
 
   return phase;
@@ -2585,7 +2585,7 @@ async function syncPlayerView(options = {}) {
 
     if (!participantId) {
       if (!silent) {
-        showLoginScreen({ showForm: Boolean(getQuestionParam()) || hasOpenedLogin });
+        showLoginScreen({ showForm: true });
       }
       return phase;
     }
