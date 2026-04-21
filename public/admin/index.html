@@ -2163,6 +2163,7 @@
       <button class="btn primary" onclick="loadData()">Odśwież</button>
       <button class="btn outline" onclick="exportExcel()">Eksportuj Excel</button>
       <button class="btn outline" onclick="exportCSV()">Eksportuj CSV</button>
+      <button class="btn outline" onclick="openDiplomaCenter()">Generuj dyplomy</button>
       <div class="toolbar-meta" id="lb-meta">Pokazano 0 z 0 uczestników</div>
     </div>
     <div class="table-wrap">
@@ -4235,6 +4236,752 @@ function exportExcel() {
   anchor.href = URL.createObjectURL(new Blob(['\ufeff', html], { type: 'application/vnd.ms-excel;charset=utf-8;' }));
   anchor.download = 'uczestnicy.xls';
   anchor.click();
+}
+
+function openDiplomaCenter() {
+  if (!allParticipants.length) {
+    setAdminFeedback('Najpierw wczytaj wyniki, aby przygotować dyplomy i umowy.', 'warning');
+    return;
+  }
+
+  const participants = getParticipantDiplomaRanking();
+  const cities = getCityDiplomaRanking();
+  const packets = [
+    ...participants.slice(0, 3).map((participant, index) => buildParticipantPacket(participant, index + 1, false)),
+    ...cities.slice(0, 3).map((city, index) => buildCityPacket(city, index + 1, false)),
+    ...participants.slice(3).map((participant, index) => buildParticipantPacket(participant, index + 4, true)),
+    ...cities.slice(3).map((city, index) => buildCityPacket(city, index + 4, true))
+  ];
+
+  const popup = window.open('', '_blank');
+  if (!popup) {
+    setAdminFeedback('Przeglądarka zablokowała nowe okno. Zezwól na wyskakujące okna dla panelu admina.', 'warning');
+    return;
+  }
+
+  popup.document.open();
+  popup.document.write(buildDiplomaDocumentHtml({
+    generatedAt: formatDiplomaGeneratedAt(new Date()),
+    totalPackets: packets.length,
+    participantWinners: participants.slice(0, 3),
+    cityWinners: cities.slice(0, 3),
+    sheets: packets.reduce((list, packet, index) => {
+      list.push(buildDiplomaSheet(packet, index * 2 + 1));
+      list.push(buildAgreementSheet(packet, index * 2 + 2));
+      return list;
+    }, [])
+  }));
+  popup.document.close();
+
+  setAdminFeedback('Otworzyłem pakiet dyplomów i umów. W nowej karcie możesz od razu drukować lub zapisać całość do PDF.', 'success');
+}
+
+function getParticipantDiplomaRanking() {
+  return [...allParticipants]
+    .sort((a, b) =>
+      (b.score || 0) - (a.score || 0) ||
+      (b.answeredCount || 0) - (a.answeredCount || 0) ||
+      (a.lastName || '').localeCompare(b.lastName || '', 'pl') ||
+      (a.firstName || '').localeCompare(b.firstName || '', 'pl')
+    );
+}
+
+function getCityDiplomaRanking() {
+  return [...getCityStats()]
+    .sort((a, b) =>
+      (b.score || 0) - (a.score || 0) ||
+      (b.answers || 0) - (a.answers || 0) ||
+      (b.participants || 0) - (a.participants || 0) ||
+      (a.city || '').localeCompare(b.city || '', 'pl')
+    );
+}
+
+function buildParticipantPacket(participant, place, isAppreciation) {
+  const fullName = `${participant.firstName || ''} ${participant.lastName || ''}`.trim() || 'Uczestnik';
+  const cityName = participant.city || 'Bez miasta';
+  const placeLabel = formatPlaceLabel(place);
+
+  return {
+    type: 'participant',
+    title: isAppreciation ? 'Dyplom podziękowania' : 'Dyplom',
+    eyebrow: isAppreciation ? 'Udział w grze' : `${placeLabel} miejsce`,
+    recipientLabel: 'Dyplom dla',
+    recipientName: fullName,
+    highlight: isAppreciation ? 'Dziękujemy za udział w grze terenowej Gwiazdka One Day 2026.' : `Za zajęcie ${placeLabel} miejsca w grze terenowej Gwiazdka One Day 2026.`,
+    note: isAppreciation
+      ? `Miejsce w rankingu końcowym: ${place}.`
+      : 'Wyróżnienie przyznane na podstawie końcowego rankingu uczestników.',
+    stats: [
+      { label: 'Miasto', value: cityName },
+      { label: 'Punkty', value: `${participant.score || 0} pkt` },
+      { label: 'Odpowiedzi', value: `${participant.answeredCount || 0}` },
+      { label: 'E-mail', value: participant.email || 'Brak adresu e-mail' }
+    ],
+    agreementTitle: 'Umowa przekazania darowizny w postaci nagrody',
+    agreementRecipientLabel: 'Obdarowany',
+    agreementRecipientValue: `${fullName}${cityName ? `, ${cityName}` : ''}`,
+    agreementBody: [
+      'Organizator przekazuje nagrodę lub upominek przyznany w ramach wydarzenia Gwiazdka One Day 2026.',
+      'Dokument ma charakter roboczy i może zostać później zastąpiony finalnym wzorem umowy przekazania.',
+      `Nagroda została przygotowana dla uczestnika wskazanego na dyplomie za ${isAppreciation ? 'udział w grze' : `zajęcie ${placeLabel} miejsca`}.`
+    ]
+  };
+}
+
+function buildCityPacket(city, place, isAppreciation) {
+  const placeLabel = formatPlaceLabel(place);
+
+  return {
+    type: 'city',
+    title: isAppreciation ? 'Dyplom podziękowania dla miasta' : 'Dyplom dla miasta',
+    eyebrow: isAppreciation ? 'Klasyfikacja miast' : `${placeLabel} miejsce`,
+    recipientLabel: 'Dyplom dla',
+    recipientName: city.city || 'Miasto',
+    highlight: isAppreciation
+      ? 'Za zaangażowanie i udział miasta w grze terenowej Gwiazdka One Day 2026.'
+      : `Za zajęcie ${placeLabel} miejsca w klasyfikacji miast w grze terenowej Gwiazdka One Day 2026.`,
+    note: isAppreciation
+      ? `Pozycja miasta w rankingu końcowym: ${place}.`
+      : 'Wyróżnienie przyznane na podstawie sumy punktów wszystkich uczestników z danego miasta.',
+    stats: [
+      { label: 'Punkty miasta', value: `${city.score || 0} pkt` },
+      { label: 'Uczestnicy', value: `${city.participants || 0}` },
+      { label: 'Odpowiedzi', value: `${city.answers || 0}` },
+      { label: 'Średnio na osobę', value: formatCityAverage(city) }
+    ],
+    agreementTitle: 'Umowa przekazania darowizny w postaci nagrody',
+    agreementRecipientLabel: 'Odbiorca',
+    agreementRecipientValue: `Reprezentant miasta ${city.city || 'Miasto'}`,
+    agreementBody: [
+      'Organizator przekazuje nagrodę lub upominek przyznany w ramach klasyfikacji miast wydarzenia Gwiazdka One Day 2026.',
+      'To jest wersja robocza dokumentu, przygotowana jako placeholder do czasu otrzymania właściwego wzoru umowy.',
+      `Nagroda dotyczy miasta wskazanego na dyplomie ${isAppreciation ? 'za udział w grze' : `za zajęcie ${placeLabel} miejsca w klasyfikacji`}.`
+    ]
+  };
+}
+
+function buildDiplomaDocumentHtml({ generatedAt, totalPackets, participantWinners, cityWinners, sheets }) {
+  const origin = window.location.origin;
+  const backgroundUrl = `${origin}/tlo-gry.png`;
+  const fundacjaLogoUrl = `${origin}/fundacjaoneday.svg`;
+  const energyLogoUrl = `${origin}/energyliandia.svg`;
+  const participantWinnerList = participantWinners.length
+    ? participantWinners.map((participant, index) => `<li>${index + 1}. ${escHtml(`${participant.firstName || ''} ${participant.lastName || ''}`.trim() || 'Uczestnik')} - ${participant.score || 0} pkt</li>`).join('')
+    : '<li>Brak danych uczestników.</li>';
+  const cityWinnerList = cityWinners.length
+    ? cityWinners.map((city, index) => `<li>${index + 1}. ${escHtml(city.city || 'Miasto')} - ${city.score || 0} pkt</li>`).join('')
+    : '<li>Brak danych miast.</li>';
+
+  return `<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dyplomy i umowy - Gwiazdka One Day 2026</title>
+  <style>
+    :root {
+      --pink: #ff3d6b;
+      --pink-strong: #f02f8b;
+      --purple: #7c6af7;
+      --lime: #d5ff3f;
+      --navy: #1f1b4d;
+      --navy-soft: #494469;
+      --paper: rgba(255, 255, 255, 0.95);
+      --paper-strong: rgba(255, 255, 255, 0.985);
+      --border: rgba(126, 109, 248, 0.18);
+      --shadow: 0 24px 60px rgba(35, 22, 90, 0.2);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--navy);
+      background: #f6f2ff;
+    }
+
+    body {
+      min-height: 100vh;
+      background-image:
+        linear-gradient(180deg, rgba(255, 245, 252, 0.94), rgba(241, 236, 255, 0.9)),
+        url('${backgroundUrl}');
+      background-size: cover;
+      background-position: center;
+      padding: 28px 18px 48px;
+    }
+
+    .print-toolbar {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      justify-content: space-between;
+      max-width: 1120px;
+      margin: 0 auto 24px;
+      padding: 16px 18px;
+      border-radius: 22px;
+      background: rgba(13, 17, 28, 0.88);
+      border: 1px solid rgba(213, 255, 63, 0.22);
+      box-shadow: 0 16px 45px rgba(15, 14, 40, 0.28);
+      color: #f8fbff;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
+
+    .print-toolbar-title {
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+    }
+
+    .print-toolbar-sub {
+      font-size: 13px;
+      color: rgba(240, 243, 255, 0.72);
+      margin-top: 4px;
+    }
+
+    .print-toolbar-meta {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+
+    .print-chip {
+      min-height: 34px;
+      padding: 0 14px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      border: 1px solid rgba(213, 255, 63, 0.26);
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    .print-toolbar-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .toolbar-btn {
+      min-height: 44px;
+      padding: 0 18px;
+      border: none;
+      border-radius: 14px;
+      font-size: 14px;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      cursor: pointer;
+    }
+
+    .toolbar-btn.primary {
+      color: #171531;
+      background: linear-gradient(135deg, var(--lime), #fff0a3);
+      box-shadow: 0 12px 30px rgba(213, 255, 63, 0.24);
+    }
+
+    .toolbar-btn.secondary {
+      color: #ffffff;
+      background: linear-gradient(135deg, rgba(255, 61, 107, 0.9), rgba(124, 106, 247, 0.92));
+      box-shadow: 0 12px 30px rgba(124, 106, 247, 0.22);
+    }
+
+    .summary-grid {
+      max-width: 1120px;
+      margin: 0 auto 24px;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .summary-card {
+      border-radius: 28px;
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(248, 245, 255, 0.96)),
+        url('${backgroundUrl}') center/cover no-repeat;
+      border: 1px solid rgba(126, 109, 248, 0.18);
+      box-shadow: var(--shadow);
+      padding: 26px 26px 24px;
+      overflow: hidden;
+    }
+
+    .summary-card h2 {
+      margin: 0 0 12px;
+      font-size: 15px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--pink-strong);
+    }
+
+    .summary-card ol {
+      margin: 0;
+      padding-left: 22px;
+      font-size: 19px;
+      line-height: 1.65;
+      font-weight: 700;
+    }
+
+    .pages {
+      max-width: 1120px;
+      margin: 0 auto;
+      display: grid;
+      gap: 24px;
+    }
+
+    .sheet {
+      position: relative;
+      min-height: 280mm;
+      border-radius: 30px;
+      padding: 26mm 20mm 18mm;
+      background-image:
+        linear-gradient(180deg, rgba(255, 247, 253, 0.9), rgba(246, 242, 255, 0.94)),
+        url('${backgroundUrl}');
+      background-size: cover;
+      background-position: center;
+      border: 1px solid rgba(126, 109, 248, 0.16);
+      box-shadow: 0 26px 70px rgba(33, 20, 77, 0.22);
+      overflow: hidden;
+    }
+
+    .sheet::before {
+      content: '';
+      position: absolute;
+      inset: 14px;
+      border-radius: 24px;
+      border: 1.5px solid rgba(255, 255, 255, 0.5);
+      pointer-events: none;
+    }
+
+    .sheet::after {
+      content: '';
+      position: absolute;
+      inset: auto -40px -55px auto;
+      width: 200px;
+      height: 200px;
+      background: radial-gradient(circle at center, rgba(213, 255, 63, 0.36), transparent 70%);
+      pointer-events: none;
+      filter: blur(5px);
+    }
+
+    .sheet-card {
+      position: relative;
+      min-height: calc(280mm - 44mm);
+      border-radius: 28px;
+      background: var(--paper);
+      border: 1px solid var(--border);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.78);
+      padding: 22mm 18mm 16mm;
+    }
+
+    .logos {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 18px;
+      margin-bottom: 16px;
+    }
+
+    .logos img {
+      display: block;
+      height: 34px;
+      width: auto;
+      object-fit: contain;
+    }
+
+    .logos img.energy {
+      height: 44px;
+    }
+
+    .brand {
+      margin: 0 0 8px;
+      font-size: 16px;
+      line-height: 1.2;
+      text-align: center;
+      letter-spacing: 0.22em;
+      font-weight: 900;
+      text-transform: uppercase;
+      color: transparent;
+      background: linear-gradient(135deg, var(--pink), var(--purple));
+      -webkit-background-clip: text;
+      background-clip: text;
+    }
+
+    .eyebrow {
+      width: max-content;
+      max-width: 100%;
+      margin: 0 auto 18px;
+      min-height: 42px;
+      padding: 10px 20px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, rgba(255, 61, 107, 0.96), rgba(124, 106, 247, 0.92));
+      color: #ffffff;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      font-size: 12px;
+      font-weight: 900;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .diploma-title,
+    .agreement-title {
+      margin: 0;
+      text-align: center;
+      font-size: 42px;
+      line-height: 1;
+      letter-spacing: -0.04em;
+      color: var(--navy);
+    }
+
+    .recipient-label {
+      margin: 18px 0 10px;
+      text-align: center;
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: var(--navy-soft);
+      font-weight: 700;
+    }
+
+    .recipient-name {
+      margin: 0;
+      text-align: center;
+      font-size: 44px;
+      line-height: 1.02;
+      letter-spacing: -0.04em;
+      color: var(--pink-strong);
+    }
+
+    .highlight {
+      margin: 24px auto 0;
+      max-width: 760px;
+      padding: 16px 20px;
+      border-radius: 22px;
+      background: linear-gradient(135deg, rgba(255, 61, 107, 0.08), rgba(213, 255, 63, 0.18));
+      border: 1px solid rgba(213, 255, 63, 0.34);
+      text-align: center;
+      font-size: 22px;
+      line-height: 1.45;
+      font-weight: 800;
+    }
+
+    .note {
+      margin: 16px auto 0;
+      max-width: 760px;
+      text-align: center;
+      font-size: 17px;
+      line-height: 1.65;
+      color: var(--navy-soft);
+    }
+
+    .stats {
+      margin-top: 28px;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .stat-card {
+      min-height: 104px;
+      border-radius: 22px;
+      padding: 16px 18px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(247, 244, 255, 0.96));
+      border: 1px solid rgba(126, 109, 248, 0.12);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.75);
+    }
+
+    .stat-label {
+      font-size: 12px;
+      line-height: 1.3;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--navy-soft);
+      font-weight: 800;
+      margin-bottom: 10px;
+    }
+
+    .stat-value {
+      font-size: 24px;
+      line-height: 1.18;
+      font-weight: 800;
+      color: var(--navy);
+      word-break: break-word;
+    }
+
+    .footer-row,
+    .agreement-footer {
+      margin-top: 34px;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 22px;
+    }
+
+    .signature {
+      padding-top: 18px;
+      border-top: 1px solid rgba(73, 68, 105, 0.28);
+      text-align: center;
+      font-size: 13px;
+      color: var(--navy-soft);
+    }
+
+    .agreement-grid {
+      margin-top: 22px;
+      display: grid;
+      gap: 16px;
+    }
+
+    .agreement-box {
+      border-radius: 20px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 245, 255, 0.95));
+      border: 1px solid rgba(126, 109, 248, 0.14);
+      padding: 16px 18px;
+    }
+
+    .agreement-box strong {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 12px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--navy-soft);
+    }
+
+    .agreement-box div,
+    .agreement-copy p {
+      font-size: 17px;
+      line-height: 1.72;
+      color: var(--navy);
+      margin: 0;
+    }
+
+    .agreement-copy {
+      margin-top: 18px;
+      display: grid;
+      gap: 14px;
+    }
+
+    .sheet-index {
+      position: absolute;
+      right: 22px;
+      bottom: 18px;
+      font-size: 12px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(73, 68, 105, 0.7);
+      font-weight: 700;
+    }
+
+    @media (max-width: 960px) {
+      .summary-grid,
+      .stats,
+      .footer-row,
+      .agreement-footer {
+        grid-template-columns: 1fr;
+      }
+
+      .sheet {
+        min-height: auto;
+        padding: 16px;
+      }
+
+      .sheet-card {
+        min-height: auto;
+        padding: 18px;
+      }
+
+      .diploma-title,
+      .agreement-title {
+        font-size: 34px;
+      }
+
+      .recipient-name {
+        font-size: 36px;
+      }
+
+      .highlight {
+        font-size: 19px;
+      }
+    }
+
+    @page {
+      size: A4 portrait;
+      margin: 10mm;
+    }
+
+    @media print {
+      body {
+        padding: 0;
+        background: #ffffff;
+      }
+
+      .print-toolbar {
+        display: none !important;
+      }
+
+      .summary-grid {
+        display: none !important;
+      }
+
+      .pages {
+        max-width: none;
+        gap: 0;
+      }
+
+      .sheet {
+        min-height: 277mm;
+        border-radius: 0;
+        box-shadow: none;
+        page-break-after: always;
+        break-after: page;
+        margin: 0;
+      }
+
+      .sheet:last-child {
+        page-break-after: auto;
+        break-after: auto;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="print-toolbar">
+    <div>
+      <div class="print-toolbar-title">Dyplomy i umowy - Gwiazdka One Day 2026</div>
+      <div class="print-toolbar-sub">Widok do druku oraz zapisu do PDF. Każdy dyplom ma od razu dołączoną roboczą umowę przekazania nagrody.</div>
+      <div class="print-toolbar-meta">
+        <div class="print-chip">${totalPackets} pakietów dokumentów</div>
+        <div class="print-chip">Wygenerowano: ${escHtml(generatedAt)}</div>
+      </div>
+    </div>
+    <div class="print-toolbar-actions">
+      <button class="toolbar-btn primary" type="button" onclick="window.print()">Drukuj / Zapisz PDF</button>
+      <button class="toolbar-btn secondary" type="button" onclick="window.close()">Zamknij</button>
+    </div>
+  </div>
+
+  <div class="summary-grid">
+    <section class="summary-card">
+      <h2>Top 3 uczestników</h2>
+      <ol>${participantWinnerList}</ol>
+    </section>
+    <section class="summary-card">
+      <h2>Top 3 miast</h2>
+      <ol>${cityWinnerList}</ol>
+    </section>
+  </div>
+
+  <main class="pages">
+    ${sheets.join('')}
+  </main>
+</body>
+</html>`;
+}
+
+function buildDiplomaSheet(packet, sheetNumber) {
+  return `
+    <section class="sheet">
+      <div class="sheet-card">
+        <div class="logos">
+          <img src="${window.location.origin}/fundacjaoneday.svg" alt="Fundacja One Day">
+          <img class="energy" src="${window.location.origin}/energyliandia.svg" alt="Energylandia">
+        </div>
+        <div class="brand">Gwiazdka One Day 2026</div>
+        <div class="eyebrow">${escHtml(packet.eyebrow)}</div>
+        <h1 class="diploma-title">${escHtml(packet.title)}</h1>
+        <div class="recipient-label">${escHtml(packet.recipientLabel)}</div>
+        <h2 class="recipient-name">${escHtml(packet.recipientName)}</h2>
+        <div class="highlight">${escHtml(packet.highlight)}</div>
+        <div class="note">${escHtml(packet.note)}</div>
+        <div class="stats">
+          ${packet.stats.map((stat) => `
+            <div class="stat-card">
+              <div class="stat-label">${escHtml(stat.label)}</div>
+              <div class="stat-value">${escHtml(stat.value)}</div>
+            </div>
+          `).join('')}
+        </div>
+        <div class="footer-row">
+          <div class="signature">Podpis organizatora</div>
+          <div class="signature">${packet.type === 'city' ? 'Podpis reprezentanta miasta' : 'Podpis uczestnika'}</div>
+        </div>
+      </div>
+      <div class="sheet-index">Strona ${sheetNumber}</div>
+    </section>
+  `;
+}
+
+function buildAgreementSheet(packet, sheetNumber) {
+  return `
+    <section class="sheet">
+      <div class="sheet-card">
+        <div class="logos">
+          <img src="${window.location.origin}/fundacjaoneday.svg" alt="Fundacja One Day">
+          <img class="energy" src="${window.location.origin}/energyliandia.svg" alt="Energylandia">
+        </div>
+        <div class="brand">Gwiazdka One Day 2026</div>
+        <div class="eyebrow">Dokument roboczy</div>
+        <h1 class="agreement-title">${escHtml(packet.agreementTitle)}</h1>
+        <div class="agreement-grid">
+          <div class="agreement-box">
+            <strong>Organizator</strong>
+            <div>Fundacja One Day</div>
+          </div>
+          <div class="agreement-box">
+            <strong>${escHtml(packet.agreementRecipientLabel)}</strong>
+            <div>${escHtml(packet.agreementRecipientValue)}</div>
+          </div>
+          <div class="agreement-box">
+            <strong>Podstawa przekazania</strong>
+            <div>${escHtml(packet.highlight)}</div>
+          </div>
+        </div>
+        <div class="agreement-copy">
+          ${packet.agreementBody.map((paragraph) => `<p>${escHtml(paragraph)}</p>`).join('')}
+          <p>Miejsce na doprecyzowanie nagrody: ............................................................................................................................</p>
+          <p>Data przekazania: .................................................................................................................................................</p>
+        </div>
+        <div class="agreement-footer">
+          <div class="signature">Podpis organizatora</div>
+          <div class="signature">${packet.type === 'city' ? 'Podpis odbiorcy / reprezentanta miasta' : 'Podpis obdarowanego'}</div>
+        </div>
+      </div>
+      <div class="sheet-index">Strona ${sheetNumber}</div>
+    </section>
+  `;
+}
+
+function formatPlaceLabel(place) {
+  return ['I', 'II', 'III'][place - 1] || `${place}.`;
+}
+
+function formatDiplomaGeneratedAt(date) {
+  return new Intl.DateTimeFormat('pl-PL', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  }).format(date);
+}
+
+function formatCityAverage(city) {
+  const participants = Number(city.participants || 0);
+  if (!participants) return '0,0 pkt';
+  return `${(Number(city.score || 0) / participants).toFixed(1).replace('.', ',')} pkt`;
 }
 
 function safeCsv(value) {
