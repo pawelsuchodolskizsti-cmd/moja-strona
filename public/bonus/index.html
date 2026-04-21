@@ -112,6 +112,30 @@ body.safari-browser .card {
   min-height:var(--screen-card-min-height);
 }
 
+.partners-row {
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:14px;
+  flex-wrap:wrap;
+  margin:0 auto 18px;
+}
+
+.partner-logo {
+  display:block;
+  height:34px;
+  width:auto;
+  max-width:132px;
+  object-fit:contain;
+  filter:drop-shadow(0 8px 18px rgba(28,22,69,0.08));
+}
+
+.partner-logo.energy {
+  width:min(220px, 42vw);
+  height:auto;
+  max-width:100%;
+}
+
 .logo {
   font-family:'Syne',sans-serif;
   font-weight:800;
@@ -1124,6 +1148,22 @@ input:focus {
     font-size: 14px;
   }
 
+  .partners-row {
+    gap:8px;
+    margin-bottom:12px;
+  }
+
+  .partner-logo {
+    height:24px;
+    max-width:98px;
+  }
+
+  .partner-logo.energy {
+    width:min(170px, 40vw);
+    height:auto;
+    max-width:100%;
+  }
+
   .thanks-links {
     grid-template-columns: 1fr;
   }
@@ -1134,6 +1174,10 @@ input:focus {
 <div class="micro-toast-stack" id="micro-toast-stack"></div>
 
 <div class="card bonus-card" id="name-screen" style="display:none">
+  <div class="partners-row" aria-label="Partnerzy wydarzenia">
+    <img class="partner-logo" src="/fundacjaoneday.svg" alt="Fundacja One Day">
+    <img class="partner-logo energy" src="/energyliandia.svg" alt="Energylandia">
+  </div>
   <div class="logo">Gwiazdka One Day 2026</div>
   <div class="q-badge">Bonus</div>
   <div class="bonus-special-tag">
@@ -1175,6 +1219,10 @@ input:focus {
 </div>
 
 <div class="card bonus-card" id="secret-screen" style="display:none">
+  <div class="partners-row" aria-label="Partnerzy wydarzenia">
+    <img class="partner-logo" src="/fundacjaoneday.svg" alt="Fundacja One Day">
+    <img class="partner-logo energy" src="/energyliandia.svg" alt="Energylandia">
+  </div>
   <div class="logo">Gwiazdka One Day 2026</div>
   <div class="q-badge">Bonus</div>
   <div class="bonus-special-tag">
@@ -1209,6 +1257,10 @@ input:focus {
 </div>
 
 <div class="card bonus-card" id="success-screen" style="display:none">
+  <div class="partners-row" aria-label="Partnerzy wydarzenia">
+    <img class="partner-logo" src="/fundacjaoneday.svg" alt="Fundacja One Day">
+    <img class="partner-logo energy" src="/energyliandia.svg" alt="Energylandia">
+  </div>
   <div class="logo">Gwiazdka One Day 2026</div>
 
   <div id="bonus-result-default">
@@ -1664,6 +1716,7 @@ function showMicroToast(message, type = 'info', title = 'Aktualizacja', key = ''
 
   if (type === 'success' || type === 'bonus') {
     triggerHaptic([18, 55, 18]);
+    playFeedbackTone(type === 'bonus' ? 'bonus' : 'success');
   } else if (type === 'warning') {
     triggerHaptic([28, 60, 20]);
   } else if (type === 'info') {
@@ -1687,6 +1740,87 @@ function triggerHaptic(pattern) {
     // Ignore haptic errors on unsupported browsers/devices.
   }
 }
+
+let feedbackAudioContext = null;
+let feedbackAudioPrimed = false;
+
+function getFeedbackAudioContext() {
+  if (typeof window === 'undefined') return null;
+  const AudioCtx = window.AudioContext || window.webkitAudioContext;
+  if (!AudioCtx) return null;
+  if (!feedbackAudioContext) {
+    try {
+      feedbackAudioContext = new AudioCtx();
+    } catch (e) {
+      feedbackAudioContext = null;
+    }
+  }
+  return feedbackAudioContext;
+}
+
+async function primeFeedbackAudio() {
+  const context = getFeedbackAudioContext();
+  if (!context) return null;
+
+  try {
+    if (context.state === 'suspended') {
+      await context.resume();
+    }
+
+    if (!feedbackAudioPrimed && context.state === 'running') {
+      const oscillator = context.createOscillator();
+      const gain = context.createGain();
+      gain.gain.setValueAtTime(0.0001, context.currentTime);
+      oscillator.connect(gain);
+      gain.connect(context.destination);
+      oscillator.start();
+      oscillator.stop(context.currentTime + 0.01);
+      feedbackAudioPrimed = true;
+    }
+  } catch (e) {
+    return null;
+  }
+
+  return context.state === 'running' ? context : null;
+}
+
+function playFeedbackTone(type = 'success') {
+  const context = feedbackAudioContext;
+  if (!context || context.state !== 'running') return;
+
+  const presets = {
+    success: { notes: [784, 988], step: 0.085, gain: 0.028 },
+    bonus: { notes: [660, 880, 1108], step: 0.07, gain: 0.03 },
+    ready: { notes: [740, 932], step: 0.075, gain: 0.024 }
+  };
+
+  const preset = presets[type] || presets.success;
+  const startAt = context.currentTime + 0.01;
+
+  preset.notes.forEach((frequency, index) => {
+    const toneStart = startAt + index * preset.step;
+    const toneEnd = toneStart + Math.max(0.05, preset.step * 0.78);
+    const oscillator = context.createOscillator();
+    const gain = context.createGain();
+
+    oscillator.type = 'sine';
+    oscillator.frequency.setValueAtTime(frequency, toneStart);
+    gain.gain.setValueAtTime(0.0001, toneStart);
+    gain.gain.linearRampToValueAtTime(preset.gain, toneStart + 0.015);
+    gain.gain.exponentialRampToValueAtTime(0.0001, toneEnd);
+
+    oscillator.connect(gain);
+    gain.connect(context.destination);
+    oscillator.start(toneStart);
+    oscillator.stop(toneEnd + 0.01);
+  });
+}
+
+['pointerdown', 'touchstart', 'keydown'].forEach((eventName) => {
+  window.addEventListener(eventName, () => {
+    primeFeedbackAudio();
+  }, { once: true });
+});
 
 function playSuccessMotion(element) {
   if (!element) return;
@@ -2226,6 +2360,7 @@ window.onload = async () => {
 };
 
 async function doNameLogin() {
+  primeFeedbackAudio();
   const fn = normalizeLoginValue(document.getElementById('fname').value);
   const ln = normalizeLoginValue(document.getElementById('lname').value);
   const city = normalizeLoginValue(document.getElementById('city').value);
@@ -2268,6 +2403,7 @@ async function doNameLogin() {
     cachedBonusLabelData = null;
     storageSet('participantId', String(participantId));
     triggerHaptic([16, 45, 16]);
+    playFeedbackTone('ready');
     await showSecret(null, { force: true });
   } catch (e) {
     msg.className = 'msg error';
@@ -2277,6 +2413,7 @@ async function doNameLogin() {
 }
 
 async function submitSecret() {
+  primeFeedbackAudio();
   const secret = secretInputEl.value.trim();
   const msg = secretMsgEl;
   const btn = secretBtnEl;

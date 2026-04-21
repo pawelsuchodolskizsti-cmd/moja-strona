@@ -119,37 +119,65 @@
 
   .logo {
     font-family: 'Syne', sans-serif;
-    font-size: clamp(17px, 2.2vw, 22px);
+    font-size: clamp(18px, 2.4vw, 26px);
     font-weight: 800;
-    letter-spacing: .14em;
+    letter-spacing: .18em;
     text-transform: uppercase;
-    line-height: 1.12;
+    line-height: 1.08;
     max-width: 100%;
     overflow-wrap: anywhere;
-    margin-bottom: 14px;
+    margin-bottom: 16px;
     background: linear-gradient(135deg, var(--pink), var(--purple));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
+    text-shadow: 0 10px 24px rgba(124, 106, 247, 0.1);
+  }
+
+  .partners-row {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 14px;
+    flex-wrap: wrap;
+    margin: 0 0 16px;
+  }
+
+  .partner-logo {
+    display: block;
+    height: 34px;
+    width: auto;
+    max-width: 132px;
+    object-fit: contain;
+    filter: drop-shadow(0 8px 18px rgba(28, 22, 69, 0.08));
+  }
+
+  .partner-logo.energy {
+    width: min(220px, 42vw);
+    height: auto;
+    max-width: 100%;
   }
 
   .headline {
     font-family: 'Syne', sans-serif;
-    font-size: clamp(34px, 4.7vw, 62px);
+    font-size: clamp(42px, 6vw, 84px);
     font-weight: 800;
-    line-height: .94;
-    margin-bottom: 12px;
-    width: min(100%, 540px);
+    line-height: .86;
+    letter-spacing: -.05em;
+    margin-bottom: 14px;
+    width: min(100%, 620px);
     max-width: 100%;
     overflow-wrap: anywhere;
     word-break: break-word;
     text-wrap: balance;
+    text-shadow: 0 16px 30px rgba(28, 22, 69, 0.08);
   }
 
   .subline {
-    font-size: 15px;
-    line-height: 1.58;
+    font-size: clamp(16px, 1.45vw, 20px);
+    line-height: 1.55;
+    font-weight: 500;
     color: var(--muted);
-    max-width: 560px;
+    max-width: 52ch;
   }
 
   .hero-meta {
@@ -158,8 +186,9 @@
     flex-wrap: wrap;
     gap: 10px;
     color: var(--muted);
-    font-size: 13px;
-    font-weight: 700;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: .02em;
   }
 
   .meta-pill {
@@ -171,6 +200,25 @@
     border-radius: 999px;
     background: rgba(255, 255, 255, 0.68);
     border: 1px solid rgba(124, 106, 247, 0.14);
+    box-shadow: 0 10px 22px rgba(48, 38, 96, 0.05);
+  }
+
+  .meta-button {
+    cursor: pointer;
+    font: inherit;
+    color: #2f2750;
+    transition: transform .18s ease, box-shadow .18s ease, background .18s ease, border-color .18s ease;
+  }
+
+  .meta-button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 14px 24px rgba(48, 38, 96, 0.12);
+  }
+
+  .meta-button.active {
+    background: linear-gradient(135deg, rgba(200, 255, 57, 0.2), rgba(255, 212, 90, 0.22));
+    border-color: rgba(200, 255, 57, 0.4);
+    color: #2f360f;
   }
 
   .live-dot {
@@ -212,9 +260,9 @@
   }
 
   .status-label {
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 800;
-    letter-spacing: .12em;
+    letter-spacing: .16em;
     text-transform: uppercase;
     color: #73688c;
     margin-bottom: 10px;
@@ -278,9 +326,10 @@
 
   .focus-value {
     font-family: 'Syne', sans-serif;
-    font-size: clamp(22px, 2.1vw, 34px);
+    font-size: clamp(24px, 2.6vw, 42px);
     font-weight: 800;
-    line-height: .94;
+    line-height: .88;
+    letter-spacing: -.035em;
     overflow-wrap: anywhere;
     white-space: normal;
     text-wrap: balance;
@@ -327,8 +376,11 @@
   }
 
   .announcement-copy {
-    font-size: clamp(17px, 1.8vw, 22px);
-    line-height: 1.42;
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(20px, 2.4vw, 30px);
+    font-weight: 700;
+    line-height: 1.18;
+    letter-spacing: -.03em;
     margin-bottom: 10px;
   }
 
@@ -354,15 +406,16 @@
 
   .section-title {
     font-family: 'Syne', sans-serif;
-    font-size: 22px;
+    font-size: clamp(24px, 2.3vw, 34px);
     font-weight: 800;
-    line-height: 1.08;
+    line-height: .98;
+    letter-spacing: -.035em;
     margin-bottom: 6px;
   }
 
   .section-copy {
-    font-size: 13px;
-    line-height: 1.5;
+    font-size: 14px;
+    line-height: 1.55;
     color: var(--muted);
     max-width: 430px;
   }
@@ -393,18 +446,20 @@
 
   .city-item-name {
     font-family: 'Syne', sans-serif;
-    font-size: 16px;
+    font-size: clamp(17px, 1.5vw, 22px);
     font-weight: 800;
-    line-height: 1.08;
+    line-height: 1;
+    letter-spacing: -.02em;
     margin-bottom: 8px;
     overflow-wrap: anywhere;
   }
 
   .city-item-score {
     font-family: 'Syne', sans-serif;
-    font-size: 24px;
+    font-size: clamp(28px, 2.8vw, 42px);
     font-weight: 800;
     line-height: 1;
+    letter-spacing: -.035em;
     color: #2f2750;
     margin-bottom: 6px;
   }
@@ -472,9 +527,9 @@
   }
 
   .podium-rank {
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 800;
-    letter-spacing: .12em;
+    letter-spacing: .18em;
     text-transform: uppercase;
     color: #73688c;
     margin-bottom: 10px;
@@ -482,18 +537,20 @@
 
   .podium-name {
     font-family: 'Syne', sans-serif;
-    font-size: clamp(22px, 2.2vw, 30px);
+    font-size: clamp(24px, 2.8vw, 38px);
     font-weight: 800;
-    line-height: 1.04;
+    line-height: .96;
+    letter-spacing: -.035em;
     overflow-wrap: anywhere;
     margin-bottom: 8px;
   }
 
   .podium-score {
     font-family: 'Syne', sans-serif;
-    font-size: 28px;
+    font-size: clamp(30px, 3vw, 46px);
     font-weight: 800;
     line-height: 1;
+    letter-spacing: -.035em;
     color: #2f2750;
     margin-bottom: 6px;
   }
@@ -530,22 +587,23 @@
     background: linear-gradient(135deg, rgba(255, 61, 107, 0.12), rgba(124, 106, 247, 0.14));
     color: #433b6d;
     font-family: 'Syne', sans-serif;
-    font-size: 18px;
+    font-size: 19px;
     font-weight: 800;
   }
 
   .list-name {
     font-family: 'Syne', sans-serif;
-    font-size: 18px;
+    font-size: clamp(19px, 1.9vw, 25px);
     font-weight: 800;
-    line-height: 1.08;
+    line-height: .98;
+    letter-spacing: -.03em;
     overflow-wrap: anywhere;
   }
 
   .list-city {
     margin-top: 4px;
-    font-size: 12px;
-    line-height: 1.4;
+    font-size: 13px;
+    line-height: 1.45;
     color: var(--muted);
   }
 
@@ -556,16 +614,17 @@
   .list-score strong {
     display: block;
     font-family: 'Syne', sans-serif;
-    font-size: 24px;
+    font-size: clamp(26px, 2.4vw, 34px);
     font-weight: 800;
     line-height: 1;
+    letter-spacing: -.03em;
     color: #2f2750;
   }
 
   .list-score span {
     display: block;
     margin-top: 6px;
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 700;
     color: var(--muted);
   }
@@ -631,6 +690,22 @@
       font-size: clamp(36px, 13vw, 58px);
     }
 
+    .partners-row {
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .partner-logo {
+      height: 24px;
+      max-width: 98px;
+    }
+
+    .partner-logo.energy {
+      width: min(170px, 40vw);
+      height: auto;
+      max-width: 100%;
+    }
+
     .headline {
       max-width: none;
     }
@@ -652,12 +727,17 @@
     <section class="card hero">
       <div class="hero-main">
         <div class="eyebrow">Publiczny ekran wynikow</div>
+        <div class="partners-row" aria-label="Partnerzy wydarzenia">
+          <img class="partner-logo" src="/fundacjaoneday.svg" alt="Fundacja One Day">
+          <img class="partner-logo energy" src="/energyliandia.svg" alt="Energylandia">
+        </div>
         <div class="logo">Gwiazdka One Day 2026</div>
         <div class="headline" id="headline">Ranking na zywo</div>
         <div class="subline" id="subline">Najwazniejsze informacje dla widowni: czas, liderzy i czytelny obraz tego, kto prowadzi w finale gry.</div>
         <div class="hero-meta">
           <div class="meta-pill"><span class="live-dot"></span> Ekran wydarzenia</div>
           <div class="meta-pill" id="last-updated">Aktualizacja: --:--</div>
+          <button class="meta-pill meta-button" id="projection-toggle" type="button" aria-pressed="false">Tryb projekcyjny</button>
         </div>
       </div>
       <div class="hero-side">
@@ -1160,10 +1240,60 @@ function scheduleScoreboardRefresh(force = false) {
   }, 80);
 }
 
+function getFullscreenElement() {
+  return document.fullscreenElement || document.webkitFullscreenElement || document.msFullscreenElement || null;
+}
+
+function updateProjectionButton() {
+  const button = document.getElementById('projection-toggle');
+  if (!button) return;
+  const active = !!getFullscreenElement();
+  button.classList.toggle('active', active);
+  button.setAttribute('aria-pressed', active ? 'true' : 'false');
+  button.textContent = active ? 'Pelny ekran aktywny' : 'Tryb projekcyjny';
+}
+
+async function toggleProjectionMode() {
+  const target = document.documentElement;
+  const button = document.getElementById('projection-toggle');
+
+  try {
+    if (getFullscreenElement()) {
+      if (document.exitFullscreen) {
+        await document.exitFullscreen();
+      } else if (document.webkitExitFullscreen) {
+        document.webkitExitFullscreen();
+      } else if (document.msExitFullscreen) {
+        document.msExitFullscreen();
+      }
+    } else if (target.requestFullscreen) {
+      await target.requestFullscreen();
+    } else if (target.webkitRequestFullscreen) {
+      target.webkitRequestFullscreen();
+    } else if (target.msRequestFullscreen) {
+      target.msRequestFullscreen();
+    } else if (button) {
+      button.textContent = 'Pelny ekran niedostepny';
+      setTimeout(updateProjectionButton, 1800);
+    }
+  } catch (error) {
+    console.error('Nie udalo sie wlaczyc trybu projekcyjnego.', error);
+    if (button) {
+      button.textContent = 'Pelny ekran niedostepny';
+      setTimeout(updateProjectionButton, 1800);
+    }
+  }
+}
+
 window.onload = async () => {
   applyBrowserCompatibility();
   updateViewportHeight();
   await loadScoreboard();
+  updateProjectionButton();
+  document.getElementById('projection-toggle')?.addEventListener('click', toggleProjectionMode);
+  document.addEventListener('fullscreenchange', updateProjectionButton);
+  document.addEventListener('webkitfullscreenchange', updateProjectionButton);
+  document.addEventListener('msfullscreenchange', updateProjectionButton);
   setInterval(() => {
     renderHeader();
   }, 1000);

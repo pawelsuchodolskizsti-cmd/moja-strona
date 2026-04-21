@@ -813,6 +813,29 @@
     min-height: 340px;
   }
 
+  .player-preview-partners {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin: 0 auto 12px;
+  }
+
+  .player-preview-partner {
+    display: block;
+    height: 20px;
+    width: auto;
+    max-width: 92px;
+    object-fit: contain;
+  }
+
+  .player-preview-partner.energy {
+    width: 132px;
+    height: auto;
+    max-width: 100%;
+  }
+
   .player-preview-logo {
     font-family: 'Syne', sans-serif;
     font-size: 15px;
@@ -1245,6 +1268,15 @@
   body.event-mode .player-preview-card {
     min-height: 0;
     padding: 24px 22px;
+  }
+
+  body.event-mode .player-preview-partner {
+    height: 22px;
+    max-width: 100px;
+  }
+
+  body.event-mode .player-preview-partner.energy {
+    width: 144px;
   }
 
   body.event-mode .player-preview-title {
@@ -2785,6 +2817,11 @@ function renderPlayerPreview() {
   const gameRemaining = formatCountdown(getGameRemainingMs());
   const summaryRemaining = formatCountdown(getSummaryRemainingMs());
   const banner = previewBannerHtml();
+  const previewPartners = `
+        <div class="player-preview-partners" aria-label="Partnerzy wydarzenia">
+          <img class="player-preview-partner" src="/fundacjaoneday.svg" alt="Fundacja One Day">
+          <img class="player-preview-partner energy" src="/energyliandia.svg" alt="Energylandia">
+        </div>`;
 
   let html = '';
   let phaseText = 'Podgląd dopasowuje się do aktualnego stanu gry.';
@@ -2793,6 +2830,7 @@ function renderPlayerPreview() {
     phaseText = 'Podgląd próbki pytania z licznikiem do końca gry i miejscem na komunikat.';
     html = `
       <div class="player-preview-card">
+        ${previewPartners}
         <div class="player-preview-logo">Gwiazdka One Day 2026</div>
         ${banner}
         <div class="player-preview-pill">Pytanie</div>
@@ -2812,6 +2850,7 @@ function renderPlayerPreview() {
     phaseText = 'Podgląd finału po zatrzymaniu gry, z zaproszeniem do Teatru i drugim licznikiem.';
     html = `
       <div class="player-preview-card">
+        ${previewPartners}
         <div class="player-preview-logo">Gwiazdka One Day 2026</div>
         ${banner}
         <div class="player-preview-pill">Finał gry</div>
@@ -2831,6 +2870,7 @@ function renderPlayerPreview() {
     phaseText = 'Podgląd planszy z podziękowaniem po zakończeniu finału i podsumowania.';
     html = `
       <div class="player-preview-card">
+        ${previewPartners}
         <div class="player-preview-logo">Gwiazdka One Day 2026</div>
         ${banner}
         <div class="player-preview-pill">Dziękujemy</div>
@@ -2859,6 +2899,7 @@ function renderPlayerPreview() {
 
     html = `
       <div class="player-preview-card">
+        ${previewPartners}
         <div class="player-preview-logo">Gwiazdka One Day 2026</div>
         ${banner}
         <div class="player-preview-pill">${gamePhase === 'active' ? 'Start gry' : 'Przed startem'}</div>
