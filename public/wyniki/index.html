@@ -85,6 +85,312 @@
     background: rgba(255, 255, 255, 0.97);
   }
 
+  body.projection-mode {
+    padding: 12px;
+    overflow: hidden;
+  }
+
+  body.projection-mode .screen {
+    max-width: none;
+    height: calc(var(--app-height) - 24px);
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(320px, 0.85fr);
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    grid-template-areas:
+      "hero hero"
+      "board board"
+      "announcement cities";
+    gap: 10px;
+    align-content: stretch;
+  }
+
+  body.projection-mode .screen > * {
+    min-height: 0;
+  }
+
+  body.projection-mode .hero {
+    grid-area: hero;
+    margin-bottom: 0;
+    padding: 12px;
+    gap: 12px;
+  }
+
+  body.projection-mode .board {
+    grid-area: board;
+    margin-bottom: 0;
+    gap: 10px;
+    min-height: 0;
+  }
+
+  body.projection-mode .announcement-card {
+    grid-area: announcement;
+    margin-bottom: 0;
+  }
+
+  body.projection-mode .city-card {
+    grid-area: cities;
+    margin-bottom: 0;
+  }
+
+  body.projection-mode .hero-main,
+  body.projection-mode .hero-side,
+  body.projection-mode .board-card,
+  body.projection-mode .announcement-card,
+  body.projection-mode .city-card {
+    padding: 16px 18px;
+  }
+
+  body.projection-mode .eyebrow {
+    min-height: 32px;
+    padding: 0 14px;
+    margin-bottom: 10px;
+    font-size: 10px;
+  }
+
+  body.projection-mode .partners-row {
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  body.projection-mode .partner-logo {
+    height: 26px;
+    max-width: 110px;
+  }
+
+  body.projection-mode .partner-logo.energy {
+    width: 170px;
+  }
+
+  body.projection-mode .logo {
+    font-size: clamp(16px, 1.8vw, 22px);
+    margin-bottom: 10px;
+  }
+
+  body.projection-mode .headline {
+    font-size: clamp(34px, 4.2vw, 62px);
+    width: min(100%, 700px);
+    margin-bottom: 10px;
+  }
+
+  body.projection-mode .subline {
+    font-size: 14px;
+    line-height: 1.42;
+    max-width: 58ch;
+  }
+
+  body.projection-mode .hero-meta {
+    margin-top: 10px;
+    gap: 8px;
+  }
+
+  body.projection-mode .meta-pill {
+    min-height: 34px;
+    padding: 0 14px;
+    font-size: 11px;
+  }
+
+  body.projection-mode .status-box.timer-box {
+    min-height: 180px;
+    padding: 16px 18px;
+  }
+
+  body.projection-mode .status-value.timer {
+    font-size: clamp(40px, 4.4vw, 72px);
+  }
+
+  body.projection-mode .status-note {
+    margin-top: 8px;
+    font-size: 12px;
+    line-height: 1.38;
+  }
+
+  body.projection-mode .status-summary-card {
+    padding: 14px 16px;
+    margin-bottom: 10px;
+  }
+
+  body.projection-mode .status-inline {
+    gap: 10px;
+  }
+
+  body.projection-mode .focus-chip {
+    min-height: 102px;
+    padding: 14px 16px;
+  }
+
+  body.projection-mode .focus-value {
+    font-size: clamp(20px, 2vw, 34px);
+  }
+
+  body.projection-mode .section-head {
+    margin-bottom: 10px;
+  }
+
+  body.projection-mode .section-title {
+    font-size: clamp(20px, 1.8vw, 28px);
+    margin-bottom: 4px;
+  }
+
+  body.projection-mode .section-copy {
+    font-size: 12px;
+    line-height: 1.4;
+  }
+
+  body.projection-mode .board-tools {
+    gap: 8px;
+  }
+
+  body.projection-mode .sort-select {
+    min-height: 40px;
+    font-size: 13px;
+  }
+
+  body.projection-mode .podium-grid,
+  body.projection-mode .list {
+    gap: 8px;
+  }
+
+  body.projection-mode .podium-item {
+    padding: 12px 14px;
+    border-radius: 18px;
+  }
+
+  body.projection-mode .podium-name {
+    font-size: clamp(20px, 2vw, 30px);
+    margin-bottom: 6px;
+  }
+
+  body.projection-mode .podium-score {
+    font-size: clamp(24px, 2.4vw, 36px);
+  }
+
+  body.projection-mode .podium-meta {
+    font-size: 11px;
+  }
+
+  body.projection-mode .list-item {
+    padding: 12px 14px;
+    gap: 10px;
+  }
+
+  body.projection-mode .list-rank {
+    width: 38px;
+    height: 38px;
+    font-size: 16px;
+  }
+
+  body.projection-mode .list-name {
+    font-size: clamp(16px, 1.6vw, 22px);
+  }
+
+  body.projection-mode .list-city,
+  body.projection-mode .list-score span {
+    font-size: 12px;
+  }
+
+  body.projection-mode .list-score strong {
+    font-size: clamp(22px, 2vw, 28px);
+  }
+
+  body.projection-mode .announcement-copy {
+    font-size: clamp(18px, 1.8vw, 24px);
+    margin-bottom: 6px;
+  }
+
+  body.projection-mode .announcement-meta {
+    font-size: 12px;
+    line-height: 1.4;
+  }
+
+  body.projection-mode .city-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  body.projection-mode .city-item {
+    padding: 12px 12px 11px;
+    border-radius: 16px;
+  }
+
+  body.projection-mode .city-item-name {
+    font-size: 15px;
+    margin-bottom: 6px;
+  }
+
+  body.projection-mode .city-item-score {
+    font-size: clamp(20px, 2vw, 30px);
+  }
+
+  body.projection-mode .city-item-meta {
+    font-size: 11px;
+  }
+
+  @media (max-height: 900px) {
+    body.projection-mode {
+      padding: 10px;
+    }
+
+    body.projection-mode .screen {
+      height: calc(var(--app-height) - 20px);
+      gap: 8px;
+    }
+
+    body.projection-mode .hero {
+      padding: 10px;
+    }
+
+    body.projection-mode .hero-main,
+    body.projection-mode .hero-side,
+    body.projection-mode .board-card,
+    body.projection-mode .announcement-card,
+    body.projection-mode .city-card {
+      padding: 14px 16px;
+    }
+
+    body.projection-mode .partners-row {
+      margin-bottom: 8px;
+    }
+
+    body.projection-mode .headline {
+      font-size: clamp(30px, 3.8vw, 52px);
+      margin-bottom: 8px;
+    }
+
+    body.projection-mode .subline,
+    body.projection-mode .section-copy,
+    body.projection-mode .announcement-meta {
+      font-size: 11px;
+    }
+
+    body.projection-mode .status-box.timer-box {
+      min-height: 156px;
+    }
+
+    body.projection-mode .status-value.timer {
+      font-size: clamp(34px, 3.8vw, 60px);
+    }
+
+    body.projection-mode .focus-chip {
+      min-height: 88px;
+    }
+
+    body.projection-mode .focus-value,
+    body.projection-mode .podium-name,
+    body.projection-mode .list-name {
+      font-size: clamp(16px, 1.5vw, 24px);
+    }
+
+    body.projection-mode .podium-score,
+    body.projection-mode .list-score strong,
+    body.projection-mode .city-item-score {
+      font-size: clamp(20px, 1.8vw, 30px);
+    }
+
+    body.projection-mode .city-grid {
+      gap: 6px;
+    }
+  }
+
   .hero {
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(390px, 470px);
@@ -1246,11 +1552,12 @@ function getFullscreenElement() {
 
 function updateProjectionButton() {
   const button = document.getElementById('projection-toggle');
-  if (!button) return;
   const active = !!getFullscreenElement();
+  document.body.classList.toggle('projection-mode', active);
+  if (!button) return;
   button.classList.toggle('active', active);
   button.setAttribute('aria-pressed', active ? 'true' : 'false');
-  button.textContent = active ? 'Pelny ekran aktywny' : 'Tryb projekcyjny';
+  button.textContent = active ? 'Wyjdz z projekcji' : 'Tryb projekcyjny';
 }
 
 async function toggleProjectionMode() {

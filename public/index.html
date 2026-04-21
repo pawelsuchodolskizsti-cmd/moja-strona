@@ -665,6 +665,39 @@ label {
   margin-bottom:5px;
   display:block;
 }
+.terms-check {
+  display:flex;
+  align-items:flex-start;
+  gap:10px;
+  margin:8px 0 14px;
+  padding:12px 14px;
+  border-radius:14px;
+  background:rgba(124,106,247,0.07);
+  border:1px solid rgba(124,106,247,0.14);
+}
+.terms-check input[type="checkbox"] {
+  width:18px;
+  height:18px;
+  margin:2px 0 0;
+  flex:0 0 18px;
+  accent-color:#7c6af7;
+}
+.terms-check-text {
+  font-size:13px;
+  line-height:1.45;
+  color:#4c4667;
+  text-transform:none;
+  letter-spacing:0;
+  font-weight:600;
+}
+.terms-check-text a {
+  color:#6d57f5;
+  font-weight:700;
+  text-decoration:none;
+}
+.terms-check-text a:hover {
+  text-decoration:underline;
+}
 
 /* INPUT */
 input, textarea {
@@ -1554,6 +1587,11 @@ textarea {
     <label>E-mail</label>
     <input type="email" id="email" data-email-login inputmode="email" autocapitalize="off" autocomplete="email" spellcheck="false" placeholder="np. anna@example.com">
 
+    <label class="terms-check" for="accept-rules">
+      <input type="checkbox" id="accept-rules">
+      <span class="terms-check-text">Akceptuję <a href="/regulamin/" target="_blank" rel="noopener">regulamin</a>.</span>
+    </label>
+
     <button class="btn" id="login-btn" onclick="doLogin()">Dołącz do gry</button>
     <div class="msg error" id="login-msg"></div>
   </div>
@@ -1753,6 +1791,7 @@ const statusBoxEl = document.getElementById('game-status-box');
 const howtoPanelEl = document.getElementById('howto-panel');
 const fnameInputEl = document.getElementById('fname');
 const emailInputEl = document.getElementById('email');
+const acceptRulesEl = document.getElementById('accept-rules');
 const loginBtnEl = document.getElementById('login-btn');
 const loginMsgEl = document.getElementById('login-msg');
 const qTextEl = document.getElementById('q-text');
@@ -2095,6 +2134,12 @@ function normalizeEmailValue(value) {
   return String(value || '').trim().toLowerCase();
 }
 
+function updateLoginConsentState() {
+  if (!loginBtnEl || !acceptRulesEl) return;
+  if (loginBtnEl.dataset.busy === 'true') return;
+  loginBtnEl.disabled = !acceptRulesEl.checked;
+}
+
 async function readJsonResponse(response) {
   const raw = await response.text();
   try {
@@ -2145,6 +2190,11 @@ function bindUppercaseLoginFields() {
       }
     });
   });
+
+  if (acceptRulesEl) {
+    acceptRulesEl.addEventListener('change', updateLoginConsentState);
+    updateLoginConsentState();
+  }
 }
 
 function formatRemainingTime(milliseconds) {
@@ -2620,6 +2670,7 @@ async function doLogin() {
   const ln   = normalizeLoginValue(document.getElementById('lname').value);
   const city = normalizeLoginValue(document.getElementById('city').value);
   const email = normalizeEmailValue(emailInputEl.value);
+  const acceptedRules = !!acceptRulesEl?.checked;
   const msg  = loginMsgEl;
 
   if (!fn || !ln || !city || !email) {
@@ -2632,6 +2683,13 @@ async function doLogin() {
     return;
   }
 
+  if (!acceptedRules) {
+    msg.innerText = 'Aby dołączyć do gry, zaakceptuj regulamin';
+    updateLoginConsentState();
+    return;
+  }
+
+  loginBtnEl.dataset.busy = 'true';
   loginBtnEl.disabled = true;
   msg.innerText = '';
 
@@ -2641,17 +2699,20 @@ async function doLogin() {
       lastName: ln,
       city,
       email,
-      deviceToken
+      deviceToken,
+      acceptedRules
     });
 
     if (!data.id) {
       if (res.status === 403) {
         await loadGameState();
-        loginBtnEl.disabled = false;
+        delete loginBtnEl.dataset.busy;
+        updateLoginConsentState();
         return;
       }
       msg.innerText = data.error || 'Błąd logowania';
-      loginBtnEl.disabled = false;
+      delete loginBtnEl.dataset.busy;
+      updateLoginConsentState();
       return;
     }
 
@@ -2665,7 +2726,8 @@ async function doLogin() {
     await showQuestionScreen({ force: true });
   } catch(e) {
     msg.innerText = e?.message || 'Błąd połączenia';
-    loginBtnEl.disabled = false;
+    delete loginBtnEl.dataset.busy;
+    updateLoginConsentState();
   }
 }
 

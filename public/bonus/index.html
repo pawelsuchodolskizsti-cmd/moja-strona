@@ -310,6 +310,39 @@ label {
   color:#625b7f;
   margin-bottom:8px;
 }
+.terms-check {
+  display:flex;
+  align-items:flex-start;
+  gap:10px;
+  margin:8px 0 14px;
+  padding:12px 14px;
+  border-radius:14px;
+  background:linear-gradient(135deg, rgba(200,255,57,0.1), rgba(124,106,247,0.08));
+  border:1px solid rgba(124,106,247,0.14);
+}
+.terms-check input[type="checkbox"] {
+  width:18px;
+  height:18px;
+  margin:2px 0 0;
+  flex:0 0 18px;
+  accent-color:#9edb34;
+}
+.terms-check-text {
+  font-size:13px;
+  line-height:1.45;
+  color:#4d4a61;
+  text-transform:none;
+  letter-spacing:0;
+  font-weight:600;
+}
+.terms-check-text a {
+  color:#5f6c18;
+  font-weight:800;
+  text-decoration:none;
+}
+.terms-check-text a:hover {
+  text-decoration:underline;
+}
 
 input {
   width:100%;
@@ -1208,6 +1241,11 @@ input:focus {
   <label for="email">E-mail</label>
   <input type="email" id="email" data-email-login inputmode="email" autocapitalize="off" autocomplete="email" spellcheck="false" placeholder="np. anna@example.com">
 
+  <label class="terms-check" for="accept-rules-bonus">
+    <input type="checkbox" id="accept-rules-bonus">
+    <span class="terms-check-text">Akceptuję <a href="/regulamin/" target="_blank" rel="noopener">regulamin</a>.</span>
+  </label>
+
   <button class="btn" id="name-btn" onclick="doNameLogin()">Przejd&#378; dalej</button>
   <button class="btn secondary" type="button" onclick="goToHomeFromBonus()">Wr&oacute;&#263; do ekranu g&#322;&oacute;wnego</button>
   <div class="msg" id="name-msg"></div>
@@ -1400,6 +1438,7 @@ const bonusScreenIds = ['name-screen', 'secret-screen', 'success-screen'];
 const bonusScreenElements = Object.fromEntries(bonusScreenIds.map((id) => [id, document.getElementById(id)]));
 const nameBtnEl = document.getElementById('name-btn');
 const nameMsgEl = document.getElementById('name-msg');
+const acceptRulesBonusEl = document.getElementById('accept-rules-bonus');
 const secretBtnEl = document.getElementById('secret-btn');
 const secretMsgEl = document.getElementById('secret-msg');
 const secretInputEl = document.getElementById('secret-input');
@@ -1475,6 +1514,12 @@ function normalizeLoginValue(value) {
 
 function normalizeEmailValue(value) {
   return String(value || '').trim().toLowerCase();
+}
+
+function updateBonusConsentState() {
+  if (!nameBtnEl || !acceptRulesBonusEl) return;
+  if (nameBtnEl.dataset.busy === 'true') return;
+  nameBtnEl.disabled = !acceptRulesBonusEl.checked;
 }
 
 async function readJsonResponse(response) {
@@ -2365,6 +2410,7 @@ async function doNameLogin() {
   const ln = normalizeLoginValue(document.getElementById('lname').value);
   const city = normalizeLoginValue(document.getElementById('city').value);
   const email = normalizeEmailValue(document.getElementById('email').value);
+  const acceptedRules = !!acceptRulesBonusEl?.checked;
   const msg = nameMsgEl;
   const btn = nameBtnEl;
 
@@ -2380,6 +2426,14 @@ async function doNameLogin() {
     return;
   }
 
+  if (!acceptedRules) {
+    msg.className = 'msg error';
+    msg.innerText = 'Aby dołączyć do gry, zaakceptuj regulamin.';
+    updateBonusConsentState();
+    return;
+  }
+
+  btn.dataset.busy = 'true';
   btn.disabled = true;
   msg.className = 'msg';
   msg.innerText = '';
@@ -2390,7 +2444,8 @@ async function doNameLogin() {
       lastName: ln,
       city,
       email,
-      deviceToken
+      deviceToken,
+      acceptedRules
     });
     if (!res.ok || !data.id) {
       throw new Error(data.error || 'B\u0142\u0105d logowania.');
@@ -2408,7 +2463,8 @@ async function doNameLogin() {
   } catch (e) {
     msg.className = 'msg error';
     msg.innerText = e.message || 'B\u0142\u0105d po\u0142\u0105czenia.';
-    btn.disabled = false;
+    delete btn.dataset.busy;
+    updateBonusConsentState();
   }
 }
 
