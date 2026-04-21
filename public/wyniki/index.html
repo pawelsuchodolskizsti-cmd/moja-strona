@@ -95,11 +95,12 @@
     height: calc(var(--app-height) - 24px);
     display: grid;
     grid-template-columns: minmax(0, 1.15fr) minmax(320px, 0.85fr);
-    grid-template-rows: auto minmax(0, 1fr) auto;
+    grid-template-rows: minmax(240px, 0.95fr) minmax(230px, 0.88fr) minmax(150px, 0.48fr) minmax(116px, 0.34fr);
     grid-template-areas:
       "hero hero"
       "board board"
-      "announcement cities";
+      "announcement cities"
+      "summary cities";
     gap: 10px;
     align-content: stretch;
   }
@@ -129,6 +130,11 @@
 
   body.projection-mode .city-card {
     grid-area: cities;
+    margin-bottom: 0;
+  }
+
+  body.projection-mode .status-summary-card {
+    grid-area: summary;
     margin-bottom: 0;
   }
 
@@ -240,6 +246,40 @@
     gap: 8px;
   }
 
+  body.projection-mode .hero,
+  body.projection-mode .board,
+  body.projection-mode .announcement-card,
+  body.projection-mode .city-card,
+  body.projection-mode .status-summary-card {
+    min-height: 0;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  body.projection-mode .board {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: stretch;
+  }
+
+  body.projection-mode .board-card,
+  body.projection-mode .city-card,
+  body.projection-mode .announcement-card {
+    display: grid;
+    min-height: 0;
+  }
+
+  body.projection-mode .board-card {
+    grid-template-rows: auto minmax(0, 1fr);
+  }
+
+  body.projection-mode .city-card {
+    grid-template-rows: auto minmax(0, 1fr);
+  }
+
+  body.projection-mode .announcement-card {
+    grid-template-rows: auto auto minmax(0, 1fr);
+  }
+
   body.projection-mode .sort-select {
     min-height: 40px;
     font-size: 13px;
@@ -248,29 +288,56 @@
   body.projection-mode .podium-grid,
   body.projection-mode .list {
     gap: 8px;
+    min-height: 0;
+    height: 100%;
+    align-content: start;
+    overflow: hidden;
+  }
+
+  body.projection-mode .podium-grid {
+    grid-template-rows: repeat(3, minmax(0, 1fr));
   }
 
   body.projection-mode .podium-item {
     padding: 12px 14px;
     border-radius: 18px;
+    min-height: 0;
+    height: 100%;
+    display: grid;
+    align-content: start;
+    overflow: hidden;
   }
 
   body.projection-mode .podium-name {
     font-size: clamp(20px, 2vw, 30px);
     margin-bottom: 6px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
   }
 
   body.projection-mode .podium-score {
     font-size: clamp(24px, 2.4vw, 36px);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   body.projection-mode .podium-meta {
     font-size: 11px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
   }
 
   body.projection-mode .list-item {
     padding: 12px 14px;
     gap: 10px;
+    min-height: 0;
+    height: 100%;
+    overflow: hidden;
   }
 
   body.projection-mode .list-rank {
@@ -281,6 +348,10 @@
 
   body.projection-mode .list-name {
     font-size: clamp(16px, 1.6vw, 22px);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
   }
 
   body.projection-mode .list-city,
@@ -295,34 +366,84 @@
   body.projection-mode .announcement-copy {
     font-size: clamp(18px, 1.8vw, 24px);
     margin-bottom: 6px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
   }
 
   body.projection-mode .announcement-meta {
     font-size: 12px;
     line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
   }
 
   body.projection-mode .city-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-auto-rows: minmax(0, 1fr);
     gap: 8px;
+    min-height: 0;
+    height: 100%;
+    overflow: hidden;
   }
 
   body.projection-mode .city-item {
     padding: 12px 12px 11px;
     border-radius: 16px;
+    min-height: 0;
+    height: 100%;
+    overflow: hidden;
   }
 
   body.projection-mode .city-item-name {
     font-size: 15px;
     margin-bottom: 6px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
   }
 
   body.projection-mode .city-item-score {
     font-size: clamp(20px, 2vw, 30px);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   body.projection-mode .city-item-meta {
     font-size: 11px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  body.projection-mode .section-copy,
+  body.projection-mode .status-note {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  body.projection-mode .status-summary-card {
+    display: flex;
+    align-items: stretch;
+  }
+
+  body.projection-mode .status-inline {
+    width: 100%;
+    height: 100%;
+  }
+
+  body.projection-mode .focus-chip {
+    min-height: 0;
+    height: 100%;
+    overflow: hidden;
   }
 
   @media (max-height: 900px) {
