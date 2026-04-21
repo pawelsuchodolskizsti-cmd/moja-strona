@@ -1987,7 +1987,6 @@
       <div class="ops-copy">Szybki podgląd sumy punktów, liczby uczestników i odpowiedzi dla każdego miasta bez przechodzenia do zakładki rankingu.</div>
       <div class="table-wrap city-summary tight">
         <div class="city-summary-head">
-          <div class="city-summary-title">Punkty miast</div>
           <div class="city-summary-copy" data-city-meta>Ładowanie rankingu miast...</div>
         </div>
         <table>
@@ -2153,7 +2152,6 @@
     </div>
     <div class="table-wrap city-summary">
       <div class="city-summary-head">
-        <div class="city-summary-title">Punkty miast</div>
         <div class="city-summary-copy" data-city-meta>Ładowanie rankingu miast...</div>
       </div>
       <table>
@@ -2901,7 +2899,7 @@ async function loadGameState() {
     if (data.started_at) {
       summaryAt = null;
       gameStartedAt = new Date(data.started_at).getTime();
-  gameDurationMs = (data.duration_minutes || 10) * 60 * 1000;
+      gameDurationMs = (data.duration_minutes || 10) * 60 * 1000;
       const remaining = gameDurationMs - (Date.now() - gameStartedAt);
 
       if (remaining > 0) {
@@ -2912,23 +2910,21 @@ async function loadGameState() {
         if (!timerInterval) timerInterval = setInterval(updateLiveTimer, 1000);
       } else {
         gameStartedAt = null;
-    summaryAt = new Date(data.summary_at || (Date.now() + 5 * 60000)).getTime();
+        summaryAt = new Date(data.summary_at || (Date.now() + 5 * 60000)).getTime();
         clearTimer();
         gamePhase = 'ended';
         setStatus('ended', 'Gra zakończona', 'Czas gry minął. Możesz uruchomić nową turę lub wyczyścić dane.');
         syncActionButtons('ended');
         updateLiveTimer();
-        if (!timerInterval) timerInterval = setInterval(updateLiveTimer, 1000);
       }
     } else if (data.ended_at || data.summary_at) {
       gameStartedAt = null;
-    summaryAt = new Date(data.summary_at || (new Date(data.ended_at).getTime() + 5 * 60000)).getTime();
+      summaryAt = new Date(data.summary_at || (new Date(data.ended_at).getTime() + 5 * 60000)).getTime();
       clearTimer();
       gamePhase = 'ended';
       setStatus('ended', 'Gra zakończona', 'Uczestnicy widzą zaproszenie do Teatru i licznik do podsumowania.');
       syncActionButtons('ended');
       updateLiveTimer();
-      if (!timerInterval) timerInterval = setInterval(updateLiveTimer, 1000);
     } else {
       gameStartedAt = null;
       summaryAt = null;
@@ -3009,33 +3005,19 @@ function updateLiveTimer() {
   }
 
   if (!gameStartedAt && summaryAt) {
-    const summaryRemaining = summaryAt - Date.now();
-    if (summaryRemaining <= 0) {
-      timerEl.textContent = 'TEATR';
-      timerEl.classList.add('warning');
-      clearTimer();
-      renderPlayerPreview();
-      return;
-    }
-
-    const summaryMinutes = Math.floor((summaryRemaining % 3600000) / 60000);
-    const summarySeconds = Math.floor((summaryRemaining % 60000) / 1000);
-    const summaryHours = Math.floor(summaryRemaining / 3600000);
-
-    timerEl.textContent = summaryHours > 0
-      ? `${summaryHours}:${String(summaryMinutes).padStart(2, '0')}:${String(summarySeconds).padStart(2, '0')}`
-      : `${String(summaryMinutes).padStart(2, '0')}:${String(summarySeconds).padStart(2, '0')}`;
-
+    timerEl.textContent = 'TEATR';
     timerEl.classList.add('warning');
+    clearTimer();
     return;
   }
 
   const remaining = gameDurationMs - (Date.now() - gameStartedAt);
   if (remaining <= 0) {
     gameStartedAt = null;
-  summaryAt = Date.now() + 5 * 60000;
+    summaryAt = Date.now() + 5 * 60000;
     timerEl.textContent = 'TEATR';
     timerEl.classList.add('warning');
+    clearTimer();
     gamePhase = 'ended';
     setStatus('ended', 'Gra zakończona', 'Czas gry minął. Możesz uruchomić nową turę lub wyczyścić dane.');
     syncActionButtons('ended');
