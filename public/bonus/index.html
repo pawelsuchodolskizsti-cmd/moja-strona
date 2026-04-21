@@ -633,22 +633,22 @@ input:focus {
 .thanks-links {
   display: grid;
   gap: 10px;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: 1fr;
 }
 
 .thanks-link {
-  display: flex;
+  display: grid;
+  grid-template-columns: 36px minmax(0, 1fr);
   align-items: center;
-  justify-content: flex-start;
   gap: 12px;
-  min-height: 52px;
-  padding: 10px 14px;
+  min-height: 72px;
+  padding: 14px 16px;
   border-radius: 14px;
   text-decoration: none;
   font-family: 'Syne';
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 800;
-  letter-spacing: .02em;
+  letter-spacing: .01em;
   color: #ffffff;
   background: linear-gradient(135deg, var(--pink), var(--purple));
   box-shadow: 0 12px 24px rgba(124,106,247,0.26);
@@ -688,6 +688,7 @@ input:focus {
 .thanks-link-title {
   display: block;
   line-height: 1.15;
+  overflow-wrap: anywhere;
 }
 
 .thanks-link-subtitle {
@@ -695,7 +696,9 @@ input:focus {
   font-family: 'DM Sans', sans-serif;
   font-size: 12px;
   font-weight: 600;
+  line-height: 1.35;
   color: rgba(255,255,255,0.82);
+  overflow-wrap: anywhere;
 }
 
 .badge-board {
