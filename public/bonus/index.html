@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pl">
 <head>
 <meta charset="UTF-8">
@@ -1062,10 +1062,26 @@ input:focus {
     margin-bottom: 14px;
   }
 
+  .success-copy-row {
+    gap:10px;
+  }
+
   .success-copy {
     font-size: 14px;
     line-height: 1.45;
     margin-bottom: 12px;
+  }
+
+  .camera-scan-btn {
+    flex-basis:62px;
+    width:62px;
+    min-width:62px;
+    border-radius:16px;
+  }
+
+  .camera-scan-btn svg {
+    width:24px;
+    height:24px;
   }
 }
 
@@ -1160,9 +1176,25 @@ input:focus {
     margin-bottom: 12px;
   }
 
+  .success-copy-row {
+    gap:8px;
+  }
+
   .success-copy {
     font-size: 13px;
     margin-bottom: 10px;
+  }
+
+  .camera-scan-btn {
+    flex-basis:58px;
+    width:58px;
+    min-width:58px;
+    border-radius:14px;
+  }
+
+  .camera-scan-btn svg {
+    width:22px;
+    height:22px;
   }
 
   .status-thanks {
@@ -1217,7 +1249,7 @@ input:focus {
     <div class="bonus-special-icon">+1</div>
     <div class="bonus-special-copy">
       <span class="bonus-special-title">Bonus specjalny</span>
-      <span class="bonus-special-subtitle">Limonkowo-złota okazja poza zwykłym pytaniem</span>
+      <span class="bonus-special-subtitle">Limonkowo-zĹ‚ota okazja poza zwykĹ‚ym pytaniem</span>
     </div>
   </div>
   <h1>Odbierz dodatkowy punkt</h1>
@@ -1243,7 +1275,7 @@ input:focus {
 
   <label class="terms-check" for="accept-rules-bonus">
     <input type="checkbox" id="accept-rules-bonus">
-    <span class="terms-check-text">Akceptuję <a href="/regulamin/" target="_blank" rel="noopener">regulamin</a>.</span>
+    <span class="terms-check-text">AkceptujÄ™ <a href="/regulamin/" target="_blank" rel="noopener">regulamin</a>.</span>
   </label>
 
   <button class="btn" id="name-btn" onclick="doNameLogin()">Przejd&#378; dalej</button>
@@ -1267,7 +1299,7 @@ input:focus {
     <div class="bonus-special-icon">+1</div>
     <div class="bonus-special-copy">
       <span class="bonus-special-title">Bonus specjalny</span>
-      <span class="bonus-special-subtitle">Ten etap daje dodatkowy punkt za aktywność extra</span>
+      <span class="bonus-special-subtitle">Ten etap daje dodatkowy punkt za aktywnoĹ›Ä‡ extra</span>
     </div>
   </div>
   <h1>Wpisz has&#322;o bonusowe</h1>
@@ -1307,7 +1339,7 @@ input:focus {
       <div class="bonus-special-icon">+1</div>
       <div class="bonus-special-copy">
         <span class="bonus-special-title">Bonus specjalny</span>
-        <span class="bonus-special-subtitle">To wyróżniony punkt dodatkowy do Twojego wyniku</span>
+        <span class="bonus-special-subtitle">To wyrĂłĹĽniony punkt dodatkowy do Twojego wyniku</span>
       </div>
     </div>
     <div class="success-icon" id="bonus-result-icon">+1</div>
@@ -1319,7 +1351,15 @@ input:focus {
       <div class="bonus-highlight-value" data-bonus-label>Bonus</div>
     </div>
 
-    <div class="success-copy" id="bonus-result-copy">Je&#347;li gra nadal trwa, sprawd&#378; nast&#281;pne punkty na trasie i wypatruj kolejnych niespodzianek.</div>
+    <div class="success-copy-row">
+      <div class="success-copy" id="bonus-result-copy">Je&#347;li gra nadal trwa, sprawd&#378; nast&#281;pne punkty na trasie i wypatruj kolejnych niespodzianek.</div>
+      <button class="camera-scan-btn" id="bonus-qr-camera-btn" type="button" aria-label="Otwórz aparat do skanowania kolejnego kodu QR" title="Otwórz aparat">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path fill="currentColor" d="M9 4.5 10.2 3h3.6L15 4.5h2.7A2.8 2.8 0 0 1 20.5 7.3v8.9A2.8 2.8 0 0 1 17.7 19H6.3a2.8 2.8 0 0 1-2.8-2.8V7.3A2.8 2.8 0 0 1 6.3 4.5H9Zm3 3.1a4.4 4.4 0 1 0 0 8.8 4.4 4.4 0 0 0 0-8.8Zm0 1.9a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5Z"/>
+        </svg>
+      </button>
+    </div>
+    <input id="bonus-qr-camera-input" type="file" accept="image/*" capture="environment" hidden>
 
     <div class="game-remaining">
       <span class="game-remaining-label" data-game-remaining-label>Do ko&#324;ca gry zosta&#322;o</span>
@@ -1527,7 +1567,7 @@ async function readJsonResponse(response) {
   try {
     return raw ? JSON.parse(raw) : {};
   } catch (error) {
-    return { error: raw || 'Nie udało się odczytać odpowiedzi serwera.' };
+    return { error: raw || 'Nie udaĹ‚o siÄ™ odczytaÄ‡ odpowiedzi serwera.' };
   }
 }
 
@@ -1551,7 +1591,7 @@ async function postJsonWithRetry(url, payload, options = {}) {
     }
   }
 
-  throw lastError || new Error('Błąd połączenia');
+  throw lastError || new Error('BĹ‚Ä…d poĹ‚Ä…czenia');
 }
 
 async function readJsonResponse(response) {
@@ -1735,6 +1775,167 @@ function rememberMicroToast(key) {
   if (shownMicroToastKeys.has(key)) return true;
   shownMicroToastKeys.add(key);
   return false;
+}
+function getBonusQrBarcodeDetector() {
+  if (bonusQrCameraState.detector !== null) {
+    return bonusQrCameraState.detector || null;
+  }
+
+  if (typeof BarcodeDetector === 'undefined') {
+    bonusQrCameraState.detector = false;
+    return null;
+  }
+
+  try {
+    bonusQrCameraState.detector = new BarcodeDetector({ formats: ['qr_code'] });
+    return bonusQrCameraState.detector;
+  } catch (error) {
+    bonusQrCameraState.detector = false;
+    return null;
+  }
+}
+
+async function loadBonusQrImage(file) {
+  if (typeof createImageBitmap === 'function') {
+    return createImageBitmap(file);
+  }
+
+  return new Promise((resolve, reject) => {
+    const objectUrl = URL.createObjectURL(file);
+    const image = new Image();
+    image.onload = () => {
+      URL.revokeObjectURL(objectUrl);
+      resolve(image);
+    };
+    image.onerror = () => {
+      URL.revokeObjectURL(objectUrl);
+      reject(new Error('Nie udało się wczytać zdjęcia.'));
+    };
+    image.src = objectUrl;
+  });
+}
+
+async function decodeBonusQrFromFile(file) {
+  const detector = getBonusQrBarcodeDetector();
+  if (!detector || !file) return '';
+
+  const source = await loadBonusQrImage(file);
+  try {
+    const results = await detector.detect(source);
+    return results && results[0] && results[0].rawValue ? String(results[0].rawValue).trim() : '';
+  } finally {
+    if (source && typeof source.close === 'function') {
+      source.close();
+    }
+  }
+}
+
+function parseBonusQrTarget(rawValue) {
+  const value = String(rawValue || '').trim();
+  if (!value) return null;
+
+  try {
+    const parsed = new URL(value, window.location.origin);
+    if (parsed.origin === window.location.origin) {
+      const qParam = parsed.searchParams.get('q');
+      if (qParam) return { type: 'question', value: qParam.trim() };
+      const bParam = parsed.searchParams.get('b');
+      if (bParam) return { type: 'bonus', value: bParam.trim() };
+      return { type: 'url', value: `${parsed.pathname}${parsed.search}${parsed.hash}` };
+    }
+  } catch (error) {
+    // Continue with raw parsing.
+  }
+
+  const questionMatch = value.match(/(?:^|[?&])q=([^&#]+)/i);
+  if (questionMatch) {
+    return { type: 'question', value: decodeURIComponent(questionMatch[1]).trim() };
+  }
+
+  const bonusMatch = value.match(/(?:^|[?&])b=([^&#]+)/i);
+  if (bonusMatch) {
+    return { type: 'bonus', value: decodeURIComponent(bonusMatch[1]).trim() };
+  }
+
+  if (/^B[0-9A-Za-z_-]{1,64}$/.test(value)) {
+    return { type: 'bonus', value };
+  }
+
+  if (/^[A-Za-z0-9_-]{1,64}$/.test(value)) {
+    return { type: 'question', value };
+  }
+
+  return null;
+}
+
+function openBonusQrCameraCapture() {
+  if (!bonusQrCameraInputEl || bonusQrCameraState.busy) return;
+  primeFeedbackAudio();
+  triggerHaptic(12);
+  bonusQrCameraInputEl.value = '';
+  bonusQrCameraInputEl.click();
+}
+
+function navigateToQrTarget(target) {
+  if (!target) return;
+
+  if (target.type === 'url') {
+    window.location.href = target.value;
+    return;
+  }
+
+  const nextUrl = new URL(window.location.origin);
+  if (target.type === 'bonus') {
+    nextUrl.pathname = '/bonus/';
+    nextUrl.searchParams.set('b', target.value);
+  } else {
+    nextUrl.pathname = '/';
+    nextUrl.searchParams.set('q', target.value);
+  }
+  window.location.href = `${nextUrl.pathname}${nextUrl.search}`;
+}
+
+async function handleBonusQrCameraCapture(event) {
+  const file = event.target && event.target.files && event.target.files[0];
+  if (!file || bonusQrCameraState.busy) return;
+
+  bonusQrCameraState.busy = true;
+  if (bonusQrCameraBtnEl) bonusQrCameraBtnEl.disabled = true;
+
+  try {
+    if (!getBonusQrBarcodeDetector()) {
+      showMicroToast('Aparat został otwarty. Jeśli ta przeglądarka nie odczyta QR ze zdjęcia automatycznie, użyj systemowego skanera kodów QR.', 'info', 'Aparat');
+      return;
+    }
+
+    const rawValue = await decodeBonusQrFromFile(file);
+    const target = parseBonusQrTarget(rawValue);
+
+    if (!target) {
+      showMicroToast('Nie udało się odczytać kodu QR. Spróbuj jeszcze raz, najlepiej przy lepszym świetle.', 'info', 'Aparat');
+      return;
+    }
+
+    showMicroToast('Kod QR odczytany. Otwieram właściwy ekran.', 'success', 'Aparat');
+    navigateToQrTarget(target);
+  } catch (error) {
+    showMicroToast('Aparat został otwarty, ale nie udało się odczytać kodu QR z tego zdjęcia.', 'info', 'Aparat');
+  } finally {
+    bonusQrCameraState.busy = false;
+    if (bonusQrCameraBtnEl) bonusQrCameraBtnEl.disabled = false;
+    if (event.target) event.target.value = '';
+  }
+}
+
+function initBonusQrCameraCapture() {
+  if (bonusQrCameraState.bound) return;
+  if (bonusQrCameraBtnEl) {
+    bonusQrCameraBtnEl.addEventListener('click', openBonusQrCameraCapture);
+  }
+  if (bonusQrCameraInputEl) {
+    bonusQrCameraInputEl.addEventListener('change', handleBonusQrCameraCapture);
+  }
+  bonusQrCameraState.bound = true;
 }
 
 function showMicroToast(message, type = 'info', title = 'Aktualizacja', key = '') {
@@ -2091,11 +2292,11 @@ function renderGameRemaining() {
     const remaining = endTime - Date.now();
     if (remaining > 0) {
       const label = formatRemainingTime(remaining);
-      setGameRemainingLabel('Do końca gry zostało');
+      setGameRemainingLabel('Do koĹ„ca gry zostaĹ‚o');
 
       if (remaining <= 15 * 60000) {
         showMicroToast(
-          'Zostało 15 minut do końca gry. To dobry moment na finałowy sprint.',
+          'ZostaĹ‚o 15 minut do koĹ„ca gry. To dobry moment na finaĹ‚owy sprint.',
           'warning',
           'Uwaga',
           `warning-15-${startedAt}`
@@ -2114,7 +2315,7 @@ function renderGameRemaining() {
   if (summaryTarget) {
     const remaining = summaryTarget - Date.now();
     if (remaining <= 0) {
-      setGameRemainingLabel('Do podsumowania zostało');
+      setGameRemainingLabel('Do podsumowania zostaĹ‚o');
       gameRemainingElements.forEach((element) => {
         if (element.innerText !== '00:00') {
           element.innerText = '00:00';
@@ -2125,7 +2326,7 @@ function renderGameRemaining() {
     }
 
     const label = formatRemainingTime(remaining);
-    setGameRemainingLabel('Do podsumowania zostało');
+    setGameRemainingLabel('Do podsumowania zostaĹ‚o');
     gameRemainingElements.forEach((element) => {
       if (element.innerText !== label) {
         element.innerText = label;
@@ -2134,7 +2335,7 @@ function renderGameRemaining() {
     return;
   }
 
-  setGameRemainingLabel('Do końca gry zostało');
+  setGameRemainingLabel('Do koĹ„ca gry zostaĹ‚o');
   gameRemainingElements.forEach((element) => {
     if (element.innerText !== 'Gra nieaktywna') {
       element.innerText = 'Gra nieaktywna';
@@ -2369,6 +2570,7 @@ window.onload = async () => {
 
   applyBrowserCompatibility();
   updateViewportHeight();
+  initBonusQrCameraCapture();
   deviceToken = getDeviceToken();
   bindUppercaseLoginFields();
   renderGameRemaining();
@@ -2428,7 +2630,7 @@ async function doNameLogin() {
 
   if (!acceptedRules) {
     msg.className = 'msg error';
-    msg.innerText = 'Aby dołączyć do gry, zaakceptuj regulamin.';
+    msg.innerText = 'Aby doĹ‚Ä…czyÄ‡ do gry, zaakceptuj regulamin.';
     updateBonusConsentState();
     return;
   }
@@ -2493,7 +2695,7 @@ async function submitSecret() {
 
     const data = await res.json();
 
-    if (res.status === 403 && /urzadzen|urzÄ…dzen|przypisane/i.test(String(data.error || ''))) {
+    if (res.status === 403 && /urzadzen|urzĂ„â€¦dzen|przypisane/i.test(String(data.error || ''))) {
       clearBonusAccess(data.error);
       btn.disabled = false;
       return;

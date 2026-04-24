@@ -1095,15 +1095,55 @@ textarea {
 #no-q-screen h1 {
   text-align:center;
 }
+.scan-info-row {
+  display:flex;
+  align-items:stretch;
+  gap:12px;
+  margin-top:14px;
+}
 .info-box {
   background: rgba(124,106,247,0.07);
   border: 1px solid rgba(124,106,247,0.2);
   border-radius:14px;
   padding:20px;
   text-align:center;
-  margin-top:14px;
+  margin-top:0;
+  flex:1 1 auto;
 }
 .info-box p { font-size:14px; color:var(--purple); font-weight:500; line-height:1.6; }
+.camera-scan-btn {
+  flex:0 0 68px;
+  width:68px;
+  min-width:68px;
+  border:none;
+  border-radius:18px;
+  background: linear-gradient(135deg, #ff4f92, #7c6af7);
+  color:#fff;
+  box-shadow: 0 14px 26px rgba(124,106,247,0.26);
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  transition: transform .18s ease, box-shadow .18s ease, opacity .18s ease;
+}
+.camera-scan-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 18px 28px rgba(124,106,247,0.32);
+}
+.camera-scan-btn:active {
+  transform: translateY(0);
+}
+.camera-scan-btn:disabled {
+  opacity:.6;
+  cursor:default;
+  transform:none;
+  box-shadow: 0 10px 18px rgba(124,106,247,0.18);
+}
+.camera-scan-btn svg {
+  width:28px;
+  height:28px;
+  display:block;
+}
 
 @media (max-width: 520px) {
   body {
@@ -1128,6 +1168,22 @@ textarea {
     max-width: 100%;
     min-height: auto;
     padding: 24px 18px 20px;
+  }
+
+  .scan-info-row {
+    gap:10px;
+  }
+
+  .camera-scan-btn {
+    flex-basis:62px;
+    width:62px;
+    min-width:62px;
+    border-radius:16px;
+  }
+
+  .camera-scan-btn svg {
+    width:24px;
+    height:24px;
   }
 
   #thanks-screen {
@@ -1530,7 +1586,7 @@ textarea {
   </div>
 
   <div class="socials-wrap">
-    <div class="socials-note">&#346;led&#378; nas, mo&#380;e Ci si&#281; to przyda&#263; w dniu fina&#322;u. Przygotowania do fina&#322;u to &#347;wietny czas &#8212; &#347;led&#378; nas, aby nic nie przegapi&#263;.</div>
+    <div class="socials-note"> Przygotowania do fina&#322;u to &#347;wietny czas &#8212; &#347;led&#378; nas, aby nic nie przegapi&#263;.</div>
     <div class="socials">
       <a href="https://www.instagram.com/fundacjaoneday/" target="_blank" rel="noopener" aria-label="Instagram">
         <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
@@ -1658,9 +1714,17 @@ textarea {
     <div class="announcement-text"></div>
   </div>
   <h1>Zeskanuj kod QR</h1>
-  <div class="info-box">
-    <p>Znajdź kod QR w terenie<br>i zeskanuj go, aby zobaczyć pytanie.</p>
+  <div class="scan-info-row">
+    <div class="info-box">
+      <p>Znajdź kod QR w terenie<br>i zeskanuj go, aby zobaczyć pytanie.</p>
+    </div>
+    <button class="camera-scan-btn" id="qr-camera-btn" type="button" aria-label="Otwórz aparat do skanowania kodu QR" title="Otwórz aparat">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path fill="currentColor" d="M9 4.5 10.2 3h3.6L15 4.5h2.7A2.8 2.8 0 0 1 20.5 7.3v8.9A2.8 2.8 0 0 1 17.7 19H6.3a2.8 2.8 0 0 1-2.8-2.8V7.3A2.8 2.8 0 0 1 6.3 4.5H9Zm3 3.1a4.4 4.4 0 1 0 0 8.8 4.4 4.4 0 0 0 0-8.8Zm0 1.9a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5Z"/>
+      </svg>
+    </button>
   </div>
+  <input id="qr-camera-input" type="file" accept="image/*" capture="environment" hidden>
   <div class="game-remaining">
     <span class="game-remaining-label" data-game-remaining-label>Do końca gry zostało</span>
     <div class="game-remaining-value" data-game-remaining>--:--</div>
@@ -1795,6 +1859,8 @@ const acceptRulesEl = document.getElementById('accept-rules');
 const loginBtnEl = document.getElementById('login-btn');
 const loginMsgEl = document.getElementById('login-msg');
 const qTextEl = document.getElementById('q-text');
+const qrCameraBtnEl = document.getElementById('qr-camera-btn');
+const qrCameraInputEl = document.getElementById('qr-camera-input');
 const resultAreaEl = document.getElementById('result-area');
 const qMsgEl = document.getElementById('q-msg');
 const answerAreaEl = document.getElementById('answer-area');
@@ -1808,6 +1874,7 @@ gameRemainingLabelElements = Array.from(document.querySelectorAll('[data-game-re
 
 const EVENT_DATE = new Date('2026-12-13T10:00:00+01:00');
 const memoryStorage = new Map();
+const qrCameraState = { detector: null, busy: false, bound: false };
 
 function getCookieValue(name) {
   try {
@@ -2045,6 +2112,156 @@ function playFeedbackTone(type = 'success') {
 
 function getQuestionParam() {
   return new URLSearchParams(window.location.search).get('q');
+}
+function getQrBarcodeDetector() {
+  if (qrCameraState.detector !== null) {
+    return qrCameraState.detector || null;
+  }
+
+  if (typeof BarcodeDetector === 'undefined') {
+    qrCameraState.detector = false;
+    return null;
+  }
+
+  try {
+    qrCameraState.detector = new BarcodeDetector({ formats: ['qr_code'] });
+    return qrCameraState.detector;
+  } catch (error) {
+    qrCameraState.detector = false;
+    return null;
+  }
+}
+
+async function loadImageForQr(file) {
+  if (typeof createImageBitmap === 'function') {
+    return createImageBitmap(file);
+  }
+
+  return new Promise((resolve, reject) => {
+    const objectUrl = URL.createObjectURL(file);
+    const image = new Image();
+    image.onload = () => {
+      URL.revokeObjectURL(objectUrl);
+      resolve(image);
+    };
+    image.onerror = () => {
+      URL.revokeObjectURL(objectUrl);
+      reject(new Error('Nie udało się wczytać zdjęcia.'));
+    };
+    image.src = objectUrl;
+  });
+}
+
+async function decodeQrFromFile(file) {
+  const detector = getQrBarcodeDetector();
+  if (!detector || !file) return '';
+
+  const source = await loadImageForQr(file);
+  try {
+    const results = await detector.detect(source);
+    return results && results[0] && results[0].rawValue ? String(results[0].rawValue).trim() : '';
+  } finally {
+    if (source && typeof source.close === 'function') {
+      source.close();
+    }
+  }
+}
+
+function parseQrTarget(rawValue) {
+  const value = String(rawValue || '').trim();
+  if (!value) return null;
+
+  try {
+    const parsed = new URL(value, window.location.origin);
+    if (parsed.origin === window.location.origin) {
+      const qParam = parsed.searchParams.get('q');
+      if (qParam) return { type: 'question', value: qParam.trim() };
+      return { type: 'url', value: `${parsed.pathname}${parsed.search}${parsed.hash}` };
+    }
+  } catch (error) {
+    // Continue with raw parsing.
+  }
+
+  const queryMatch = value.match(/(?:^|[?&])q=([^&#]+)/i);
+  if (queryMatch) {
+    return { type: 'question', value: decodeURIComponent(queryMatch[1]).trim() };
+  }
+
+  if (/^[A-Za-z0-9_-]{1,64}$/.test(value)) {
+    return { type: 'question', value };
+  }
+
+  return null;
+}
+
+async function openQrTarget(target) {
+  if (!target) return;
+
+  if (target.type === 'url') {
+    window.location.href = target.value;
+    return;
+  }
+
+  if (target.type !== 'question' || !target.value) return;
+
+  const nextUrl = new URL(window.location.href);
+  nextUrl.searchParams.set('q', target.value);
+  const nextSearch = nextUrl.searchParams.toString();
+  window.history.replaceState({}, '', `${nextUrl.pathname}${nextSearch ? `?${nextSearch}` : ''}${nextUrl.hash}`);
+  currentQuestion = null;
+  questionFetchedAt = 0;
+  await syncPlayerView({ force: true });
+}
+
+function openQrCameraCapture() {
+  if (!qrCameraInputEl || qrCameraState.busy) return;
+  primeFeedbackAudio();
+  triggerHaptic(12);
+  qrCameraInputEl.value = '';
+  qrCameraInputEl.click();
+}
+
+async function handleQrCameraCapture(event) {
+  const file = event.target && event.target.files && event.target.files[0];
+  if (!file || qrCameraState.busy) return;
+
+  qrCameraState.busy = true;
+  if (qrCameraBtnEl) qrCameraBtnEl.disabled = true;
+
+  try {
+    if (!getQrBarcodeDetector()) {
+      showMicroToast('Aparat został otwarty. Jeśli ta przeglądarka nie odczyta QR ze zdjęcia automatycznie, użyj systemowego skanera kodów QR.', 'info', 'Aparat');
+      return;
+    }
+
+    const rawValue = await decodeQrFromFile(file);
+    const target = parseQrTarget(rawValue);
+
+    if (!target) {
+      showMicroToast('Nie udało się odczytać kodu QR. Spróbuj jeszcze raz, najlepiej przy lepszym świetle.', 'info', 'Aparat');
+      return;
+    }
+
+    showMicroToast('Kod QR odczytany. Otwieram właściwy ekran.', 'success', 'Aparat');
+    await openQrTarget(target);
+  } catch (error) {
+    showMicroToast('Aparat został otwarty, ale nie udało się odczytać kodu QR z tego zdjęcia.', 'info', 'Aparat');
+  } finally {
+    qrCameraState.busy = false;
+    if (qrCameraBtnEl) qrCameraBtnEl.disabled = false;
+    if (event.target) event.target.value = '';
+  }
+}
+
+function initQrCameraCapture() {
+  if (qrCameraState.bound) return;
+  if (qrCameraBtnEl) {
+    qrCameraBtnEl.addEventListener('click', openQrCameraCapture);
+  }
+  if (qrCameraInputEl) {
+    qrCameraInputEl.addEventListener('change', handleQrCameraCapture);
+  }
+  qrCameraState.bound = true;
 }
 
 function playSuccessMotion(element) {
@@ -3030,6 +3247,7 @@ window.onload = async () => {
   updateCountdown();
   setInterval(updateCountdown, 30000);
   bindUppercaseLoginFields();
+  initQrCameraCapture();
   deviceToken = getDeviceToken();
   gameRemainingElements = Array.from(document.querySelectorAll('[data-game-remaining]'));
   summaryRemainingElements = Array.from(document.querySelectorAll('[data-summary-remaining]'));
