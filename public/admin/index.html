@@ -216,6 +216,84 @@
     box-shadow: var(--shadow);
   }
 
+  .system-mini-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    margin: 0 0 14px;
+    padding: 10px 14px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: rgba(255, 255, 255, 0.04);
+  }
+
+  .system-mini-bar.ok {
+    background: linear-gradient(135deg, rgba(109, 255, 179, 0.16), rgba(183, 255, 72, 0.12));
+    border-color: rgba(109, 255, 179, 0.34);
+  }
+
+  .system-mini-bar.warning {
+    background: linear-gradient(135deg, rgba(255, 215, 109, 0.18), rgba(183, 255, 72, 0.08));
+    border-color: rgba(255, 215, 109, 0.34);
+  }
+
+  .system-mini-bar.error {
+    background: linear-gradient(135deg, rgba(255, 107, 129, 0.18), rgba(139, 92, 246, 0.08));
+    border-color: rgba(255, 107, 129, 0.34);
+  }
+
+  .system-mini-main {
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .system-mini-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--muted);
+    box-shadow: 0 0 0 0 transparent;
+    flex-shrink: 0;
+  }
+
+  .system-mini-bar.ok .system-mini-dot {
+    background: var(--success);
+    box-shadow: 0 0 16px rgba(109, 255, 179, 0.52);
+  }
+
+  .system-mini-bar.warning .system-mini-dot {
+    background: #ffd76d;
+    box-shadow: 0 0 16px rgba(255, 215, 109, 0.46);
+  }
+
+  .system-mini-bar.error .system-mini-dot {
+    background: var(--danger);
+    box-shadow: 0 0 16px rgba(255, 107, 129, 0.42);
+  }
+
+  .system-mini-text {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: .02em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .system-mini-meta {
+    flex-shrink: 0;
+    font-size: 11px;
+    font-weight: 700;
+    color: #d9e1f7;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    text-align: right;
+  }
+
   .system-bar.ok {
     background: linear-gradient(135deg, rgba(109, 255, 179, 0.18), rgba(183, 255, 72, 0.14));
     border-color: rgba(109, 255, 179, 0.34);
@@ -458,6 +536,18 @@
     color: #cffff0;
   }
 
+  .action-btn.integrity {
+    background: linear-gradient(135deg, rgba(255, 215, 109, 0.18), rgba(139, 92, 246, 0.1));
+    border-color: rgba(255, 215, 109, 0.34);
+    color: #fff0bf;
+  }
+
+  .action-btn.simulate {
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.24), rgba(109, 255, 179, 0.1));
+    border-color: rgba(139, 92, 246, 0.42);
+    color: #efe6ff;
+  }
+
   .admin-feedback {
     min-height: 22px;
     margin-top: 14px;
@@ -620,6 +710,11 @@
     grid-column: 1 / -1;
   }
 
+  .ops-card.simulator-card {
+    display: grid;
+    gap: 14px;
+  }
+
   .ops-title {
     font-family: 'Syne', sans-serif;
     font-size: 18px;
@@ -683,6 +778,22 @@
     gap: 10px;
     flex-wrap: wrap;
     align-items: center;
+  }
+
+  .simulator-actions {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .simulator-actions .btn {
+    width: 100%;
+  }
+
+  .simulator-meta {
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.5;
   }
 
   .ops-meta {
@@ -1118,6 +1229,14 @@
     border-radius: 20px;
   }
 
+  body.event-mode .system-mini-bar {
+    padding: 12px 16px;
+  }
+
+  body.event-mode .system-mini-text {
+    font-size: 14px;
+  }
+
   body.event-mode .system-bar-title {
     font-size: 19px;
   }
@@ -1194,6 +1313,10 @@
   body.event-mode .action-grid,
   body.event-mode .utility-grid {
     gap: 14px;
+  }
+
+  body.event-mode .simulator-actions {
+    gap: 12px;
   }
 
   body.event-mode .action-btn {
@@ -1859,6 +1982,16 @@
       align-items: flex-start;
     }
 
+    .system-mini-bar {
+      flex-direction: column;
+      align-items: flex-start;
+      border-radius: 18px;
+    }
+
+    .system-mini-meta {
+      text-align: left;
+    }
+
     .system-bar-main {
       width: 100%;
       align-items: flex-start;
@@ -1889,6 +2022,10 @@
       display: grid;
       grid-template-columns: 1fr;
     }
+
+    .simulator-actions {
+      grid-template-columns: 1fr;
+    }
   }
 </style>
 </head>
@@ -1917,6 +2054,13 @@
 </div>
 
 <div class="shell" id="admin-shell" style="display:none">
+  <div class="system-mini-bar warning" id="system-mini-bar">
+    <div class="system-mini-main">
+      <div class="system-mini-dot" id="system-mini-dot"></div>
+      <div class="system-mini-text" id="system-mini-text">System przygotowuje panel i czeka na pierwszą kontrolę.</div>
+    </div>
+    <div class="system-mini-meta" id="system-mini-meta">Status panelu</div>
+  </div>
   <div class="header-row">
     <div class="header-main">
       <div class="logo">Gwiazdka One Day 2026 - Panel Organizatora</div>
@@ -1987,9 +2131,17 @@
           Szybki test systemu
           <small>Baza, timer, pytania, bonusy i linki</small>
         </button>
+        <button class="action-btn integrity" id="btn-integrity-scan" onclick="runIntegrityScan()">
+          Skan integralności
+          <small>Widoki publiczne, logotypy, tła i kluczowe ścieżki</small>
+        </button>
         <button class="action-btn time" id="btn-extend" onclick="confirmAction('extend')">
           +10 minut gry
           <small>Przedłuża aktywną turę bez resetu</small>
+        </button>
+        <button class="action-btn simulate" id="btn-start-simulator" onclick="runStartSimulator(35)">
+          Symulator startu
+          <small>35 uczestnikow testowych zapisanych w bazie</small>
         </button>
       </div>
 
@@ -1998,8 +2150,8 @@
 
     <aside class="panel notes-panel">
       <div>
-        <div class="notes-title">Szybkie testy</div>
-        <div class="notes-copy">Najbezpieczniejszy cykl testowy to: uruchom grę, sprawdź logowanie i odpowiedzi, zatrzymaj grę, a potem wyczyść dane przed kolejną próbą.</div>
+        <div class="notes-title">Kontrola startu</div>
+        <div class="notes-copy">Przed finałem uruchom szybki test, skan integralności i dopiero potem właściwy start. Dzięki temu szybciej wychwycisz brakujące pliki, błędne ścieżki i problemy z liczeniem.</div>
       </div>
       <div class="checklist" id="quick-test-list">
         <div class="check-item pending">
@@ -2029,6 +2181,13 @@
             <div class="check-badge pending">Czeka</div>
           </div>
           <div class="check-item-sub">Sprawdzę, czy strona główna zawiera poprawne linki do Instagrama i Facebooka.</div>
+        </div>
+        <div class="check-item pending">
+          <div class="check-item-head">
+            <div class="check-item-title">Integralność publiczna</div>
+            <div class="check-badge pending">Czeka</div>
+          </div>
+          <div class="check-item-sub">Sprawdzę, czy widoki publiczne, logotypy i tło gry odpowiadają bez błędów.</div>
         </div>
       </div>
     </aside>
@@ -2071,6 +2230,35 @@
         <button class="btn outline" type="button" onclick="clearAnnouncementField()">Wyczyść pole</button>
       </div>
       <div class="ops-meta" id="announcement-meta">Komunikat możesz zmieniać w trakcie gry bez resetowania panelu.</div>
+    </section>
+
+    <section class="ops-card simulator-card">
+      <div class="ops-title">Symulator startu</div>
+      <div class="ops-copy">Generuje oddzielne dane testowe w bazie i przełącza panel oraz tablicę wyników na bezpieczny tryb podglądowy bez dotykania prawdziwej gry.</div>
+      <div class="simulator-actions">
+        <button class="btn outline" type="button" onclick="runStartSimulator(20)">20 uczestników</button>
+        <button class="btn primary" type="button" onclick="runStartSimulator(35)">35 uczestników</button>
+        <button class="btn outline" type="button" onclick="runStartSimulator(50)">50 uczestników</button>
+        <button class="btn outline" type="button" onclick="toggleTestMode('enable')">Pokaż test</button>
+        <button class="btn outline" type="button" onclick="toggleTestMode('disable')">Wróć do żywych</button>
+        <button class="btn outline" type="button" onclick="toggleTestMode('clear')">Wyczyść test</button>
+      </div>
+      <div class="qr-admin-summary">
+        <div class="qr-admin-pill" id="sim-total-participants">0 uczestników</div>
+        <div class="qr-admin-pill" id="sim-total-answers">0 odpowiedzi</div>
+        <div class="qr-admin-pill" id="sim-total-bonuses">0 bonusów</div>
+        <div class="qr-admin-pill" id="sim-total-cities">0 miast</div>
+      </div>
+      <div class="checklist" id="simulator-results">
+        <div class="check-item pending">
+          <div class="check-item-head">
+            <div class="check-item-title">Brak ostatniej symulacji</div>
+            <div class="check-badge pending">Czeka</div>
+          </div>
+          <div class="check-item-sub">Uruchom 20, 35 lub 50 uczestników, aby sprawdzić liczenie punktów, topkę i ranking miast.</div>
+        </div>
+      </div>
+      <div class="simulator-meta" id="simulator-meta">Symulator zapisuje oddzielne dane testowe w bazie i może przełączyć na nie panel admina oraz tablicę wyników.</div>
     </section>
 
     <section class="ops-card">
@@ -2474,10 +2662,15 @@ let isDataLoading = false;
 let pendingDataReload = false;
 let adminUnlocked = false;
 let pollingStarted = false;
+let activeDataScope = 'live';
+let testModeEnabled = false;
+let testModeSeededAt = null;
+let testModeParticipantCount = 0;
 let systemHealth = {
   state: 'unknown',
   data: 'unknown',
   quickTest: 'unknown',
+  integrity: 'unknown',
   note: 'Sprawdzam połączenie z backendem i czekam na pierwszy szybki test systemu.',
   updatedAt: null
 };
@@ -2594,8 +2787,8 @@ function isAdminAuthenticated() {
 
 function bootAdminPanel() {
   if (!adminUnlocked) return;
-  loadGameState();
   loadData();
+  loadGameState();
 
   if (!pollingStarted) {
     pollingStarted = true;
@@ -2687,6 +2880,9 @@ function renderSystemBar() {
   const title = document.getElementById('system-bar-title');
   const text = document.getElementById('system-bar-text');
   const meta = document.getElementById('system-bar-meta');
+  const miniBar = document.getElementById('system-mini-bar');
+  const miniText = document.getElementById('system-mini-text');
+  const miniMeta = document.getElementById('system-mini-meta');
 
   let level = 'warning';
   let badgeText = 'Ostrzeżenia';
@@ -2708,16 +2904,35 @@ function renderSystemBar() {
     badgeText = 'Problem';
     titleText = 'Jest problem';
     messageText = 'Szybki test wykrył problem. Sprawdź listę po prawej stronie i popraw błędny moduł.';
+  } else if (systemHealth.integrity === 'error') {
+    level = 'error';
+    badgeText = 'Problem';
+    titleText = 'Braki w integralności';
+    messageText = 'Skan integralności wykrył brakujący widok, plik albo błędną ścieżkę publiczną.';
   } else if (systemHealth.quickTest === 'ok' && systemHealth.state === 'ok' && systemHealth.data === 'ok') {
-    level = 'ok';
-    badgeText = 'Wszystko działa';
-    titleText = 'Wszystko działa';
-    messageText = 'Backend, dane panelu i szybki test wyglądają poprawnie.';
-  } else if (systemHealth.quickTest === 'running') {
+    if (systemHealth.integrity === 'ok') {
+      level = 'ok';
+      badgeText = 'Wszystko działa';
+      titleText = 'Wszystko działa';
+      messageText = 'Backend, dane panelu, szybki test i integralność publiczna wyglądają poprawnie.';
+    } else {
+      level = 'warning';
+      badgeText = 'Ostrzeżenia';
+      titleText = 'Są ostrzeżenia';
+      messageText = 'Panel i szybki test wyglądają dobrze, ale przed startem uruchom jeszcze skan integralności.';
+    }
+  } else if (systemHealth.quickTest === 'running' || systemHealth.integrity === 'running') {
     level = 'warning';
     badgeText = 'Sprawdzanie';
     titleText = 'Trwa sprawdzanie';
-    messageText = 'Trwa szybki test systemu: sprawdzam bazę, timer, pytania, bonusy i linki.';
+    messageText = systemHealth.integrity === 'running'
+      ? 'Trwa skan integralności: sprawdzam widoki publiczne, logotypy, tło i kluczowe ścieżki.'
+      : 'Trwa szybki test systemu: sprawdzam bazę, timer, pytania, bonusy i linki.';
+  } else if (systemHealth.state === 'ok' && systemHealth.data === 'ok' && systemHealth.integrity === 'ok') {
+    level = 'warning';
+    badgeText = 'Ostrzeżenia';
+    titleText = 'Brakuje pełnego testu';
+    messageText = 'Widoki i pliki publiczne są dostępne, ale przed startem uruchom jeszcze szybki test systemu.';
   } else if (systemHealth.state === 'ok' && systemHealth.data === 'ok') {
     level = 'warning';
     badgeText = 'Ostrzeżenia';
@@ -2732,6 +2947,18 @@ function renderSystemBar() {
   meta.textContent = systemHealth.updatedAt
     ? `Ostatnia kontrola: ${formatSystemHealthTime(systemHealth.updatedAt)}`
     : 'Brak pomiaru';
+
+  if (miniBar && miniText && miniMeta) {
+    miniBar.className = `system-mini-bar ${level}`;
+    miniText.textContent = level === 'ok'
+      ? 'System działa poprawnie.'
+      : level === 'error'
+        ? 'System wymaga pilnej uwagi.'
+        : 'Są ostrzeżenia przed startem.';
+    miniMeta.textContent = systemHealth.updatedAt
+      ? `Kontrola ${formatSystemHealthTime(systemHealth.updatedAt)}`
+      : 'Status panelu';
+  }
 }
 
 function updateSystemHealth(patch = {}) {
@@ -2986,7 +3213,7 @@ async function loadGameState() {
 
   isStateLoading = true;
   try {
-    const res = await fetch('/api/game-state');
+    const res = await fetch('/api/game-state?scope=active');
     const data = await res.json();
     announcementText = (data.announcement_text || '').trim();
     announcementUpdatedAt = data.announcement_updated_at || null;
@@ -2999,7 +3226,7 @@ async function loadGameState() {
 
       if (remaining > 0) {
         gamePhase = 'active';
-        setStatus('active', 'Gra trwa', 'Uczestnicy mogą aktualnie logować się i odpowiadać.');
+        setStatus('active', 'Gra trwa', testModeEnabled ? 'Aktywny jest zapisany w bazie tryb testowy.' : 'Uczestnicy mogą aktualnie logować się i odpowiadać.');
         syncActionButtons('active');
         updateLiveTimer();
         if (!timerInterval) timerInterval = setInterval(updateLiveTimer, 1000);
@@ -3008,7 +3235,7 @@ async function loadGameState() {
         summaryAt = new Date(data.summary_at || (Date.now() + 5 * 60000)).getTime();
         clearTimer();
         gamePhase = 'ended';
-        setStatus('ended', 'Gra zakończona', 'Czas gry minął. Możesz uruchomić nową turę lub wyczyścić dane.');
+        setStatus('ended', 'Gra zakończona', testModeEnabled ? 'Tryb testowy zakończył odliczanie. Możesz wrócić do danych żywych albo wygenerować nowy test.' : 'Czas gry minął. Możesz uruchomić nową turę lub wyczyścić dane.');
         syncActionButtons('ended');
         updateLiveTimer();
       }
@@ -3017,7 +3244,7 @@ async function loadGameState() {
       summaryAt = new Date(data.summary_at || (new Date(data.ended_at).getTime() + 5 * 60000)).getTime();
       clearTimer();
       gamePhase = 'ended';
-      setStatus('ended', 'Gra zakończona', 'Uczestnicy widzą zaproszenie do Teatru i licznik do podsumowania.');
+      setStatus('ended', 'Gra zakończona', testModeEnabled ? 'Widoki pokazują testowe podsumowanie i licznik do finału.' : 'Uczestnicy widzą zaproszenie do Teatru i licznik do podsumowania.');
       syncActionButtons('ended');
       updateLiveTimer();
     } else {
@@ -3026,7 +3253,7 @@ async function loadGameState() {
       clearTimer();
   gameDurationMs = (data.duration_minutes || 10) * 60 * 1000;
       gamePhase = 'idle';
-      setStatus('idle', 'Gra zatrzymana', 'Możesz uruchomić start gry albo wyczyścić dane testowe.');
+      setStatus('idle', testModeEnabled ? 'Tryb testowy gotowy' : 'Gra zatrzymana', testModeEnabled ? 'Panel pracuje na danych testowych. Możesz uruchomić testową turę albo wrócić do danych żywych.' : 'Możesz uruchomić start gry albo wyczyścić dane testowe.');
       syncActionButtons('idle');
       document.getElementById('live-timer').textContent = '--:--';
       document.getElementById('live-timer').classList.remove('warning');
@@ -3035,8 +3262,8 @@ async function loadGameState() {
     updateSystemHealth({
       state: 'ok',
       note: systemHealth.quickTest === 'ok'
-        ? 'Stan gry i dane panelu są dostępne, a szybki test potwierdził gotowość systemu.'
-        : 'Stan gry jest dostępny. Dla pełnej pewności uruchom szybki test systemu przed startem.'
+        ? (testModeEnabled ? 'Panel pokazuje zapisany w bazie tryb testowy, a szybki test potwierdził gotowość systemu.' : 'Stan gry i dane panelu są dostępne, a szybki test potwierdził gotowość systemu.')
+        : (testModeEnabled ? 'Panel pokazuje zapisany w bazie tryb testowy. Przed finałem wróć jeszcze do danych żywych i uruchom szybki test.' : 'Stan gry jest dostępny. Dla pełnej pewności uruchom szybki test systemu przed startem.')
     });
 
     renderOpsState();
@@ -3220,7 +3447,7 @@ async function startGame() {
     const res = await fetch('/api/game-state', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'start' })
+      body: JSON.stringify({ action: 'start', scope: 'active' })
     });
 
     if (!res.ok) throw new Error('Start gry nie powiódł się.');
@@ -3247,7 +3474,7 @@ async function stopGame() {
     const res = await fetch('/api/game-state', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'stop' })
+      body: JSON.stringify({ action: 'stop', scope: 'active' })
     });
 
     if (!res.ok) throw new Error('Stop gry nie powiódł się.');
@@ -3268,7 +3495,7 @@ async function confirmReset() {
     const res = await fetch('/api/game-state', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'reset' })
+      body: JSON.stringify({ action: 'reset', scope: 'active' })
     });
 
     if (!res.ok) throw new Error('Reset danych nie powiódł się.');
@@ -3303,7 +3530,7 @@ async function extendGameTime() {
     const res = await fetch('/api/game-state', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'extend-time', minutes: 10 })
+      body: JSON.stringify({ action: 'extend-time', minutes: 10, scope: 'active' })
     });
     const data = await res.json();
 
@@ -3333,7 +3560,7 @@ async function sendAnnouncement() {
     const res = await fetch('/api/game-state', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'set-announcement', message })
+      body: JSON.stringify({ action: 'set-announcement', message, scope: 'active' })
     });
     const data = await res.json();
 
@@ -3349,6 +3576,485 @@ async function sendAnnouncement() {
   }
 }
 
+async function runIntegrityScan() {
+  const button = document.getElementById('btn-integrity-scan');
+  button.disabled = true;
+  setAdminFeedback('Trwa skan integralności widoków i plików publicznych...');
+  updateSystemHealth({
+    integrity: 'running',
+    note: 'Trwa skan integralności: sprawdzam widoki publiczne, logotypy, tło i kluczowe ścieżki.'
+  });
+
+  try {
+    const report = await performIntegrityScan();
+    renderQuickTestResults(report.items);
+    setAdminFeedback(
+      report.ok
+        ? 'Skan integralności potwierdził, że widoki publiczne, logotypy i tło gry są gotowe.'
+        : 'Skan integralności wykrył problem. Sprawdź listę po prawej stronie.',
+      report.ok ? 'success' : 'error'
+    );
+    updateSystemHealth({
+      integrity: report.ok ? 'ok' : 'error',
+      note: report.ok
+        ? 'Skan integralności potwierdził poprawność widoków publicznych, logotypów i tła gry.'
+        : 'Skan integralności wykrył brakujący plik, widok albo błędną ścieżkę publiczną.'
+    });
+  } catch (error) {
+    console.error(error);
+    renderQuickTestResults([
+      {
+        label: 'Skan integralności',
+        status: 'error',
+        badge: 'Błąd',
+        message: 'Nie udało się zakończyć skanu integralności. Sprawdź połączenie z aplikacją.'
+      }
+    ]);
+    setAdminFeedback('Nie udało się zakończyć skanu integralności.', 'error');
+    updateSystemHealth({
+      integrity: 'error',
+      note: 'Nie udało się zakończyć skanu integralności.'
+    });
+  } finally {
+    button.disabled = false;
+  }
+}
+
+async function performIntegrityScan() {
+  const homeRes = await fetch('/', { cache: 'no-store' });
+  const homeHtml = await homeRes.text();
+
+  const checks = await Promise.all([
+    scanPublicResource({
+      label: 'Strona główna',
+      url: '/',
+      response: { ok: homeRes.ok, text: homeHtml },
+      validate: (text) => text.includes('Gwiazdka One Day 2026') && text.includes('/fundacjaoneday.svg') && text.includes('/energyliandia.svg'),
+      success: 'Strona główna odpowiada i zawiera logotypy wydarzenia.',
+      failure: 'Strona główna nie odpowiada poprawnie albo brakuje w niej logotypów.'
+    }),
+    scanPublicResource({
+      label: 'Tablica wyników',
+      url: '/wyniki/',
+      validate: (text) => text.includes('Gwiazdka One Day 2026') && text.includes('Ranking na zywo'),
+      success: 'Publiczna tablica wyników odpowiada poprawnie.',
+      failure: 'Tablica wyników nie odpowiada albo brakuje w niej głównego widoku.'
+    }),
+    scanPublicResource({
+      label: 'Widok pytania',
+      url: '/?q=1',
+      validate: (text) => text.includes('Gwiazdka One Day 2026'),
+      success: 'Ścieżka pytania odpowiada poprawnie.',
+      failure: 'Ścieżka pytania nie odpowiada poprawnie.'
+    }),
+    scanPublicResource({
+      label: 'Widok bonusu',
+      url: '/bonus/?b=B01',
+      validate: (text) => text.includes('Gwiazdka One Day 2026'),
+      success: 'Ścieżka bonusu odpowiada poprawnie.',
+      failure: 'Ścieżka bonusu nie odpowiada poprawnie.'
+    }),
+    scanPublicResource({
+      label: 'Logo Fundacja One Day',
+      url: '/fundacjaoneday.svg',
+      binary: true,
+      contentTypeIncludes: 'image/',
+      success: 'Plik logotypu Fundacji One Day jest dostępny publicznie.',
+      failure: 'Brakuje publicznego pliku fundacjaoneday.svg.'
+    }),
+    scanPublicResource({
+      label: 'Logo Energylandia',
+      url: '/energyliandia.svg',
+      binary: true,
+      contentTypeIncludes: 'image/',
+      success: 'Plik logotypu Energylandii jest dostępny publicznie.',
+      failure: 'Brakuje publicznego pliku energyliandia.svg.'
+    }),
+    scanPublicResource({
+      label: 'Tło gry',
+      url: '/tlo-gry.png',
+      binary: true,
+      contentTypeIncludes: 'image/',
+      success: 'Plik tła gry jest dostępny i gotowy dla widoków publicznych.',
+      failure: 'Brakuje publicznego pliku tlo-gry.png.'
+    }),
+    Promise.resolve({
+      label: 'Linki społecznościowe',
+      status: homeRes.ok && homeHtml.includes('https://www.instagram.com/fundacjaoneday/') && homeHtml.includes('https://www.facebook.com/fundacjaoneday') ? 'ok' : 'error',
+      badge: homeRes.ok && homeHtml.includes('https://www.instagram.com/fundacjaoneday/') && homeHtml.includes('https://www.facebook.com/fundacjaoneday') ? 'OK' : 'Błąd',
+      message: homeRes.ok && homeHtml.includes('https://www.instagram.com/fundacjaoneday/') && homeHtml.includes('https://www.facebook.com/fundacjaoneday')
+        ? 'Strona główna zawiera poprawne linki do Instagrama i Facebooka.'
+        : 'Na stronie głównej brakuje poprawnych linków społecznościowych.'
+    })
+  ]);
+
+  return {
+    ok: checks.every((item) => item.status === 'ok'),
+    items: checks
+  };
+}
+
+async function scanPublicResource({ label, url, response = null, validate = null, success, failure, contentTypeIncludes = '', binary = false }) {
+  try {
+    const res = response || await fetch(url, { cache: 'no-store' });
+    const text = binary ? '' : (response?.text ?? await res.text());
+    const contentType = res.headers?.get ? (res.headers.get('content-type') || '') : '';
+    const hasContentType = !contentTypeIncludes || contentType.includes(contentTypeIncludes);
+    const passesValidation = typeof validate === 'function' ? validate(text, res) : true;
+    const ok = Boolean(res.ok) && hasContentType && passesValidation;
+
+    return {
+      label,
+      status: ok ? 'ok' : 'error',
+      badge: ok ? 'OK' : 'Błąd',
+      message: ok ? success : failure
+    };
+  } catch (error) {
+    return {
+      label,
+      status: 'error',
+      badge: 'Błąd',
+      message: failure
+    };
+  }
+}
+
+async function runStartSimulator(participantCount = 35) {
+  const button = document.getElementById('btn-start-simulator');
+  if (button) button.disabled = true;
+
+  setAdminFeedback(`Generuję ${participantCount} uczestników testowych w bazie i przełączam panel na dane testowe...`);
+
+  try {
+    const res = await fetch('/api/test-mode', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'seed', participantCount })
+    });
+    const data = await res.json();
+
+    if (!res.ok || data.error) {
+      throw new Error(data.error || 'Nie udało się uruchomić trybu testowego.');
+    }
+
+    await loadData();
+    await loadGameState();
+    renderSimulatorSnapshot();
+    setAdminFeedback(data.message || `Wygenerowano ${participantCount} uczestników testowych.`, 'success');
+  } catch (error) {
+    console.error(error);
+    setAdminFeedback(error.message || 'Nie udało się uruchomić trybu testowego.', 'error');
+  } finally {
+    if (button) button.disabled = false;
+  }
+}
+
+function buildStartSimulation(participantCount = 35) {
+  const firstNames = ['Paweł', 'Julia', 'Maja', 'Kacper', 'Zuzanna', 'Jan', 'Lena', 'Antoni', 'Oliwia', 'Michał', 'Natalia', 'Szymon'];
+  const lastNames = ['Nowak', 'Kowalski', 'Wiśniewski', 'Wójcik', 'Kaczmarek', 'Mazur', 'Zieliński', 'Sikora', 'Kamińska', 'Król', 'Lewandowski', 'Sokołowska'];
+  const cities = ['ELBLĄG', 'MALBORK', 'GDAŃSK', 'GDYNIA', 'OLSZTYN', 'WARSZAWA', 'TORUŃ', 'SOPOT'];
+  const questionsTotal = Math.max(Number(questionCatalog.length || 0), 30);
+  const bonusesTotal = Math.max(Number(bonusCatalog.length || 0), 10);
+  const participants = [];
+  const answers = [];
+  const bonuses = [];
+
+  for (let index = 0; index < participantCount; index += 1) {
+    const firstName = firstNames[index % firstNames.length];
+    const lastName = lastNames[(index * 3) % lastNames.length];
+    const city = cities[(index * 5) % cities.length];
+    const answeredCount = Math.min(questionsTotal, 4 + (index % 9) + Math.floor(index / 7));
+    const correctCount = Math.min(answeredCount, Math.max(1, answeredCount - (index % 4)));
+    const bonusCount = Math.min(bonusesTotal, index % 4);
+    const score = correctCount + bonusCount;
+    const participantId = index + 1;
+    const lastActivity = new Date(Date.now() - index * 47000).toISOString();
+
+    participants.push({
+      id: participantId,
+      firstName,
+      lastName,
+      city,
+      email: `symulator${participantId}@test.local`,
+      answeredCount,
+      score,
+      bonusCount,
+      correctCount,
+      lastActivity
+    });
+
+    for (let answerIndex = 0; answerIndex < answeredCount; answerIndex += 1) {
+      answers.push({
+        participantId,
+        questionId: answerIndex + 1,
+        correct: answerIndex < correctCount
+      });
+    }
+
+    for (let bonusIndex = 0; bonusIndex < bonusCount; bonusIndex += 1) {
+      bonuses.push({
+        participantId,
+        bonusId: `B${String((bonusIndex % bonusesTotal) + 1).padStart(2, '0')}`
+      });
+    }
+  }
+
+  const rankedParticipants = [...participants]
+    .sort((a, b) =>
+      (b.score || 0) - (a.score || 0) ||
+      (b.answeredCount || 0) - (a.answeredCount || 0) ||
+      (a.lastName || '').localeCompare(b.lastName || '', 'pl') ||
+      (a.firstName || '').localeCompare(b.firstName || '', 'pl')
+    )
+    .map((participant, index) => ({ ...participant, rank: index + 1 }));
+
+  const cityStats = [...rankedParticipants.reduce((map, participant) => {
+    const current = map.get(participant.city) || {
+      city: participant.city,
+      score: 0,
+      participants: 0,
+      answers: 0
+    };
+    current.score += Number(participant.score || 0);
+    current.participants += 1;
+    current.answers += Number(participant.answeredCount || 0);
+    map.set(participant.city, current);
+    return map;
+  }, new Map()).values()]
+    .sort((a, b) =>
+      b.score - a.score ||
+      b.participants - a.participants ||
+      a.city.localeCompare(b.city, 'pl')
+    );
+
+  const totalAnswers = answers.length;
+  const totalBonuses = bonuses.length;
+  const totalScore = rankedParticipants.reduce((sum, participant) => sum + Number(participant.score || 0), 0);
+  const cityScoreTotal = cityStats.reduce((sum, city) => sum + Number(city.score || 0), 0);
+  const scoreMatches = rankedParticipants.every((participant) => participant.score === participant.correctCount + participant.bonusCount);
+  const answersMatch = totalAnswers === rankedParticipants.reduce((sum, participant) => sum + Number(participant.answeredCount || 0), 0);
+  const cityAggregationMatches = totalScore === cityScoreTotal;
+  const rankingStable = rankedParticipants.every((participant, index, list) =>
+    index === 0 ||
+    (list[index - 1].score > participant.score) ||
+    (list[index - 1].score === participant.score && (list[index - 1].answeredCount || 0) >= (participant.answeredCount || 0))
+  );
+  const ok = scoreMatches && answersMatch && cityAggregationMatches && rankingStable;
+
+  return {
+    ok,
+    participantCount,
+    totalAnswers,
+    totalBonuses,
+    cityCount: cityStats.length,
+    topParticipant: rankedParticipants[0] || null,
+    topCity: cityStats[0] || null,
+    checks: [
+      {
+        label: 'Liczba uczestników',
+        status: rankedParticipants.length === participantCount ? 'ok' : 'error',
+        badge: rankedParticipants.length === participantCount ? 'OK' : 'Błąd',
+        message: `Wygenerowano ${rankedParticipants.length} z ${participantCount} uczestników testowych.`
+      },
+      {
+        label: 'Punkty i bonusy',
+        status: scoreMatches ? 'ok' : 'error',
+        badge: scoreMatches ? 'OK' : 'Błąd',
+        message: scoreMatches
+          ? 'Każdy wynik uczestnika zgadza się z liczbą poprawnych odpowiedzi i bonusów.'
+          : 'W symulacji pojawiła się rozbieżność między punktami a poprawnymi odpowiedziami lub bonusami.'
+      },
+      {
+        label: 'Odpowiedzi',
+        status: answersMatch ? 'ok' : 'error',
+        badge: answersMatch ? 'OK' : 'Błąd',
+        message: answersMatch
+          ? `Łącznie policzono ${totalAnswers} odpowiedzi i suma zgadza się z kartami uczestników.`
+          : 'Suma odpowiedzi nie zgadza się z liczbą odpowiedzi przypisaną uczestnikom.'
+      },
+      {
+        label: 'Ranking miast',
+        status: cityAggregationMatches ? 'ok' : 'error',
+        badge: cityAggregationMatches ? 'OK' : 'Błąd',
+        message: cityAggregationMatches
+          ? `Punkty miast sumują się poprawnie. Liderem jest ${cityStats[0]?.city || '—'}.`
+          : 'Suma punktów miast nie zgadza się z łącznym wynikiem uczestników.'
+      },
+      {
+        label: 'Topka i remisy',
+        status: rankingStable ? 'ok' : 'error',
+        badge: rankingStable ? 'OK' : 'Błąd',
+        message: rankingStable
+          ? 'Sortowanie uczestników pozostaje stabilne nawet przy zbliżonych wynikach.'
+          : 'Wykryto problem z kolejnością uczestników o podobnych wynikach.'
+      }
+    ]
+  };
+}
+
+function renderStartSimulation(report) {
+  const participantsEl = document.getElementById('sim-total-participants');
+  const answersEl = document.getElementById('sim-total-answers');
+  const bonusesEl = document.getElementById('sim-total-bonuses');
+  const citiesEl = document.getElementById('sim-total-cities');
+  const list = document.getElementById('simulator-results');
+  const meta = document.getElementById('simulator-meta');
+
+  participantsEl.textContent = `${report.participantCount} uczestników`;
+  answersEl.textContent = `${report.totalAnswers} odpowiedzi`;
+  bonusesEl.textContent = `${report.totalBonuses} bonusów`;
+  citiesEl.textContent = `${report.cityCount} miast`;
+
+  list.innerHTML = report.checks.map((item) => `
+    <div class="check-item ${item.status}">
+      <div class="check-item-head">
+        <div class="check-item-title">${escHtml(item.label)}</div>
+        <div class="check-badge ${item.status}">${escHtml(item.badge)}</div>
+      </div>
+      <div class="check-item-sub">${escHtml(item.message)}</div>
+    </div>
+  `).join('');
+
+  meta.textContent = report.topParticipant && report.topCity
+    ? `Lider testu: ${report.topParticipant.firstName} ${report.topParticipant.lastName} (${report.topParticipant.score} pkt) | Lider miast: ${report.topCity.city} (${report.topCity.score} pkt).`
+    : 'Symulator korzysta z tych samych zasad liczenia co panel, ale nie modyfikuje prawdziwych wyników.';
+}
+
+function buildPersistedSimulationReport() {
+  const cityMap = new Map();
+  allParticipants.forEach((participant) => {
+    const cityName = (participant.city || '').trim() || 'BEZ MIASTA';
+    const current = cityMap.get(cityName) || { city: cityName, score: 0, participants: 0 };
+    current.score += Number(participant.score || 0);
+    current.participants += 1;
+    cityMap.set(cityName, current);
+  });
+
+  const cityStats = [...cityMap.values()].sort((a, b) => b.score - a.score || a.city.localeCompare(b.city, 'pl'));
+  const topParticipant = [...allParticipants].sort((a, b) => (b.score || 0) - (a.score || 0) || (b.answeredCount || 0) - (a.answeredCount || 0))[0] || null;
+  const topCity = cityStats[0] || null;
+  const answersOk = allAnswers.length >= allParticipants.length;
+  const cityOk = cityStats.length >= 2;
+  const rankOk = allParticipants.every((participant, index, list) => {
+    if (index === 0) return true;
+    return Number(list[index - 1].score || 0) >= Number(participant.score || 0);
+  });
+
+  return {
+    participantCount: allParticipants.length,
+    totalAnswers: allAnswers.length,
+    totalBonuses: allBonuses.length,
+    cityCount: cityStats.length,
+    topParticipant,
+    topCity,
+    ok: activeDataScope === 'test' && allParticipants.length > 0 && answersOk && cityOk && rankOk,
+    checks: [
+      {
+        label: 'Tryb danych',
+        status: activeDataScope === 'test' ? 'ok' : 'pending',
+        badge: activeDataScope === 'test' ? 'TEST' : 'LIVE',
+        message: activeDataScope === 'test'
+          ? 'Panel i tablica wyników korzystają aktualnie z danych testowych zapisanych w bazie.'
+          : 'Panel pokazuje teraz dane żywe. Włącz test, aby zobaczyć ranking symulacyjny.'
+      },
+      {
+        label: 'Ranking uczestników',
+        status: rankOk && allParticipants.length ? 'ok' : 'warning',
+        badge: rankOk && allParticipants.length ? 'OK' : 'Uwaga',
+        message: allParticipants.length
+          ? `Załadowano ${allParticipants.length} uczestników testowych i ranking jest uporządkowany malejąco po punktach.`
+          : 'Brak zapisanych uczestników testowych.'
+      },
+      {
+        label: 'Odpowiedzi i bonusy',
+        status: answersOk ? 'ok' : 'warning',
+        badge: answersOk ? 'OK' : 'Uwaga',
+        message: `Baza zwróciła ${allAnswers.length} odpowiedzi oraz ${allBonuses.length} bonusów dla danych testowych.`
+      },
+      {
+        label: 'Punkty miast',
+        status: cityOk ? 'ok' : 'warning',
+        badge: cityOk ? 'OK' : 'Uwaga',
+        message: cityStats.length
+          ? `W rankingu miast widać ${cityStats.length} miast, a liderem jest ${topCity?.city || '---'}.`
+          : 'Brak wystarczających danych miast w trybie testowym.'
+      }
+    ]
+  };
+}
+
+function renderSimulatorSnapshot() {
+  if (activeDataScope !== 'test') {
+    renderStartSimulation({
+      participantCount: 0,
+      totalAnswers: 0,
+      totalBonuses: 0,
+      cityCount: 0,
+      topParticipant: null,
+      topCity: null,
+      checks: [
+        {
+          label: 'Tryb danych',
+          status: 'pending',
+          badge: 'LIVE',
+          message: 'Panel pokazuje obecnie dane żywe. Wygeneruj test albo włącz ostatni zapisany tryb testowy.'
+        }
+      ]
+    });
+
+    const meta = document.getElementById('simulator-meta');
+    if (meta) {
+      meta.textContent = testModeParticipantCount
+        ? `W bazie czeka zapisany test dla ${testModeParticipantCount} uczestników. Kliknij "Pokaż test", aby przełączyć widoki.`
+        : 'Tryb testowy jest wyłączony. Wygeneruj dane testowe, aby przejść na ranking symulacyjny.';
+    }
+    return;
+  }
+
+  renderStartSimulation(buildPersistedSimulationReport());
+
+  const meta = document.getElementById('simulator-meta');
+  if (!meta) return;
+
+  if (activeDataScope === 'test') {
+    const seededText = testModeSeededAt
+      ? `Dane testowe zapisano ${new Date(testModeSeededAt).toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' })}.`
+      : 'Dane testowe są zapisane w bazie.';
+    meta.textContent = `${seededText} Panel pokazuje ${testModeParticipantCount || allParticipants.length} uczestników testowych.`;
+  }
+}
+
+async function toggleTestMode(action) {
+  setAdminFeedback(
+    action === 'clear'
+      ? 'Usuwam dane testowe i wracam do danych żywych...'
+      : action === 'disable'
+        ? 'Wracam do danych żywych...'
+        : 'Przełączam panel na dane testowe...'
+  );
+
+  try {
+    const res = await fetch('/api/test-mode', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action })
+    });
+    const data = await res.json();
+
+    if (!res.ok || data.error) {
+      throw new Error(data.error || 'Nie udało się przełączyć trybu testowego.');
+    }
+
+    await loadData();
+    await loadGameState();
+    renderSimulatorSnapshot();
+    setAdminFeedback(data.message || 'Tryb testowy został zaktualizowany.', 'success');
+  } catch (error) {
+    console.error(error);
+    setAdminFeedback(error.message || 'Nie udało się przełączyć trybu testowego.', 'error');
+  }
+}
+
 async function runQuickTest() {
   const button = document.getElementById('btn-quick-test');
   button.disabled = true;
@@ -3360,7 +4066,7 @@ async function runQuickTest() {
 
   try {
     const [stateRes, adminRes, homeRes] = await Promise.all([
-      fetch('/api/game-state'),
+      fetch('/api/game-state?scope=active'),
       fetch('/api/admin-results'),
       fetch('/')
     ]);
@@ -3477,10 +4183,15 @@ async function loadData() {
     allParticipants = data.participants || [];
     allAnswers = data.answers || [];
     allBonuses = data.bonuses || [];
+    activeDataScope = data.dataScope || 'live';
+    testModeEnabled = Boolean(data.testModeEnabled);
+    testModeParticipantCount = Number(data.testParticipantCount || 0);
+    testModeSeededAt = data.testSeededAt || null;
     questionCatalog = data.questionCatalog || [];
     bonusCatalog = data.bonusCatalog || [];
     liveActivity = data.liveActivity || { liveParticipants: [], hottestQuestions: [], recentActivity: [] };
     questionStats = computeQuestionStats(allAnswers);
+    await loadGameState();
 
     updateSystemHealth({
       data: 'ok',
@@ -3490,6 +4201,7 @@ async function loadData() {
     });
 
     renderVisibleData();
+    renderSimulatorSnapshot();
     renderPlayerPreview();
   } catch (e) {
     console.error(e);
