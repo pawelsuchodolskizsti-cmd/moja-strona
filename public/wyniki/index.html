@@ -1246,6 +1246,131 @@
     color: var(--muted);
   }
 
+
+  .reveal-lock {
+    position: relative;
+    overflow: hidden;
+    min-height: 150px;
+    padding: 26px 22px;
+    border-radius: 22px;
+    border: 1px solid rgba(255, 212, 90, 0.34);
+    background:
+      radial-gradient(circle at 18% 12%, rgba(200, 255, 57, 0.2), transparent 30%),
+      radial-gradient(circle at 82% 0%, rgba(255, 61, 107, 0.18), transparent 34%),
+      linear-gradient(135deg, rgba(255, 255, 255, 0.92), rgba(255, 248, 225, 0.9));
+    display: grid;
+    place-items: center;
+    text-align: center;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.56), 0 18px 46px rgba(48, 38, 96, 0.1);
+  }
+
+  .reveal-lock::before,
+  .reveal-lock::after {
+    content: '';
+    position: absolute;
+    inset: -40% auto auto -18%;
+    width: 52%;
+    height: 190%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.72), transparent);
+    transform: rotate(18deg);
+    animation: suspenseSweep 3.2s ease-in-out infinite;
+    pointer-events: none;
+  }
+
+  .reveal-lock::after {
+    left: auto;
+    right: -22%;
+    animation-delay: 1.35s;
+  }
+
+  .reveal-stage-label {
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    color: #7a6c2e;
+    margin-bottom: 10px;
+  }
+
+  .reveal-stage-title {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(24px, 2.5vw, 38px);
+    font-weight: 900;
+    line-height: .98;
+    letter-spacing: -.04em;
+    color: #2f2750;
+    margin-bottom: 10px;
+  }
+
+  .reveal-stage-copy {
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.45;
+    max-width: 46ch;
+    margin: 0 auto;
+  }
+
+  .reveal-flash {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    pointer-events: none;
+    display: grid;
+    place-items: center;
+    background:
+      radial-gradient(circle at center, rgba(255, 255, 255, 0.96), rgba(255, 61, 107, 0.36) 36%, rgba(47, 39, 80, 0.1) 68%, transparent 100%);
+    animation: revealFlashOut 2.2s ease forwards;
+  }
+
+  .reveal-flash-card {
+    width: min(78vw, 900px);
+    padding: 42px 46px;
+    border-radius: 36px;
+    text-align: center;
+    color: #2f2750;
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(255, 212, 90, 0.38);
+    box-shadow: 0 34px 90px rgba(48, 38, 96, 0.24);
+    animation: revealCardPop 1.7s cubic-bezier(.18,.92,.22,1) forwards;
+  }
+
+  .reveal-flash-kicker {
+    font-size: 14px;
+    font-weight: 900;
+    letter-spacing: .22em;
+    text-transform: uppercase;
+    color: #db4ea1;
+    margin-bottom: 12px;
+  }
+
+  .reveal-flash-title {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(42px, 7vw, 108px);
+    font-weight: 900;
+    line-height: .86;
+    letter-spacing: -.06em;
+  }
+
+  @keyframes suspenseSweep {
+    0% { transform: translateX(-18%) rotate(18deg); opacity: 0; }
+    32% { opacity: .72; }
+    72% { opacity: .22; }
+    100% { transform: translateX(230%) rotate(18deg); opacity: 0; }
+  }
+
+  @keyframes revealFlashOut {
+    0% { opacity: 0; }
+    12% { opacity: 1; }
+    72% { opacity: 1; }
+    100% { opacity: 0; }
+  }
+
+  @keyframes revealCardPop {
+    0% { transform: translateY(24px) scale(.92); filter: blur(10px); }
+    28% { transform: translateY(0) scale(1); filter: blur(0); }
+    100% { transform: translateY(-8px) scale(1.02); }
+  }
+
   .empty-state {
     padding: 18px;
     border-radius: 18px;
@@ -1447,6 +1572,8 @@ let cachedLeaderboardKey = '';
 let cachedSortedLeaderboard = [];
 let cachedCityLeadersKey = '';
 let cachedCityLeaders = [];
+let lastRawRevealState = { participants: null, cities: null };
+let lastResultsLockKey = '';
 
 const SCOREBOARD_CACHE_MS = 4000;
 const SCOREBOARD_SYNC_COOLDOWN_MS = 1200;
@@ -1513,6 +1640,51 @@ function isSuspenseMode() {
   return remaining !== null && remaining > 0 && remaining <= SUSPENSE_THRESHOLD_MS;
 }
 
+function getRawRevealState() {
+  const reveal = scoreboardState.resultsReveal || {};
+  return {
+    participants: Boolean(reveal.participantsAt || scoreboardState.results_participants_revealed_at),
+    cities: Boolean(reveal.citiesAt || scoreboardState.results_cities_revealed_at)
+  };
+}
+
+function getResultsRevealState() {
+  const raw = getRawRevealState();
+  const lockedByFinale = isSuspenseMode() || scoreboardState.phase === 'ended' || scoreboardState.phase === 'thanks';
+  return {
+    lockedByFinale,
+    participantsVisible: !lockedByFinale || raw.participants,
+    citiesVisible: !lockedByFinale || raw.cities
+  };
+}
+
+function getRevealLockMarkup(title, copy, stage) {
+  return `
+    <div class="reveal-lock">
+      <div>
+        <div class="reveal-stage-label">${stage}</div>
+        <div class="reveal-stage-title">${title}</div>
+        <p class="reveal-stage-copy">${copy}</p>
+      </div>
+    </div>
+  `;
+}
+
+function triggerRevealMoment(type) {
+  const existing = document.querySelector('.reveal-flash');
+  if (existing) existing.remove();
+  const overlay = document.createElement('div');
+  overlay.className = 'reveal-flash';
+  const isCities = type === 'cities';
+  overlay.innerHTML = `
+    <div class="reveal-flash-card">
+      <div class="reveal-flash-kicker">${isCities ? 'Etap drugi' : 'Etap pierwszy'}</div>
+      <div class="reveal-flash-title">${isCities ? 'Ranking miast' : 'Wyniki uczestników'}</div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  setTimeout(() => overlay.remove(), 2300);
+}
 function getCityStats() {
   const cacheKey = `${scoreboardState.updatedAt || 'none'}|${scoreboardState.leaderboard.length}|${scoreboardState.cityStats.length}`;
   if (cachedCityStatsKey === cacheKey) {
@@ -1691,12 +1863,12 @@ function renderStats() {
 
 function renderCityStats() {
   const container = document.getElementById('city-ranking');
-  const suspenseMode = isSuspenseMode();
+  const revealState = getResultsRevealState();
   const cityStats = getCityStats();
   const projectionMode = document.body.classList.contains('projection-mode');
 
-  if (suspenseMode) {
-    container.innerHTML = '<div class="empty-state" style="grid-column:1 / -1;">Punkty miast sa chwilowo ukryte.<br>Pelny widok wroci po zakonczeniu gry.</div>';
+  if (!revealState.citiesVisible) {
+    container.innerHTML = getRevealLockMarkup('Punkty miast są zasłonięte', 'Miasta odsłonimy w drugim kroku, kiedy organizator uruchomi finałowe pokazanie rankingu.', 'Miasta czekają na odsłonięcie');
     return;
   }
 
@@ -1725,13 +1897,13 @@ function renderCityStats() {
 function renderCityPodium() {
   const podium = document.getElementById('podium');
   const podiumCopy = document.getElementById('podium-copy');
-  const suspenseMode = isSuspenseMode();
+  const revealState = getResultsRevealState();
   const top = getCityLeaders();
   const variants = ['gold', 'silver', 'bronze'];
 
-  if (suspenseMode) {
-    podiumCopy.textContent = 'Top 3 miast zostalo zamkniete na ostatnie 3 minuty. Wielki final jest juz bardzo blisko.';
-    podium.innerHTML = '<div class="empty-state">Top 3 miast jest ukryte.<br>Pelne podium odslonimy dopiero po koncu gry.</div>';
+  if (!revealState.citiesVisible) {
+    podiumCopy.textContent = 'Ranking miast jest zasłonięty na finał. Najpierw odsłaniamy uczestników, potem miasta.';
+    podium.innerHTML = getRevealLockMarkup('Top 3 miast za chwilę', 'Podium miast pozostaje ukryte, żeby finał miał mocniejsze napięcie na sali.', 'Drugi etap odsłonięcia');
     return;
   }
 
@@ -1756,12 +1928,12 @@ function renderCityPodium() {
 
 function renderLeaderboardList() {
   const container = document.getElementById('leaderboard-list');
-  const suspenseMode = isSuspenseMode();
+  const revealState = getResultsRevealState();
   const projectionMode = document.body.classList.contains('projection-mode');
   const sorted = getSortedLeaderboard().slice(0, projectionMode ? 4 : 5);
 
-  if (suspenseMode) {
-    container.innerHTML = '<div class="empty-state">Najlepsi uczestnicy sa ukryci.<br>Za chwile poznamy finalowy uklad rankingu.</div>';
+  if (!revealState.participantsVisible) {
+    container.innerHTML = getRevealLockMarkup('Wyniki uczestników są zasłonięte', 'Tablica trzyma napięcie do momentu, gdy admin uruchomi pierwsze odsłonięcie.', 'Pierwszy etap odsłonięcia');
     return;
   }
 
@@ -1817,7 +1989,9 @@ async function loadScoreboard(force = false) {
         data.summaryAt || '',
         data.durationMinutes || 0,
         Array.isArray(data.leaderboard) ? data.leaderboard.length : 0,
-        Array.isArray(data.cityStats) ? data.cityStats.length : 0
+        Array.isArray(data.cityStats) ? data.cityStats.length : 0,
+        data.resultsReveal?.participantsAt || '',
+        data.resultsReveal?.citiesAt || ''
       ].join('|');
 
       scoreboardState = {
@@ -1825,9 +1999,18 @@ async function loadScoreboard(force = false) {
         ...data,
         stats: data.stats || { participants: 0, answers: 0, bonuses: 0 },
         leaderboard: Array.isArray(data.leaderboard) ? data.leaderboard : [],
-        cityStats: Array.isArray(data.cityStats) ? data.cityStats : []
+        cityStats: Array.isArray(data.cityStats) ? data.cityStats : [],
+        resultsReveal: data.resultsReveal || { participantsAt: null, citiesAt: null }
       };
       scoreboardFetchedAt = Date.now();
+
+      const incomingReveal = {
+        participants: Boolean(data.resultsReveal?.participantsAt || data.results_participants_revealed_at),
+        cities: Boolean(data.resultsReveal?.citiesAt || data.results_cities_revealed_at)
+      };
+      if (lastRawRevealState.participants === false && incomingReveal.participants) triggerRevealMoment('participants');
+      if (lastRawRevealState.cities === false && incomingReveal.cities) triggerRevealMoment('cities');
+      lastRawRevealState = incomingReveal;
 
       if (lastScoreboardVersion !== nextVersion) {
         cachedCityStatsKey = '';
@@ -1922,6 +2105,13 @@ window.onload = async () => {
   document.addEventListener('msfullscreenchange', updateProjectionButton);
   setInterval(() => {
     renderHeader();
+    const nextLockKey = JSON.stringify(getResultsRevealState());
+    if (nextLockKey !== lastResultsLockKey) {
+      lastResultsLockKey = nextLockKey;
+      renderCityStats();
+      renderCityPodium();
+      renderLeaderboardList();
+    }
   }, 1000);
   setInterval(() => {
     if (!document.hidden) {
@@ -1946,3 +2136,6 @@ window.onload = async () => {
 </script>
 </body>
 </html>
+
+
+

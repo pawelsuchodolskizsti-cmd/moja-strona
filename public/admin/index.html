@@ -548,6 +548,75 @@
     color: #efe6ff;
   }
 
+
+  .reveal-control-card {
+    position: relative;
+    overflow: hidden;
+    border-color: rgba(183, 255, 72, 0.28);
+    background:
+      radial-gradient(circle at 88% 0%, rgba(183, 255, 72, 0.16), transparent 36%),
+      linear-gradient(180deg, rgba(18, 23, 34, 0.98), rgba(12, 16, 24, 0.98));
+  }
+
+  .reveal-status-row {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+    margin: 14px 0;
+  }
+
+  .reveal-step {
+    min-height: 74px;
+    padding: 13px 14px;
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    background: rgba(255, 255, 255, 0.03);
+  }
+
+  .reveal-step strong {
+    display: block;
+    color: var(--text);
+    font-size: 14px;
+    margin-bottom: 6px;
+  }
+
+  .reveal-step span {
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.35;
+  }
+
+  .reveal-step.active {
+    border-color: rgba(183, 255, 72, 0.54);
+    background: linear-gradient(135deg, rgba(183, 255, 72, 0.16), rgba(109, 255, 179, 0.08));
+    box-shadow: 0 0 0 1px rgba(183, 255, 72, 0.12);
+  }
+
+  .reveal-actions {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .btn.reveal-primary {
+    background: linear-gradient(135deg, #b7ff48, #6dffb3);
+    color: #13200b;
+    box-shadow: 0 16px 28px rgba(183, 255, 72, 0.12);
+  }
+
+  .btn.reveal-gold {
+    background: linear-gradient(135deg, #ffd76d, #ff4f9a);
+    color: #fff;
+    box-shadow: 0 16px 28px rgba(255, 215, 109, 0.12);
+  }
+
+  .reveal-meta {
+    margin-top: 12px;
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.45;
+  }
+
   .admin-feedback {
     min-height: 22px;
     margin-top: 14px;
@@ -2217,6 +2286,30 @@
       </div>
     </section>
 
+    <section class="ops-card reveal-control-card">
+      <div class="ops-title">Odsłanianie wyników</div>
+      <div class="ops-copy">To steruje blokadą z końcówki gry na publicznej tablicy. Najpierw odsłoń uczestników, potem miasta, żeby finał miał mocniejszy efekt.</div>
+      <div class="reveal-status-row">
+        <div class="reveal-step" id="reveal-step-lock">
+          <strong>Blokada finałowa</strong>
+          <span>W ostatnich minutach wyniki chowają się automatycznie.</span>
+        </div>
+        <div class="reveal-step" id="reveal-step-players">
+          <strong>Etap 1: osoby</strong>
+          <span id="reveal-players-label">Czeka na odsłonięcie.</span>
+        </div>
+        <div class="reveal-step" id="reveal-step-cities">
+          <strong>Etap 2: miasta</strong>
+          <span id="reveal-cities-label">Czeka na odsłonięcie.</span>
+        </div>
+      </div>
+      <div class="reveal-actions">
+        <button class="btn reveal-primary" id="btn-reveal-participants" type="button" onclick="confirmAction('reveal-participants')">Odsłoń osoby</button>
+        <button class="btn reveal-gold" id="btn-reveal-cities" type="button" onclick="confirmAction('reveal-cities')">Odsłoń miasta</button>
+        <button class="btn outline" id="btn-lock-results" type="button" onclick="confirmAction('lock-results')">Zablokuj ponownie</button>
+      </div>
+      <div class="reveal-meta" id="reveal-results-meta">Start lub reset gry automatycznie zamknie wyniki od nowa.</div>
+    </section>
     <section class="ops-card">
       <div class="ops-title">Komunikat i czas gry</div>
       <div class="ops-copy">Wyślij krótką informację do wszystkich graczy. Pojawi się na ich ekranie przy najbliższym odświeżeniu stanu gry.</div>
@@ -2653,6 +2746,8 @@ let currentParticipantId = null;
 let gamePhase = 'idle';
 let announcementText = '';
 let announcementUpdatedAt = null;
+let resultsParticipantsRevealedAt = null;
+let resultsCitiesRevealedAt = null;
 let previewMode = 'current';
 let pendingAction = null;
 let currentTab = 'leaderboard';
@@ -3091,6 +3186,41 @@ function previewBannerHtml() {
     : '';
 }
 
+function renderRevealControls() {
+  const playersStep = document.getElementById('reveal-step-players');
+  const citiesStep = document.getElementById('reveal-step-cities');
+  const lockStep = document.getElementById('reveal-step-lock');
+  const playersLabel = document.getElementById('reveal-players-label');
+  const citiesLabel = document.getElementById('reveal-cities-label');
+  const meta = document.getElementById('reveal-results-meta');
+  const playersBtn = document.getElementById('btn-reveal-participants');
+  const citiesBtn = document.getElementById('btn-reveal-cities');
+  const lockBtn = document.getElementById('btn-lock-results');
+  if (!playersStep || !citiesStep || !lockStep) return;
+
+  const playersOpen = Boolean(resultsParticipantsRevealedAt);
+  const citiesOpen = Boolean(resultsCitiesRevealedAt);
+  const finaleWindow = gamePhase === 'active' || gamePhase === 'ended';
+
+  playersStep.classList.toggle('active', playersOpen);
+  citiesStep.classList.toggle('active', citiesOpen);
+  lockStep.classList.toggle('active', !playersOpen && !citiesOpen && finaleWindow);
+
+  playersLabel.textContent = playersOpen ? `Odsłonięto ${formatAnnouncementTime(resultsParticipantsRevealedAt)}.` : 'Czeka na odsłonięcie.';
+  citiesLabel.textContent = citiesOpen ? `Odsłonięto ${formatAnnouncementTime(resultsCitiesRevealedAt)}.` : 'Czeka na odsłonięcie.';
+
+  if (playersBtn) playersBtn.disabled = playersOpen;
+  if (citiesBtn) citiesBtn.disabled = citiesOpen || !playersOpen;
+  if (lockBtn) lockBtn.disabled = !playersOpen && !citiesOpen;
+
+  if (meta) {
+    meta.textContent = citiesOpen
+      ? 'Pełny ranking jest odsłonięty na tablicy wyników.'
+      : playersOpen
+        ? 'Uczestnicy są odsłonięci. Kolejny krok to spektakularne pokazanie rankingu miast.'
+        : 'Wyniki pozostają zasłonięte w finale. Odsłanianie działa etapami: najpierw osoby, potem miasta.';
+  }
+}
 function renderPlayerPreview() {
   const container = document.getElementById('player-preview');
   const phaseLabel = document.getElementById('player-preview-phase');
@@ -3217,6 +3347,8 @@ async function loadGameState() {
     const data = await res.json();
     announcementText = (data.announcement_text || '').trim();
     announcementUpdatedAt = data.announcement_updated_at || null;
+    resultsParticipantsRevealedAt = data.results_participants_revealed_at || null;
+    resultsCitiesRevealedAt = data.results_cities_revealed_at || null;
 
     if (data.started_at) {
       summaryAt = null;
@@ -3267,6 +3399,7 @@ async function loadGameState() {
     });
 
     renderOpsState();
+    renderRevealControls();
     renderPlayerPreview();
   } catch (e) {
     console.error(e);
@@ -3278,6 +3411,7 @@ async function loadGameState() {
       note: 'Panel nie może odczytać bieżącego stanu gry z backendu.'
     });
     renderOpsState();
+    renderRevealControls();
     renderPlayerPreview();
   } finally {
     isStateLoading = false;
@@ -3309,6 +3443,7 @@ function syncActionButtons(state) {
   startBtn.disabled = state === 'active';
   stopBtn.disabled = state !== 'active';
   extendBtn.disabled = state !== 'active';
+  renderRevealControls();
 }
 
 function clearTimer() {
@@ -3389,6 +3524,21 @@ function confirmAction(action) {
       title: 'Wysłać komunikat do graczy?',
       copy: `Komunikat pojawi się u graczy na wszystkich ekranach: "${messageValue}"`,
       button: 'Tak, wyślij komunikat'
+    },
+    'reveal-participants': {
+      title: 'Odsłonić wyniki uczestników?',
+      copy: 'Na tablicy wyników pojawi się mocna animacja i ranking najlepszych osób.',
+      button: 'Tak, odsłoń osoby'
+    },
+    'reveal-cities': {
+      title: 'Odsłonić ranking miast?',
+      copy: 'To drugi etap finału: po osobach tablica pokaże Top 3 miast i punkty miast.',
+      button: 'Tak, odsłoń miasta'
+    },
+    'lock-results': {
+      title: 'Zablokować wyniki ponownie?',
+      copy: 'Tablica wyników wróci do zasłoniętego finałowego widoku. Możesz potem odsłonić wyniki jeszcze raz.',
+      button: 'Tak, zablokuj'
     }
   }[action];
 
@@ -3437,6 +3587,11 @@ async function confirmPendingAction() {
 
   if (action === 'announcement') {
     await sendAnnouncement();
+    return;
+  }
+
+  if (action === 'reveal-participants' || action === 'reveal-cities' || action === 'lock-results') {
+    await setResultsReveal(action);
   }
 }
 
@@ -3511,6 +3666,8 @@ async function confirmReset() {
     gamePhase = 'idle';
     announcementText = '';
     announcementUpdatedAt = null;
+    resultsParticipantsRevealedAt = null;
+    resultsCitiesRevealedAt = null;
     clearTimer();
     await loadGameState();
     await loadData();
@@ -3576,6 +3733,41 @@ async function sendAnnouncement() {
   }
 }
 
+async function setResultsReveal(action) {
+  const labels = {
+    'reveal-participants': 'Odsłaniam wyniki uczestników...',
+    'reveal-cities': 'Odsłaniam ranking miast...',
+    'lock-results': 'Zasłaniam wyniki ponownie...'
+  };
+  setAdminFeedback(labels[action] || 'Aktualizuję blokadę wyników...');
+
+  try {
+    const res = await fetch('/api/game-state', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action, scope: 'active' })
+    });
+    const data = await res.json();
+
+    if (!res.ok || data.error) {
+      throw new Error(data.error || 'Nie udało się zmienić blokady wyników.');
+    }
+
+    await loadGameState();
+    setAdminFeedback(
+      action === 'lock-results'
+        ? 'Wyniki zostały ponownie zasłonięte na tablicy.'
+        : action === 'reveal-cities'
+          ? 'Ranking miast został odsłonięty na tablicy wyników.'
+          : 'Wyniki uczestników zostały odsłonięte na tablicy wyników.',
+      'success'
+    );
+  } catch (e) {
+    console.error(e);
+    setAdminFeedback(e.message || 'Nie udało się zmienić blokady wyników.', 'error');
+    renderRevealControls();
+  }
+}
 async function runIntegrityScan() {
   const button = document.getElementById('btn-integrity-scan');
   button.disabled = true;
@@ -5799,4 +5991,10 @@ initializeAdminAccess();
 </script>
 </body>
 </html>
+
+
+
+
+
+
 

@@ -1144,6 +1144,80 @@ textarea {
   height:28px;
   display:block;
 }
+.qr-scanner-overlay {
+  position:fixed;
+  inset:0;
+  z-index:1000;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:18px;
+  background:rgba(14,12,36,0.72);
+  backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px);
+}
+.qr-scanner-overlay.show {
+  display:flex;
+}
+.qr-scanner-panel {
+  width:min(460px, 100%);
+  border-radius:24px;
+  padding:18px;
+  background:rgba(255,255,255,0.96);
+  border:1px solid rgba(255,255,255,0.7);
+  box-shadow:0 24px 70px rgba(0,0,0,0.32);
+}
+.qr-scanner-head {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:12px;
+}
+.qr-scanner-title {
+  font-family:'Syne',sans-serif;
+  font-size:18px;
+  font-weight:800;
+  color:#1c1840;
+}
+.qr-scanner-close {
+  border:0;
+  border-radius:999px;
+  padding:9px 14px;
+  background:rgba(124,106,247,0.12);
+  color:#30284f;
+  font-weight:800;
+  cursor:pointer;
+}
+.qr-video-wrap {
+  position:relative;
+  overflow:hidden;
+  border-radius:20px;
+  background:#111;
+  aspect-ratio:3 / 4;
+}
+.qr-video-wrap video {
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  display:block;
+}
+.qr-frame {
+  position:absolute;
+  inset:16%;
+  border:3px solid rgba(200,255,57,0.94);
+  border-radius:24px;
+  box-shadow:0 0 0 999px rgba(0,0,0,0.24), 0 0 26px rgba(200,255,57,0.36);
+  pointer-events:none;
+}
+.qr-scanner-status {
+  margin-top:12px;
+  color:#5f5877;
+  font-size:14px;
+  line-height:1.45;
+  text-align:center;
+  font-weight:700;
+}
 
 @media (max-width: 520px) {
   body {
@@ -1724,7 +1798,19 @@ textarea {
       </svg>
     </button>
   </div>
-  <input id="qr-camera-input" type="file" accept="image/*" capture="environment" hidden>
+  <div class="qr-scanner-overlay" id="qr-scanner" aria-hidden="true">
+    <div class="qr-scanner-panel" role="dialog" aria-modal="true" aria-label="Skaner kodu QR">
+      <div class="qr-scanner-head">
+        <div class="qr-scanner-title">Skanuj kod QR</div>
+        <button class="qr-scanner-close" id="qr-scanner-close" type="button">Zamknij</button>
+      </div>
+      <div class="qr-video-wrap">
+        <video id="qr-scanner-video" playsinline muted></video>
+        <div class="qr-frame" aria-hidden="true"></div>
+      </div>
+      <div class="qr-scanner-status" id="qr-scanner-status">Nakieruj aparat na kod QR.</div>
+    </div>
+  </div>
   <div class="game-remaining">
     <span class="game-remaining-label" data-game-remaining-label>Do końca gry zostało</span>
     <div class="game-remaining-value" data-game-remaining>--:--</div>
@@ -1860,7 +1946,10 @@ const loginBtnEl = document.getElementById('login-btn');
 const loginMsgEl = document.getElementById('login-msg');
 const qTextEl = document.getElementById('q-text');
 const qrCameraBtnEl = document.getElementById('qr-camera-btn');
-const qrCameraInputEl = document.getElementById('qr-camera-input');
+const qrScannerEl = document.getElementById('qr-scanner');
+const qrScannerVideoEl = document.getElementById('qr-scanner-video');
+const qrScannerCloseEl = document.getElementById('qr-scanner-close');
+const qrScannerStatusEl = document.getElementById('qr-scanner-status');
 const resultAreaEl = document.getElementById('result-area');
 const qMsgEl = document.getElementById('q-msg');
 const answerAreaEl = document.getElementById('answer-area');
@@ -1874,7 +1963,7 @@ gameRemainingLabelElements = Array.from(document.querySelectorAll('[data-game-re
 
 const EVENT_DATE = new Date('2026-12-13T10:00:00+01:00');
 const memoryStorage = new Map();
-const qrCameraState = { detector: null, busy: false, bound: false };
+const qrCameraState = { detector: null, busy: false, bound: false, active: false, stream: null, scanTimer: null };
 
 function getCookieValue(name) {
   try {
@@ -2132,41 +2221,6 @@ function getQrBarcodeDetector() {
   }
 }
 
-async function loadImageForQr(file) {
-  if (typeof createImageBitmap === 'function') {
-    return createImageBitmap(file);
-  }
-
-  return new Promise((resolve, reject) => {
-    const objectUrl = URL.createObjectURL(file);
-    const image = new Image();
-    image.onload = () => {
-      URL.revokeObjectURL(objectUrl);
-      resolve(image);
-    };
-    image.onerror = () => {
-      URL.revokeObjectURL(objectUrl);
-      reject(new Error('Nie udało się wczytać zdjęcia.'));
-    };
-    image.src = objectUrl;
-  });
-}
-
-async function decodeQrFromFile(file) {
-  const detector = getQrBarcodeDetector();
-  if (!detector || !file) return '';
-
-  const source = await loadImageForQr(file);
-  try {
-    const results = await detector.detect(source);
-    return results && results[0] && results[0].rawValue ? String(results[0].rawValue).trim() : '';
-  } finally {
-    if (source && typeof source.close === 'function') {
-      source.close();
-    }
-  }
-}
-
 function parseQrTarget(rawValue) {
   const value = String(rawValue || '').trim();
   if (!value) return null;
@@ -2213,43 +2267,107 @@ async function openQrTarget(target) {
   await syncPlayerView({ force: true });
 }
 
-function openQrCameraCapture() {
-  if (!qrCameraInputEl || qrCameraState.busy) return;
-  primeFeedbackAudio();
-  triggerHaptic(12);
-  qrCameraInputEl.value = '';
-  qrCameraInputEl.click();
+function setQrScannerStatus(message) {
+  if (qrScannerStatusEl) qrScannerStatusEl.innerText = message;
 }
 
-async function handleQrCameraCapture(event) {
-  const file = event.target && event.target.files && event.target.files[0];
-  if (!file || qrCameraState.busy) return;
+function stopQrScanner() {
+  qrCameraState.active = false;
+  qrCameraState.busy = false;
+  if (qrCameraState.scanTimer) {
+    clearTimeout(qrCameraState.scanTimer);
+    qrCameraState.scanTimer = null;
+  }
+  if (qrCameraState.stream) {
+    qrCameraState.stream.getTracks().forEach((track) => track.stop());
+    qrCameraState.stream = null;
+  }
+  if (qrScannerVideoEl) {
+    qrScannerVideoEl.pause();
+    qrScannerVideoEl.srcObject = null;
+  }
+  if (qrScannerEl) {
+    qrScannerEl.classList.remove('show');
+    qrScannerEl.setAttribute('aria-hidden', 'true');
+  }
+  if (qrCameraBtnEl) qrCameraBtnEl.disabled = false;
+}
+
+async function scanQrVideoFrame() {
+  if (!qrCameraState.active || qrCameraState.busy || !qrScannerVideoEl) return;
+
+  const detector = getQrBarcodeDetector();
+  if (!detector) {
+    setQrScannerStatus('Ta przeglądarka nie obsługuje automatycznego skanowania QR. Użyj systemowego skanera aparatu.');
+    return;
+  }
 
   qrCameraState.busy = true;
-  if (qrCameraBtnEl) qrCameraBtnEl.disabled = true;
-
   try {
-    if (!getQrBarcodeDetector()) {
-      showMicroToast('Aparat został otwarty. Jeśli ta przeglądarka nie odczyta QR ze zdjęcia automatycznie, użyj systemowego skanera kodów QR.', 'info', 'Aparat');
-      return;
+    if (qrScannerVideoEl.readyState >= 2) {
+      const results = await detector.detect(qrScannerVideoEl);
+      const rawValue = results && results[0] && results[0].rawValue ? String(results[0].rawValue).trim() : '';
+      const target = parseQrTarget(rawValue);
+      if (target) {
+        stopQrScanner();
+        triggerHaptic([18, 45, 18]);
+        showMicroToast('Kod QR odczytany. Otwieram właściwy ekran.', 'success', 'Aparat');
+        await openQrTarget(target);
+        return;
+      }
     }
-
-    const rawValue = await decodeQrFromFile(file);
-    const target = parseQrTarget(rawValue);
-
-    if (!target) {
-      showMicroToast('Nie udało się odczytać kodu QR. Spróbuj jeszcze raz, najlepiej przy lepszym świetle.', 'info', 'Aparat');
-      return;
-    }
-
-    showMicroToast('Kod QR odczytany. Otwieram właściwy ekran.', 'success', 'Aparat');
-    await openQrTarget(target);
+    setQrScannerStatus('Nakieruj aparat na kod QR i trzymaj telefon nieruchomo przez chwilę.');
   } catch (error) {
-    showMicroToast('Aparat został otwarty, ale nie udało się odczytać kodu QR z tego zdjęcia.', 'info', 'Aparat');
+    setQrScannerStatus('Skanuję kod QR. Zbliż aparat albo popraw światło.');
   } finally {
     qrCameraState.busy = false;
-    if (qrCameraBtnEl) qrCameraBtnEl.disabled = false;
-    if (event.target) event.target.value = '';
+  }
+
+  if (qrCameraState.active) {
+    qrCameraState.scanTimer = setTimeout(scanQrVideoFrame, 180);
+  }
+}
+
+async function openQrCameraCapture() {
+  if (qrCameraState.active) return;
+  primeFeedbackAudio();
+  triggerHaptic(12);
+
+  if (!getQrBarcodeDetector()) {
+    showMicroToast('Ta przeglądarka nie obsługuje automatycznego skanowania QR w aplikacji. Użyj systemowego skanera aparatu.', 'info', 'Aparat');
+    return;
+  }
+
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    showMicroToast('Nie udało się uruchomić aparatu w tej przeglądarce.', 'info', 'Aparat');
+    return;
+  }
+
+  qrCameraState.active = true;
+  if (qrCameraBtnEl) qrCameraBtnEl.disabled = true;
+  if (qrScannerEl) {
+    qrScannerEl.classList.add('show');
+    qrScannerEl.setAttribute('aria-hidden', 'false');
+  }
+  setQrScannerStatus('Uruchamiam aparat...');
+
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({
+      audio: false,
+      video: {
+        facingMode: { ideal: 'environment' },
+        width: { ideal: 1280 },
+        height: { ideal: 720 }
+      }
+    });
+    qrCameraState.stream = stream;
+    qrScannerVideoEl.srcObject = stream;
+    await qrScannerVideoEl.play();
+    setQrScannerStatus('Nakieruj aparat na kod QR. Skanowanie działa automatycznie.');
+    scanQrVideoFrame();
+  } catch (error) {
+    stopQrScanner();
+    showMicroToast('Nie udało się uruchomić aparatu. Sprawdź zgodę na kamerę w przeglądarce.', 'info', 'Aparat');
   }
 }
 
@@ -2258,9 +2376,12 @@ function initQrCameraCapture() {
   if (qrCameraBtnEl) {
     qrCameraBtnEl.addEventListener('click', openQrCameraCapture);
   }
-  if (qrCameraInputEl) {
-    qrCameraInputEl.addEventListener('change', handleQrCameraCapture);
+  if (qrScannerCloseEl) {
+    qrScannerCloseEl.addEventListener('click', stopQrScanner);
   }
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && qrCameraState.active) stopQrScanner();
+  });
   qrCameraState.bound = true;
 }
 
