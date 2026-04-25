@@ -845,8 +845,15 @@ input:focus {
   box-shadow:inset 0 0 0 1px rgba(200,255,57,0.28), 0 12px 28px rgba(155, 166, 37, 0.16);
 }
 
-.success-copy {
+.success-copy-row {
+  display:flex;
+  align-items:stretch;
+  gap:12px;
   margin-top:16px;
+}
+
+.success-copy {
+  margin-top:0;
   padding:16px 18px;
   border-radius:18px;
   background:linear-gradient(180deg, rgba(255,255,255,0.96), rgba(247,243,255,0.88));
@@ -854,6 +861,45 @@ input:focus {
   color:#5f5877;
   text-align:center;
   line-height:1.55;
+  flex:1 1 auto;
+}
+
+.camera-scan-btn {
+  flex:0 0 68px;
+  width:68px;
+  min-width:68px;
+  border:none;
+  border-radius:18px;
+  background:linear-gradient(135deg, #ff4f92, #7c6af7);
+  color:#fff;
+  box-shadow:0 14px 26px rgba(124,106,247,0.26);
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  transition:transform .18s ease, box-shadow .18s ease, opacity .18s ease;
+}
+
+.camera-scan-btn:hover {
+  transform:translateY(-1px);
+  box-shadow:0 18px 28px rgba(124,106,247,0.32);
+}
+
+.camera-scan-btn:active {
+  transform:translateY(0);
+}
+
+.camera-scan-btn:disabled {
+  opacity:.6;
+  cursor:default;
+  transform:none;
+  box-shadow:0 10px 18px rgba(124,106,247,0.18);
+}
+
+.camera-scan-btn svg {
+  width:28px;
+  height:28px;
+  display:block;
 }
 
 .bonus-card.is-completed #bonus-result-default {
@@ -1339,7 +1385,7 @@ input:focus {
       <div class="bonus-special-icon">+1</div>
       <div class="bonus-special-copy">
         <span class="bonus-special-title">Bonus specjalny</span>
-        <span class="bonus-special-subtitle">To wyrĂłĹĽniony punkt dodatkowy do Twojego wyniku</span>
+        <span class="bonus-special-subtitle">To wyróżniony punkt dodatkowy do Twojego wyniku</span>
       </div>
     </div>
     <div class="success-icon" id="bonus-result-icon">+1</div>
@@ -1482,12 +1528,15 @@ const acceptRulesBonusEl = document.getElementById('accept-rules-bonus');
 const secretBtnEl = document.getElementById('secret-btn');
 const secretMsgEl = document.getElementById('secret-msg');
 const secretInputEl = document.getElementById('secret-input');
+const bonusQrCameraBtnEl = document.getElementById('bonus-qr-camera-btn');
+const bonusQrCameraInputEl = document.getElementById('bonus-qr-camera-input');
 
 const GAME_STATE_CACHE_MS = 2500;
 const BONUS_LABEL_CACHE_MS = 4000;
 const BONUS_COUNT_CACHE_MS = 4000;
 const PARTICIPANT_STATS_CACHE_MS = 4000;
 const BONUS_SYNC_COOLDOWN_MS = 1200;
+const bonusQrCameraState = { detector: null, busy: false, bound: false };
 
 function isSafariBrowser() {
   const ua = navigator.userAgent || '';
