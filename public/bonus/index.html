@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pl">
 <head>
 <meta charset="UTF-8">
@@ -218,7 +218,7 @@ body.safari-browser .card {
   line-height: 1.1;
 }
 
-.bonus-special-subtitle {
+      <span class="bonus-special-subtitle">Limonkowo-złota okazja poza zwykłym pytaniem</span>
   display: block;
   margin-top: 2px;
   font-size: 11px;
@@ -1132,7 +1132,7 @@ input:focus {
     font-size: 11px;
   }
 
-  .bonus-special-subtitle {
+      <span class="bonus-special-subtitle">Ten etap daje dodatkowy punkt za aktywność extra</span>
     font-size: 10px;
   }
 
@@ -1369,7 +1369,7 @@ input:focus {
     <div class="bonus-special-icon">+1</div>
     <div class="bonus-special-copy">
       <span class="bonus-special-title">Bonus specjalny</span>
-      <span class="bonus-special-subtitle">Limonkowo-zĹ‚ota okazja poza zwykĹ‚ym pytaniem</span>
+      <span class="bonus-special-subtitle">Limonkowo-złota okazja poza zwykłym pytaniem</span>
     </div>
   </div>
   <h1>Odbierz dodatkowy punkt</h1>
@@ -1395,7 +1395,7 @@ input:focus {
 
   <label class="terms-check" for="accept-rules-bonus">
     <input type="checkbox" id="accept-rules-bonus">
-    <span class="terms-check-text">AkceptujÄ™ <a href="/regulamin/" target="_blank" rel="noopener">regulamin</a>.</span>
+    <span class="terms-check-text">Akceptuję <a href="/regulamin/" target="_blank" rel="noopener">regulamin</a>.</span>
   </label>
 
   <button class="btn" id="name-btn" onclick="doNameLogin()">Przejd&#378; dalej</button>
@@ -1419,7 +1419,7 @@ input:focus {
     <div class="bonus-special-icon">+1</div>
     <div class="bonus-special-copy">
       <span class="bonus-special-title">Bonus specjalny</span>
-      <span class="bonus-special-subtitle">Ten etap daje dodatkowy punkt za aktywnoĹ›Ä‡ extra</span>
+      <span class="bonus-special-subtitle">Ten etap daje dodatkowy punkt za aktywność extra</span>
     </div>
   </div>
   <h1>Wpisz has&#322;o bonusowe</h1>
@@ -1625,7 +1625,9 @@ const BONUS_LABEL_CACHE_MS = 4000;
 const BONUS_COUNT_CACHE_MS = 4000;
 const PARTICIPANT_STATS_CACHE_MS = 4000;
 const BONUS_SYNC_COOLDOWN_MS = 1200;
-const bonusQrCameraState = { detector: null, busy: false, bound: false, active: false, stream: null, scanTimer: null };
+const JS_QR_SCRIPT_URL = 'https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js';
+const PARTICIPANT_GAME_STORAGE_KEY = 'participantGameStartedAt';
+const bonusQrCameraState = { detector: null, busy: false, bound: false, active: false, stream: null, scanTimer: null, jsQrPromise: null, canvas: null };
 
 function isSafariBrowser() {
   const ua = navigator.userAgent || '';
@@ -1686,6 +1688,48 @@ function getDeviceToken() {
   return token;
 }
 
+function getCurrentGameSessionKey() {
+  return activeGameState.startedAt ? String(activeGameState.startedAt) : '';
+}
+
+function clearStoredParticipantSession() {
+  storageRemove('participantId');
+  storageRemove(PARTICIPANT_GAME_STORAGE_KEY);
+}
+
+function rememberParticipantSession(id) {
+  participantId = String(id);
+  storageSet('participantId', String(participantId));
+  const sessionKey = getCurrentGameSessionKey();
+  if (sessionKey) {
+    storageSet(PARTICIPANT_GAME_STORAGE_KEY, sessionKey);
+  }
+}
+
+function resetLocalParticipantSession() {
+  participantId = null;
+  participantStats = { answers: 0, bonuses: 0 };
+  participantStatsFetchedAt = 0;
+  participantStatsLoadPromise = null;
+  cachedBonusCount = 0;
+  clearStoredParticipantSession();
+  renderParticipantBadges();
+}
+
+function getStoredParticipantIdForCurrentGame() {
+  const saved = storageGet('participantId', '');
+  if (!saved) return '';
+
+  const currentSessionKey = getCurrentGameSessionKey();
+  const savedSessionKey = storageGet(PARTICIPANT_GAME_STORAGE_KEY, '');
+
+  if (currentSessionKey && savedSessionKey !== currentSessionKey) {
+    resetLocalParticipantSession();
+    return '';
+  }
+
+  return saved;
+}
 function normalizeLoginValue(value) {
   return String(value || '').trim().toUpperCase();
 }
@@ -1705,7 +1749,7 @@ async function readJsonResponse(response) {
   try {
     return raw ? JSON.parse(raw) : {};
   } catch (error) {
-    return { error: raw || 'Nie udaĹ‚o siÄ™ odczytaÄ‡ odpowiedzi serwera.' };
+    return { error: raw || 'Nie udało się odczytać odpowiedzi serwera.' };
   }
 }
 
@@ -1729,7 +1773,7 @@ async function postJsonWithRetry(url, payload, options = {}) {
     }
   }
 
-  throw lastError || new Error('BĹ‚Ä…d poĹ‚Ä…czenia');
+  throw lastError || new Error('Błąd połączenia');
 }
 
 async function readJsonResponse(response) {
@@ -1737,7 +1781,7 @@ async function readJsonResponse(response) {
   try {
     return raw ? JSON.parse(raw) : {};
   } catch (error) {
-    return { error: raw || 'Nie uda\u0142o si\u0119 odczyta\u0107 odpowiedzi serwera.' };
+    return { error: raw || 'Nie udało się odczytać odpowiedzi serwera.' };
   }
 }
 
@@ -1761,7 +1805,7 @@ async function postJsonWithRetry(url, payload, options = {}) {
     }
   }
 
-  throw lastError || new Error('B\u0142\u0105d po\u0142\u0105czenia');
+  throw lastError || new Error('Błąd połączenia');
 }
 
 function escHtml(value) {
@@ -1933,6 +1977,64 @@ function getBonusQrBarcodeDetector() {
   }
 }
 
+function loadBonusJsQrReader() {
+  if (typeof jsQR === 'function') return Promise.resolve(jsQR);
+  if (bonusQrCameraState.jsQrPromise) return bonusQrCameraState.jsQrPromise;
+
+  bonusQrCameraState.jsQrPromise = new Promise((resolve, reject) => {
+    const existing = document.querySelector(`script[src="${JS_QR_SCRIPT_URL}"]`);
+    if (existing) {
+      existing.addEventListener('load', () => resolve(window.jsQR), { once: true });
+      existing.addEventListener('error', reject, { once: true });
+      return;
+    }
+
+    const script = document.createElement('script');
+    script.src = JS_QR_SCRIPT_URL;
+    script.async = true;
+    script.onload = () => resolve(window.jsQR);
+    script.onerror = reject;
+    document.head.appendChild(script);
+  });
+
+  return bonusQrCameraState.jsQrPromise;
+}
+
+async function readBonusQrFromVideoFrame() {
+  const detector = getBonusQrBarcodeDetector();
+  if (detector) {
+    try {
+      const results = await detector.detect(bonusQrScannerVideoEl);
+      return results && results[0] && results[0].rawValue ? String(results[0].rawValue).trim() : '';
+    } catch (error) {
+      bonusQrCameraState.detector = false;
+    }
+  }
+
+  setBonusQrScannerStatus('Safari używa trybu zgodności. Trzymaj kod w środku ramki.');
+  const reader = await loadBonusJsQrReader();
+  if (typeof reader !== 'function') return '';
+
+  const sourceWidth = bonusQrScannerVideoEl.videoWidth || 0;
+  const sourceHeight = bonusQrScannerVideoEl.videoHeight || 0;
+  if (!sourceWidth || !sourceHeight) return '';
+
+  const maxWidth = 720;
+  const scale = Math.min(1, maxWidth / sourceWidth);
+  const width = Math.max(1, Math.round(sourceWidth * scale));
+  const height = Math.max(1, Math.round(sourceHeight * scale));
+  const canvas = bonusQrCameraState.canvas || document.createElement('canvas');
+  bonusQrCameraState.canvas = canvas;
+  canvas.width = width;
+  canvas.height = height;
+  const context = canvas.getContext('2d', { willReadFrequently: true });
+  if (!context) return '';
+
+  context.drawImage(bonusQrScannerVideoEl, 0, 0, width, height);
+  const imageData = context.getImageData(0, 0, width, height);
+  const result = reader(imageData.data, width, height, { inversionAttempts: 'attemptBoth' });
+  return result && result.data ? String(result.data).trim() : '';
+}
 function parseBonusQrTarget(rawValue) {
   const value = String(rawValue || '').trim();
   if (!value) return null;
@@ -2019,17 +2121,10 @@ function stopBonusQrScanner() {
 async function scanBonusQrVideoFrame() {
   if (!bonusQrCameraState.active || bonusQrCameraState.busy || !bonusQrScannerVideoEl) return;
 
-  const detector = getBonusQrBarcodeDetector();
-  if (!detector) {
-    setBonusQrScannerStatus('Ta przeglądarka nie obsługuje automatycznego skanowania QR. Użyj systemowego skanera aparatu.');
-    return;
-  }
-
   bonusQrCameraState.busy = true;
   try {
     if (bonusQrScannerVideoEl.readyState >= 2) {
-      const results = await detector.detect(bonusQrScannerVideoEl);
-      const rawValue = results && results[0] && results[0].rawValue ? String(results[0].rawValue).trim() : '';
+      const rawValue = await readBonusQrFromVideoFrame();
       const target = parseBonusQrTarget(rawValue);
       if (target) {
         stopBonusQrScanner();
@@ -2039,7 +2134,9 @@ async function scanBonusQrVideoFrame() {
         return;
       }
     }
-    setBonusQrScannerStatus('Nakieruj aparat na kod QR i trzymaj telefon nieruchomo przez chwilę.');
+    setBonusQrScannerStatus(getBonusQrBarcodeDetector()
+      ? 'Nakieruj aparat na kod QR i trzymaj telefon nieruchomo przez chwilę.'
+      : 'Safari używa trybu zgodności. Trzymaj kod w środku ramki i popraw światło.');
   } catch (error) {
     setBonusQrScannerStatus('Skanuję kod QR. Zbliż aparat albo popraw światło.');
   } finally {
@@ -2047,7 +2144,7 @@ async function scanBonusQrVideoFrame() {
   }
 
   if (bonusQrCameraState.active) {
-    bonusQrCameraState.scanTimer = setTimeout(scanBonusQrVideoFrame, 180);
+    bonusQrCameraState.scanTimer = setTimeout(scanBonusQrVideoFrame, getBonusQrBarcodeDetector() ? 180 : 260);
   }
 }
 
@@ -2056,10 +2153,6 @@ async function openBonusQrCameraCapture() {
   primeFeedbackAudio();
   triggerHaptic(12);
 
-  if (!getBonusQrBarcodeDetector()) {
-    showMicroToast('Ta przeglądarka nie obsługuje automatycznego skanowania QR w aplikacji. Użyj systemowego skanera aparatu.', 'info', 'Aparat');
-    return;
-  }
 
   if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
     showMicroToast('Nie udało się uruchomić aparatu w tej przeglądarce.', 'info', 'Aparat');
@@ -2086,7 +2179,9 @@ async function openBonusQrCameraCapture() {
     bonusQrCameraState.stream = stream;
     bonusQrScannerVideoEl.srcObject = stream;
     await bonusQrScannerVideoEl.play();
-    setBonusQrScannerStatus('Nakieruj aparat na kod QR. Skanowanie działa automatycznie.');
+    setBonusQrScannerStatus(getBonusQrBarcodeDetector()
+      ? 'Nakieruj aparat na kod QR. Skanowanie działa automatycznie.'
+      : 'Safari używa trybu zgodności. Trzymaj kod w środku ramki.');
     scanBonusQrVideoFrame();
   } catch (error) {
     stopBonusQrScanner();
@@ -2436,13 +2531,13 @@ function goToHomeFromBonus() {
   window.location.href = '/';
 }
 
-function clearBonusAccess(message = 'To konto jest przypisane do innego urzadzenia. Zaloguj sie ponownie.') {
+function clearBonusAccess(message = 'To konto jest przypisane do innego urządzenia. Zaloguj się ponownie.') {
   participantId = null;
   bonusLabelFetchedAt = 0;
   bonusCountFetchedAt = 0;
   bonusLabelCacheKey = '';
   cachedBonusLabelData = null;
-  storageRemove('participantId');
+  clearStoredParticipantSession();
   showNameLoginScreen();
   nameBtnEl.disabled = false;
   secretBtnEl.disabled = false;
@@ -2462,11 +2557,11 @@ function renderGameRemaining() {
     const remaining = endTime - Date.now();
     if (remaining > 0) {
       const label = formatRemainingTime(remaining);
-      setGameRemainingLabel('Do koĹ„ca gry zostaĹ‚o');
+      setGameRemainingLabel('Do końca gry zostało');
 
       if (remaining <= 15 * 60000) {
         showMicroToast(
-          'ZostaĹ‚o 15 minut do koĹ„ca gry. To dobry moment na finaĹ‚owy sprint.',
+          'Zostało 15 minut do końca gry. To dobry moment na finałowy sprint.',
           'warning',
           'Uwaga',
           `warning-15-${startedAt}`
@@ -2485,7 +2580,7 @@ function renderGameRemaining() {
   if (summaryTarget) {
     const remaining = summaryTarget - Date.now();
     if (remaining <= 0) {
-      setGameRemainingLabel('Do podsumowania zostaĹ‚o');
+      setGameRemainingLabel('Do podsumowania zostało');
       gameRemainingElements.forEach((element) => {
         if (element.innerText !== '00:00') {
           element.innerText = '00:00';
@@ -2496,7 +2591,7 @@ function renderGameRemaining() {
     }
 
     const label = formatRemainingTime(remaining);
-    setGameRemainingLabel('Do podsumowania zostaĹ‚o');
+    setGameRemainingLabel('Do podsumowania zostało');
     gameRemainingElements.forEach((element) => {
       if (element.innerText !== label) {
         element.innerText = label;
@@ -2505,7 +2600,7 @@ function renderGameRemaining() {
     return;
   }
 
-  setGameRemainingLabel('Do koĹ„ca gry zostaĹ‚o');
+  setGameRemainingLabel('Do końca gry zostało');
   gameRemainingElements.forEach((element) => {
     if (element.innerText !== 'Gra nieaktywna') {
       element.innerText = 'Gra nieaktywna';
@@ -2556,7 +2651,7 @@ async function restoreParticipantSession() {
     if (!data.id) return null;
 
     participantId = data.id;
-    storageSet('participantId', String(participantId));
+    rememberParticipantSession(participantId);
     return participantId;
   } catch (e) {
     return null;
@@ -2594,7 +2689,7 @@ async function loadBonusLabel(options = {}) {
         cachedBonusLabelData = { inactive: true, ...data };
         return cachedBonusLabelData;
       }
-      clearBonusAccess(data.error || 'To konto jest przypisane do innego urzadzenia. Zaloguj sie ponownie.');
+      clearBonusAccess(data.error || 'To konto jest przypisane do innego urządzenia. Zaloguj się ponownie.');
       return null;
     }
     const data = await res.json();
@@ -2746,10 +2841,11 @@ window.onload = async () => {
   renderGameRemaining();
   setInterval(renderGameRemaining, 1000);
 
-  const saved = storageGet('participantId', '');
+  const phase = await loadGameState({ force: true });
+  const saved = getStoredParticipantIdForCurrentGame();
   if (saved) {
     participantId = saved;
-  } else if (!participantId) {
+  } else if (phase === 'active' && !participantId) {
     await restoreParticipantSession();
   }
 
@@ -2800,7 +2896,7 @@ async function doNameLogin() {
 
   if (!acceptedRules) {
     msg.className = 'msg error';
-    msg.innerText = 'Aby doĹ‚Ä…czyÄ‡ do gry, zaakceptuj regulamin.';
+    msg.innerText = 'Aby dołączyć do gry, zaakceptuj regulamin.';
     updateBonusConsentState();
     return;
   }
@@ -2828,7 +2924,7 @@ async function doNameLogin() {
     bonusCountFetchedAt = 0;
     bonusLabelCacheKey = '';
     cachedBonusLabelData = null;
-    storageSet('participantId', String(participantId));
+    rememberParticipantSession(participantId);
     triggerHaptic([16, 45, 16]);
     playFeedbackTone('ready');
     await showSecret(null, { force: true });
@@ -2865,7 +2961,7 @@ async function submitSecret() {
 
     const data = await res.json();
 
-    if (res.status === 403 && /urzadzen|urzĂ„â€¦dzen|przypisane/i.test(String(data.error || ''))) {
+    if (res.status === 403 && /urzadzen|urządzen|przypisane/i.test(String(data.error || ''))) {
       clearBonusAccess(data.error);
       btn.disabled = false;
       return;
@@ -2923,7 +3019,7 @@ async function submitSecret() {
     }
 
     if (res.status === 404 && /uczestnika/i.test(data.error || '')) {
-      storageRemove('participantId');
+      clearStoredParticipantSession();
     }
 
     msg.className = 'msg error';
@@ -2938,6 +3034,3 @@ async function submitSecret() {
 </script>
 </body>
 </html>
-
-
-

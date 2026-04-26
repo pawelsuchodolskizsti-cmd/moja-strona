@@ -1,9 +1,9 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pl">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ekran Wynikow - Gwiazdka One Day 2026</title>
+<title>Ekran Wyników - Gwiazdka One Day 2026</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -390,7 +390,7 @@
   }
 
   body.suspense-mode .empty-state::before {
-    content: 'FINALOWA KONCOWKA';
+    content: 'FINAŁOWA KOŃCÓWKA';
     position: absolute;
     top: 16px;
     left: 50%;
@@ -745,7 +745,11 @@
     letter-spacing: .16em;
     text-transform: uppercase;
     line-height: 1.06;
-    color: #db4ea1;
+    background: linear-gradient(135deg, var(--pink), var(--purple));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
     white-space: nowrap;
     text-align: center;
   }
@@ -1473,7 +1477,7 @@
     </div>
     <section class="card hero">
       <div class="hero-main">
-        <div class="headline" id="headline">Ranking na zywo</div>
+        <div class="headline" id="headline">Ranking na żywo</div>
         <div class="subline" id="subline">Najwazniejsze informacje dla widowni: czas, liderzy i czytelny obraz tego, kto prowadzi w finale gry.</div>
         <div class="hero-meta">
           <div class="meta-pill"><span class="live-dot"></span> Ekran wydarzenia</div>
@@ -1484,7 +1488,7 @@
       <div class="hero-side">
         <div class="timer-stack">
           <div class="status-box timer-box">
-            <div class="status-label" id="timer-label">Do konca gry</div>
+            <div class="status-label" id="timer-label">Do końca gry</div>
             <div class="status-value timer" id="timer-value">--:--</div>
             <div class="status-note" id="timer-note" style="display:none;"></div>
           </div>
@@ -1497,7 +1501,7 @@
         <div class="section-head">
           <div>
             <div class="section-title">Top 3 miast</div>
-            <div class="section-copy" id="podium-copy">Podium liczone wedlug sumy punktow zdobytych przez cale miasto.</div>
+            <div class="section-copy" id="podium-copy">Podium liczone według sumy punktów zdobytych przez całe miasto.</div>
           </div>
           <div class="board-tools">
             <select class="sort-select" id="city-podium-mode" onchange="setCityPodiumMode(this.value)">
@@ -1800,23 +1804,23 @@ function renderHeader() {
   headline.classList.toggle('phase-ended', scoreboardState.phase === 'ended');
 
   if (scoreboardState.phase === 'active') {
-    headline.textContent = suspenseMode ? 'Finalowa koncowka' : 'Ranking na zywo';
+    headline.textContent = suspenseMode ? 'Finałowa końcówka' : 'Ranking na żywo';
     subline.textContent = suspenseMode
-      ? 'Ostatnie 3 minuty. Top 3 miast i najlepsi uczestnicy zostaly wlasnie ukryte, a pelny wynik wroci dopiero po zakonczeniu gry.'
-      : 'Gra trwa. Widownia widzi najwazniejsze miasta, licznik czasu i aktualne komunikaty od organizatora.';
-    timerLabel.textContent = 'Do konca gry';
+      ? 'Ostatnie 3 minuty. Top 3 miast i najlepsi uczestnicy zostały właśnie ukryte, a pełny wynik wróci dopiero po zakończeniu gry.'
+      : 'Gra trwa. Widownia widzi najważniejsze miasta, licznik czasu i aktualne komunikaty od organizatora.';
+    timerLabel.textContent = 'Do końca gry';
   } else if (scoreboardState.phase === 'ended') {
-    headline.textContent = 'Final i podsumowanie';
-    subline.textContent = 'Gra zostala zatrzymana. Ekran odlicza teraz czas do podsumowania i przejscia do Teatru.';
+    headline.textContent = 'Finał i podsumowanie';
+    subline.textContent = 'Gra została zatrzymana. Ekran odlicza teraz czas do podsumowania i przejścia do Teatru.';
     timerLabel.textContent = 'Do podsumowania';
   } else if (scoreboardState.phase === 'thanks') {
-    headline.textContent = 'Dziekujemy za udzial';
-    subline.textContent = 'Gra i podsumowanie zostaly zakonczone. Ekran pozostaje w trybie koncowym.';
-    timerLabel.textContent = 'Wydarzenie zakonczone';
+    headline.textContent = 'Dziękujemy za udział';
+    subline.textContent = 'Gra i podsumowanie zostały zakończone. Ekran pozostaje w trybie końcowym.';
+    timerLabel.textContent = 'Wydarzenie zakończone';
   } else {
     headline.textContent = 'Oczekiwanie na start';
-    subline.textContent = 'System czeka na uruchomienie gry. Gdy start ruszy, ranking zacznie aktualizowac sie automatycznie.';
-    timerLabel.textContent = 'Start wkrotce';
+    subline.textContent = 'System czeka na uruchomienie gry. Gdy start ruszy, ranking zacznie aktualizować się automatycznie.';
+    timerLabel.textContent = 'Start wkrótce';
   }
 
   const remaining = getRemainingMs();
@@ -1834,23 +1838,23 @@ function renderAnnouncement() {
   if (scoreboardState.announcementText) {
     copy.textContent = scoreboardState.announcementText;
     meta.textContent = scoreboardState.announcementUpdatedAt
-      ? `Wyslano o ${formatDateTime(scoreboardState.announcementUpdatedAt)}`
+      ? `Wysłano o ${formatDateTime(scoreboardState.announcementUpdatedAt)}`
       : 'Komunikat aktywny';
     return;
   }
 
   if (scoreboardState.phase === 'active' && suspenseMode) {
-    copy.textContent = 'Finalowa koncowka trwa. Wyniki sa juz zamkniete, a pelne podium odslonimy dopiero po ostatnich sekundach gry.';
-    meta.textContent = 'To jest moment na najwieksze emocje. Tablica celowo ukrywa topke miast i uczestnikow.';
+    copy.textContent = 'Finałowa końcówka trwa. Wyniki sa juz zamkniete, a pelne podium odslonimy dopiero po ostatnich sekundach gry.';
+    meta.textContent = 'To jest moment na największe emocje. Tablica celowo ukrywa topkę miast i uczestników.';
   } else if (scoreboardState.phase === 'active') {
-    copy.textContent = 'Gra trwa. Gdy organizator wysle wazna informacje, pojawi sie ona wlasnie tutaj.';
+    copy.textContent = 'Gra trwa. Gdy organizator wyśle ważną informację, pojawi się ona właśnie tutaj.';
     meta.textContent = 'Na razie brak aktywnego komunikatu.';
   } else if (scoreboardState.phase === 'ended') {
-    copy.textContent = 'Gra dobiegla konca. Za chwile rozpocznie sie podsumowanie wydarzenia oraz przejscie do Teatru.';
-    meta.textContent = 'Ekran pozostaje w trybie finalowym do czasu rozpoczecia podsumowania.';
+    copy.textContent = 'Gra dobiegła końca. Za chwilę rozpocznie się podsumowanie wydarzenia oraz przejście do Teatru.';
+    meta.textContent = 'Ekran pozostaje w trybie finałowym do czasu rozpoczęcia podsumowania.';
   } else {
-    copy.textContent = 'Gra jeszcze nie wystartowala. Ekran jest gotowy na start wydarzenia i pierwsze wyniki.';
-    meta.textContent = 'Po uruchomieniu gry ranking zacznie aktualizowac sie automatycznie.';
+    copy.textContent = 'Gra jeszcze nie wystartowała. Ekran jest gotowy na start wydarzenia i pierwsze wyniki.';
+    meta.textContent = 'Po uruchomieniu gry ranking zacznie aktualizować się automatycznie.';
   }
 }
 
@@ -1873,7 +1877,7 @@ function renderCityStats() {
   }
 
   if (!cityStats.length) {
-    container.innerHTML = '<div class="empty-state" style="grid-column:1 / -1;">Po starcie gry tutaj pojawi sie ranking miast z suma punktow i srednia na osobe.</div>';
+    container.innerHTML = '<div class="empty-state" style="grid-column:1 / -1;">Po starcie gry tutaj pojawi się ranking miast z sumą punktów i średnią na osobę.</div>';
     return;
   }
 
@@ -1884,7 +1888,7 @@ function renderCityStats() {
     <div class="city-item">
       <div class="city-item-name">${item.city}</div>
       <div class="city-item-score">${item.score} pkt</div>
-      <div class="city-item-meta">${item.participants} uczestnikow | srednio ${item.averageScore.toFixed(1)} pkt na osobe</div>
+      <div class="city-item-meta">${item.participants} uczestników | średnio ${item.averageScore.toFixed(1)} pkt na osobe</div>
     </div>
   `).join('') + (extraCities > 0 ? `
     <div class="city-item more">
@@ -1908,11 +1912,11 @@ function renderCityPodium() {
   }
 
   podiumCopy.textContent = cityPodiumMode === 'average'
-    ? 'Podium liczone wedlug sredniej punktow na jednego uczestnika z danego miasta.'
-    : 'Podium liczone wedlug sumy punktow zdobytych przez cale miasto.';
+    ? 'Podium liczone według średniej punktów na jednego uczestnika z danego miasta.'
+    : 'Podium liczone według sumy punktów zdobytych przez całe miasto.';
 
   if (!top.length) {
-    podium.innerHTML = '<div class="empty-state">Po starcie gry tutaj pojawi sie podium miast.</div>';
+    podium.innerHTML = '<div class="empty-state">Po starcie gry tutaj pojawi się podium miast.</div>';
     return;
   }
 
@@ -1938,7 +1942,7 @@ function renderLeaderboardList() {
   }
 
   if (!sorted.length) {
-    container.innerHTML = '<div class="empty-state">Po zebraniu pierwszych wynikow tutaj pojawia sie najlepsi uczestnicy.</div>';
+    container.innerHTML = '<div class="empty-state">Po zebraniu pierwszych wyników tutaj pojawią się najlepsi uczestnicy.</div>';
     return;
   }
 
@@ -1977,7 +1981,7 @@ async function loadScoreboard(force = false) {
       const res = await fetch('/api/public-scoreboard');
       const data = await res.json();
       if (!res.ok || data.error) {
-        throw new Error(data.error || 'Nie udalo sie pobrac danych ekranu wynikow.');
+        throw new Error(data.error || 'Nie udało się pobrać danych ekranu wyników.');
       }
 
       const nextVersion = [
@@ -2025,8 +2029,8 @@ async function loadScoreboard(force = false) {
 
     return await scoreboardLoadPromise;
   } catch (error) {
-    document.getElementById('announcement-copy').textContent = 'Nie udalo sie pobrac danych do publicznego ekranu wynikow.';
-    document.getElementById('announcement-meta').textContent = 'Sprawdz polaczenie z API lub konfiguracje projektu.';
+    document.getElementById('announcement-copy').textContent = 'Nie udało się pobrać danych do publicznego ekranu wyników.';
+    document.getElementById('announcement-meta').textContent = 'Sprawdź połączenie z API lub konfigurację projektu.';
   } finally {
     scoreboardLoadPromise = null;
   }
@@ -2059,7 +2063,7 @@ function updateProjectionButton() {
   if (!button) return;
   button.classList.toggle('active', active);
   button.setAttribute('aria-pressed', active ? 'true' : 'false');
-  button.textContent = active ? 'Wyjdz z projekcji' : 'Tryb projekcyjny';
+  button.textContent = active ? 'Wyjdź z projekcji' : 'Tryb projekcyjny';
 }
 
 async function toggleProjectionMode() {
@@ -2082,13 +2086,13 @@ async function toggleProjectionMode() {
     } else if (target.msRequestFullscreen) {
       target.msRequestFullscreen();
     } else if (button) {
-      button.textContent = 'Pelny ekran niedostepny';
+      button.textContent = 'Pełny ekran niedostępny';
       setTimeout(updateProjectionButton, 1800);
     }
   } catch (error) {
-    console.error('Nie udalo sie wlaczyc trybu projekcyjnego.', error);
+    console.error('Nie udało się włączyć trybu projekcyjnego.', error);
     if (button) {
-      button.textContent = 'Pelny ekran niedostepny';
+      button.textContent = 'Pełny ekran niedostępny';
       setTimeout(updateProjectionButton, 1800);
     }
   }
@@ -2136,6 +2140,3 @@ window.onload = async () => {
 </script>
 </body>
 </html>
-
-
-

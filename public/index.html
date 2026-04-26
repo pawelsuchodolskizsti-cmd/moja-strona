@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pl">
 <head>
 <meta charset="UTF-8">
@@ -1963,7 +1963,9 @@ gameRemainingLabelElements = Array.from(document.querySelectorAll('[data-game-re
 
 const EVENT_DATE = new Date('2026-12-13T10:00:00+01:00');
 const memoryStorage = new Map();
-const qrCameraState = { detector: null, busy: false, bound: false, active: false, stream: null, scanTimer: null };
+const JS_QR_SCRIPT_URL = 'https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js';
+const PARTICIPANT_GAME_STORAGE_KEY = 'participantGameStartedAt';
+const qrCameraState = { detector: null, busy: false, bound: false, active: false, stream: null, scanTimer: null, jsQrPromise: null, canvas: null };
 
 function getCookieValue(name) {
   try {
@@ -2221,6 +2223,64 @@ function getQrBarcodeDetector() {
   }
 }
 
+function loadJsQrReader() {
+  if (typeof jsQR === 'function') return Promise.resolve(jsQR);
+  if (qrCameraState.jsQrPromise) return qrCameraState.jsQrPromise;
+
+  qrCameraState.jsQrPromise = new Promise((resolve, reject) => {
+    const existing = document.querySelector(`script[src="${JS_QR_SCRIPT_URL}"]`);
+    if (existing) {
+      existing.addEventListener('load', () => resolve(window.jsQR), { once: true });
+      existing.addEventListener('error', reject, { once: true });
+      return;
+    }
+
+    const script = document.createElement('script');
+    script.src = JS_QR_SCRIPT_URL;
+    script.async = true;
+    script.onload = () => resolve(window.jsQR);
+    script.onerror = reject;
+    document.head.appendChild(script);
+  });
+
+  return qrCameraState.jsQrPromise;
+}
+
+async function readQrFromVideoFrame() {
+  const detector = getQrBarcodeDetector();
+  if (detector) {
+    try {
+      const results = await detector.detect(qrScannerVideoEl);
+      return results && results[0] && results[0].rawValue ? String(results[0].rawValue).trim() : '';
+    } catch (error) {
+      qrCameraState.detector = false;
+    }
+  }
+
+  setQrScannerStatus('Safari używa trybu zgodności. Trzymaj kod w środku ramki.');
+  const reader = await loadJsQrReader();
+  if (typeof reader !== 'function') return '';
+
+  const sourceWidth = qrScannerVideoEl.videoWidth || 0;
+  const sourceHeight = qrScannerVideoEl.videoHeight || 0;
+  if (!sourceWidth || !sourceHeight) return '';
+
+  const maxWidth = 720;
+  const scale = Math.min(1, maxWidth / sourceWidth);
+  const width = Math.max(1, Math.round(sourceWidth * scale));
+  const height = Math.max(1, Math.round(sourceHeight * scale));
+  const canvas = qrCameraState.canvas || document.createElement('canvas');
+  qrCameraState.canvas = canvas;
+  canvas.width = width;
+  canvas.height = height;
+  const context = canvas.getContext('2d', { willReadFrequently: true });
+  if (!context) return '';
+
+  context.drawImage(qrScannerVideoEl, 0, 0, width, height);
+  const imageData = context.getImageData(0, 0, width, height);
+  const result = reader(imageData.data, width, height, { inversionAttempts: 'attemptBoth' });
+  return result && result.data ? String(result.data).trim() : '';
+}
 function parseQrTarget(rawValue) {
   const value = String(rawValue || '').trim();
   if (!value) return null;
@@ -2296,17 +2356,10 @@ function stopQrScanner() {
 async function scanQrVideoFrame() {
   if (!qrCameraState.active || qrCameraState.busy || !qrScannerVideoEl) return;
 
-  const detector = getQrBarcodeDetector();
-  if (!detector) {
-    setQrScannerStatus('Ta przeglądarka nie obsługuje automatycznego skanowania QR. Użyj systemowego skanera aparatu.');
-    return;
-  }
-
   qrCameraState.busy = true;
   try {
     if (qrScannerVideoEl.readyState >= 2) {
-      const results = await detector.detect(qrScannerVideoEl);
-      const rawValue = results && results[0] && results[0].rawValue ? String(results[0].rawValue).trim() : '';
+      const rawValue = await readQrFromVideoFrame();
       const target = parseQrTarget(rawValue);
       if (target) {
         stopQrScanner();
@@ -2316,7 +2369,9 @@ async function scanQrVideoFrame() {
         return;
       }
     }
-    setQrScannerStatus('Nakieruj aparat na kod QR i trzymaj telefon nieruchomo przez chwilę.');
+    setQrScannerStatus(getQrBarcodeDetector()
+      ? 'Nakieruj aparat na kod QR i trzymaj telefon nieruchomo przez chwilę.'
+      : 'Safari używa trybu zgodności. Trzymaj kod w środku ramki i popraw światło.');
   } catch (error) {
     setQrScannerStatus('Skanuję kod QR. Zbliż aparat albo popraw światło.');
   } finally {
@@ -2324,7 +2379,7 @@ async function scanQrVideoFrame() {
   }
 
   if (qrCameraState.active) {
-    qrCameraState.scanTimer = setTimeout(scanQrVideoFrame, 180);
+    qrCameraState.scanTimer = setTimeout(scanQrVideoFrame, getQrBarcodeDetector() ? 180 : 260);
   }
 }
 
@@ -2333,10 +2388,6 @@ async function openQrCameraCapture() {
   primeFeedbackAudio();
   triggerHaptic(12);
 
-  if (!getQrBarcodeDetector()) {
-    showMicroToast('Ta przeglądarka nie obsługuje automatycznego skanowania QR w aplikacji. Użyj systemowego skanera aparatu.', 'info', 'Aparat');
-    return;
-  }
 
   if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
     showMicroToast('Nie udało się uruchomić aparatu w tej przeglądarce.', 'info', 'Aparat');
@@ -2363,7 +2414,9 @@ async function openQrCameraCapture() {
     qrCameraState.stream = stream;
     qrScannerVideoEl.srcObject = stream;
     await qrScannerVideoEl.play();
-    setQrScannerStatus('Nakieruj aparat na kod QR. Skanowanie działa automatycznie.');
+    setQrScannerStatus(getQrBarcodeDetector()
+      ? 'Nakieruj aparat na kod QR. Skanowanie działa automatycznie.'
+      : 'Safari używa trybu zgodności. Trzymaj kod w środku ramki.');
     scanQrVideoFrame();
   } catch (error) {
     stopQrScanner();
@@ -2464,6 +2517,51 @@ function getDeviceToken() {
   return token;
 }
 
+function getCurrentGameSessionKey() {
+  return activeGameState.startedAt ? String(activeGameState.startedAt) : '';
+}
+
+function clearStoredParticipantSession() {
+  storageRemove('participantId');
+  storageRemove(PARTICIPANT_GAME_STORAGE_KEY);
+}
+
+function rememberParticipantSession(id) {
+  participantId = Number(id);
+  storageSet('participantId', String(participantId));
+  const sessionKey = getCurrentGameSessionKey();
+  if (sessionKey) {
+    storageSet(PARTICIPANT_GAME_STORAGE_KEY, sessionKey);
+  }
+}
+
+function resetLocalParticipantSession() {
+  participantId = null;
+  currentQuestion = null;
+  participantStats = { answers: 0, bonuses: 0 };
+  statsHydrated = false;
+  participantStatsFetchedAt = 0;
+  questionFetchedAt = 0;
+  questionRequestKey = '';
+  questionLoadPromise = null;
+  clearStoredParticipantSession();
+  renderParticipantBadges();
+}
+
+function getStoredParticipantIdForCurrentGame() {
+  const saved = storageGet('participantId', '');
+  if (!saved) return '';
+
+  const currentSessionKey = getCurrentGameSessionKey();
+  const savedSessionKey = storageGet(PARTICIPANT_GAME_STORAGE_KEY, '');
+
+  if (currentSessionKey && savedSessionKey !== currentSessionKey) {
+    resetLocalParticipantSession();
+    return '';
+  }
+
+  return saved;
+}
 function normalizeLoginValue(value) {
   return String(value || '').trim().toUpperCase();
 }
@@ -2730,6 +2828,7 @@ function showLoginScreen(options = {}) {
     waitingMessage = '',
     hidePanels = false
   } = options;
+  const keepLoginInputFocus = showForm && isLoginFormBeingEdited();
 
   setActiveScreen('login-screen');
   hasOpenedLogin = showForm;
@@ -2739,9 +2838,23 @@ function showLoginScreen(options = {}) {
     ? `<div class="status-waiting">${escHtml(waitingMessage)}</div>`
     : '';
 
-  if (showForm) {
+  if (showForm && !keepLoginInputFocus) {
     fnameInputEl.focus();
   }
+}
+
+function isLoginFormBeingEdited() {
+  if (!loginFormEl || participantId) return false;
+  if (activeScreenId !== 'login-screen') return false;
+  if (loginFormEl.style.display === 'none') return false;
+
+  const activeEl = document.activeElement;
+  if (activeEl && loginFormEl.contains(activeEl)) return true;
+
+  return ['fname', 'lname', 'city', 'email'].some((id) => {
+    const field = document.getElementById(id);
+    return !!field?.value?.trim();
+  });
 }
 
 function showNoQuestionScreen() {
@@ -2768,7 +2881,7 @@ async function restoreParticipantSession() {
     if (!data.id) return null;
 
     participantId = Number(data.id);
-    storageSet('participantId', String(participantId));
+    rememberParticipantSession(participantId);
     return participantId;
   } catch (e) {
     return null;
@@ -2780,7 +2893,7 @@ function clearParticipantAccess(message = 'To konto jest przypisane do innego ur
   currentQuestion = null;
   participantStatsFetchedAt = 0;
   questionFetchedAt = 0;
-  storageRemove('participantId');
+  clearStoredParticipantSession();
   showLoginScreen({ showForm: true });
   loginBtnEl.disabled = false;
   loginMsgEl.innerText = message;
@@ -2944,7 +3057,7 @@ function applyGamePhaseScreen(phase, manageScreens) {
 
   if (phase === 'idle') {
     if (participantId) {
-      storageRemove('participantId');
+      clearStoredParticipantSession();
       participantId = null;
       currentQuestion = null;
       questionFetchedAt = 0;
@@ -3058,7 +3171,7 @@ async function doLogin() {
     participantStatsFetchedAt = 0;
     questionFetchedAt = 0;
     currentQuestion = null;
-    storageSet('participantId', String(participantId));
+    rememberParticipantSession(participantId);
     triggerHaptic([16, 45, 16]);
     playFeedbackTone('ready');
     await showQuestionScreen({ force: true });
@@ -3204,14 +3317,18 @@ async function syncPlayerView(options = {}) {
   }
 
   syncPlayerViewPromise = (async () => {
-    const phase = await loadGameState({ manageScreens: !silent, force });
+    const keepLoginFormStable = isLoginFormBeingEdited();
+    const phase = await loadGameState({ manageScreens: !silent && !keepLoginFormStable, force });
 
     if (phase !== 'active') {
+      if (keepLoginFormStable && !silent) {
+        applyGamePhaseScreen(phase, true);
+      }
       return phase;
     }
 
     if (!participantId) {
-      if (!silent) {
+      if (!silent && !keepLoginFormStable) {
         showLoginScreen({ showForm: true });
       }
       return phase;
@@ -3302,7 +3419,7 @@ async function submitAnswer() {
     showAnsweredState(data.answer || ans, data.message || 'Odpowiedź została wysłana.', !data.alreadyAnswered);
 
   } catch(e) {
-    if (/zakonczona|wystartowala/i.test(String(e.message || ''))) {
+    if (/zakonczona|zakończona|wystartowala|wystartowała/i.test(String(e.message || ''))) {
       await loadGameState();
       return;
     }
@@ -3378,15 +3495,15 @@ window.onload = async () => {
   renderParticipantBadges();
   setInterval(renderGameRemaining, 1000);
 
-  const saved = storageGet('participantId', '');
+  const phase = await loadGameState({ manageScreens: false, force: true });
+  const saved = getStoredParticipantIdForCurrentGame();
 
   if (saved) {
     participantId = parseInt(saved, 10);
-  } else {
+  } else if (phase === 'active') {
     await restoreParticipantSession();
   }
 
-  const phase = await loadGameState({ manageScreens: false, force: true });
   if (participantId && phase === 'active') {
     await showQuestionScreen({ force: true });
   } else {
@@ -3419,4 +3536,3 @@ window.onload = async () => {
 
 </body>
 </html>
-
