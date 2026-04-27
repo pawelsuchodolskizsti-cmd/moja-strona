@@ -699,6 +699,38 @@ label {
   text-decoration:underline;
 }
 
+#login-screen.login-form-open {
+  min-height: auto;
+  padding-top: 26px;
+  padding-bottom: 24px;
+}
+
+#login-form h1 {
+  margin-bottom: 2px;
+}
+
+#login-form .subtitle {
+  margin-bottom: 12px;
+}
+
+#login-form label:not(.terms-check) {
+  margin-bottom: 4px;
+}
+
+#login-form input {
+  padding: 10px 12px;
+  margin-bottom: 9px;
+}
+
+#login-form .terms-check {
+  margin: 6px 0 12px;
+  padding: 10px 12px;
+}
+
+#login-form .btn {
+  padding: 12px 14px;
+}
+
 /* INPUT */
 input, textarea {
   width:100%;
@@ -2831,6 +2863,7 @@ function showLoginScreen(options = {}) {
   const keepLoginInputFocus = showForm && isLoginFormBeingEdited();
 
   setActiveScreen('login-screen');
+  screenElements['login-screen']?.classList.toggle('login-form-open', showForm && !hidePanels && !waitingMessage);
   hasOpenedLogin = showForm;
   howtoPanelEl.style.display = hidePanels ? 'none' : (waitingMessage ? 'none' : (showForm ? 'none' : 'block'));
   loginFormEl.style.display = hidePanels ? 'none' : (waitingMessage ? 'none' : (showForm ? 'block' : 'none'));
@@ -3317,18 +3350,14 @@ async function syncPlayerView(options = {}) {
   }
 
   syncPlayerViewPromise = (async () => {
-    const keepLoginFormStable = isLoginFormBeingEdited();
-    const phase = await loadGameState({ manageScreens: !silent && !keepLoginFormStable, force });
+    const phase = await loadGameState({ manageScreens: !silent, force });
 
     if (phase !== 'active') {
-      if (keepLoginFormStable && !silent) {
-        applyGamePhaseScreen(phase, true);
-      }
       return phase;
     }
 
     if (!participantId) {
-      if (!silent && !keepLoginFormStable) {
+      if (!silent) {
         showLoginScreen({ showForm: true });
       }
       return phase;
