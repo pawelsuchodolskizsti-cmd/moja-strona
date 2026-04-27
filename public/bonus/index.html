@@ -2640,15 +2640,28 @@ async function loadGameState(options = {}) {
   }
 }
 
-async function restoreParticipantSession() {
+async function restoreParticipantSession(options = {}) {
+  const { clearWhenMissing = false } = options;
   if (!deviceToken) return null;
 
   try {
-    const res = await fetch(`/api/participant-session?token=${encodeURIComponent(deviceToken)}`);
-    if (!res.ok) return null;
+    const res = await fetch(`/api/participant-session?token=${encodeURIComponent(deviceToken)}`, { cache: 'no-store' });
+    if (!res.ok) {
+      if (clearWhenMissing && (res.status === 400 || res.status === 404 || res.status === 403)) {
+        clearStoredParticipantSession();
+        participantId = null;
+      }
+      return null;
+    }
 
     const data = await res.json();
-    if (!data.id) return null;
+    if (!data.id) {
+      if (clearWhenMissing) {
+        clearStoredParticipantSession();
+        participantId = null;
+      }
+      return null;
+    }
 
     participantId = data.id;
     rememberParticipantSession(participantId);
@@ -2656,6 +2669,35 @@ async function restoreParticipantSession() {
   } catch (e) {
     return null;
   }
+}
+
+function isDeviceConflictMessage(message = '') {
+  return /urzadzen|urządzen|przypisane|innego urządzenia/i.test(String(message || ''));
+}
+
+function isRecoverableSessionMessage(message = '') {
+  return /sesja|wygas|nowej gry|brak aktywnej sesji|brak zapisanej sesji/i.test(String(message || ''));
+}
+
+async function recoverParticipantSessionAfterAuthError(message = '') {
+  if (!deviceToken || isDeviceConflictMessage(message) || !isRecoverableSessionMessage(message)) {
+    return false;
+  }
+
+  const previousParticipantId = participantId;
+  const restoredId = await restoreParticipantSession({ clearWhenMissing: true });
+  if (!restoredId) return false;
+
+  if (String(previousParticipantId || '') !== String(restoredId || '')) {
+    bonusLabelFetchedAt = 0;
+    bonusCountFetchedAt = 0;
+    bonusLabelCacheKey = '';
+    cachedBonusLabelData = null;
+    participantStatsFetchedAt = 0;
+    participantStatsLoadPromise = null;
+  }
+
+  return true;
 }
 
 async function loadBonusLabel(options = {}) {
@@ -2688,6 +2730,20 @@ async function loadBonusLabel(options = {}) {
         bonusLabelFetchedAt = Date.now();
         cachedBonusLabelData = { inactive: true, ...data };
         return cachedBonusLabelData;
+      }
+      const recovered = await recoverParticipantSessionAfterAuthError(data.error || '');
+      if (recovered) {
+        const retryQuery = participantId
+          ? `/api/bonus?b=${encodeURIComponent(bonusId)}&pid=${encodeURIComponent(participantId)}&token=${encodeURIComponent(deviceToken)}`
+          : `/api/bonus?b=${encodeURIComponent(bonusId)}`;
+        const retryRes = await fetch(retryQuery, { cache: 'no-store' });
+        const retryData = await retryRes.json();
+        if (retryRes.ok && !retryData.error) {
+          setBonusLabel(retryData.label || 'Podaj has\u0142o do tego bonusu.');
+          bonusLabelFetchedAt = Date.now();
+          cachedBonusLabelData = retryData;
+          return cachedBonusLabelData;
+        }
       }
       clearBonusAccess(data.error || 'To konto jest przypisane do innego urządzenia. Zaloguj się ponownie.');
       return null;
@@ -2842,11 +2898,10 @@ window.onload = async () => {
   setInterval(renderGameRemaining, 1000);
 
   const phase = await loadGameState({ force: true });
-  const saved = getStoredParticipantIdForCurrentGame();
-  if (saved) {
-    participantId = saved;
-  } else if (phase === 'active' && !participantId) {
-    await restoreParticipantSession();
+  if (phase === 'active') {
+    await restoreParticipantSession({ clearWhenMissing: true });
+  } else {
+    resetLocalParticipantSession();
   }
 
   await syncBonusView({ force: true });
@@ -2961,10 +3016,19 @@ async function submitSecret() {
 
     const data = await res.json();
 
-    if (res.status === 403 && /urzadzen|urządzen|przypisane/i.test(String(data.error || ''))) {
+    if (res.status === 403 && isDeviceConflictMessage(data.error || '')) {
       clearBonusAccess(data.error);
       btn.disabled = false;
       return;
+    }
+
+    if (res.status === 403) {
+      const recovered = await recoverParticipantSessionAfterAuthError(data.error || '');
+      if (recovered) {
+        btn.disabled = false;
+        await submitSecret();
+        return;
+      }
     }
 
     if (data.correct) {

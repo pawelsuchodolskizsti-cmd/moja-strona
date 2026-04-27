@@ -2903,15 +2903,28 @@ function showThanksScreen() {
   setActiveScreen('thanks-screen');
 }
 
-async function restoreParticipantSession() {
+async function restoreParticipantSession(options = {}) {
+  const { clearWhenMissing = false } = options;
   if (!deviceToken) return null;
 
   try {
-    const res = await fetch(`/api/participant-session?token=${encodeURIComponent(deviceToken)}`);
-    if (!res.ok) return null;
+    const res = await fetch(`/api/participant-session?token=${encodeURIComponent(deviceToken)}`, { cache: 'no-store' });
+    if (!res.ok) {
+      if (clearWhenMissing && (res.status === 400 || res.status === 404 || res.status === 403)) {
+        clearStoredParticipantSession();
+        participantId = null;
+      }
+      return null;
+    }
 
     const data = await res.json();
-    if (!data.id) return null;
+    if (!data.id) {
+      if (clearWhenMissing) {
+        clearStoredParticipantSession();
+        participantId = null;
+      }
+      return null;
+    }
 
     participantId = Number(data.id);
     rememberParticipantSession(participantId);
@@ -2919,6 +2932,34 @@ async function restoreParticipantSession() {
   } catch (e) {
     return null;
   }
+}
+
+function isDeviceConflictMessage(message = '') {
+  return /urzadzen|urządzen|przypisane|innego urządzenia/i.test(String(message || ''));
+}
+
+function isRecoverableSessionMessage(message = '') {
+  return /sesja|wygas|nowej gry|brak aktywnej sesji|brak zapisanej sesji/i.test(String(message || ''));
+}
+
+async function recoverParticipantSessionAfterAuthError(message = '') {
+  if (!deviceToken || isDeviceConflictMessage(message) || !isRecoverableSessionMessage(message)) {
+    return false;
+  }
+
+  const previousParticipantId = participantId;
+  const restoredId = await restoreParticipantSession({ clearWhenMissing: true });
+  if (!restoredId) return false;
+
+  if (Number(previousParticipantId) !== Number(restoredId)) {
+    currentQuestion = null;
+    participantStatsFetchedAt = 0;
+    questionFetchedAt = 0;
+    questionRequestKey = '';
+    questionLoadPromise = null;
+  }
+
+  return true;
 }
 
 function clearParticipantAccess(message = 'To konto jest przypisane do innego urządzenia. Zaloguj się ponownie.') {
@@ -3056,6 +3097,15 @@ async function refreshParticipantStats(options = {}) {
       const res = await fetch(`/api/participant-stats?pid=${participantId}&token=${encodeURIComponent(deviceToken)}`);
       if (res.status === 403) {
         const data = await res.json();
+        const recovered = await recoverParticipantSessionAfterAuthError(data.error || '');
+        if (recovered) {
+          const retryRes = await fetch(`/api/participant-stats?pid=${participantId}&token=${encodeURIComponent(deviceToken)}`, { cache: 'no-store' });
+          const retryData = await retryRes.json();
+          if (retryRes.ok && !retryData.error) {
+            renderParticipantStats(retryData);
+            return;
+          }
+        }
         clearParticipantAccess(data.error || 'To konto jest przypisane do innego urządzenia. Zaloguj się ponownie.');
         return;
       }
@@ -3272,11 +3322,16 @@ async function showQuestionScreen(options = {}) {
     const { res, data } = payload;
 
     if (data.error) {
-      if (res.status === 403 && /urzadzen|urządzen|przypisane/i.test(String(data.error || ''))) {
+      if (res.status === 403 && isDeviceConflictMessage(data.error || '')) {
         clearParticipantAccess(data.error);
         return;
       }
       if (res.status === 403) {
+        const recovered = await recoverParticipantSessionAfterAuthError(data.error || '');
+        if (recovered) {
+          await showQuestionScreen({ force: true });
+          return;
+        }
         await loadGameState();
         return;
       }
@@ -3525,12 +3580,11 @@ window.onload = async () => {
   setInterval(renderGameRemaining, 1000);
 
   const phase = await loadGameState({ manageScreens: false, force: true });
-  const saved = getStoredParticipantIdForCurrentGame();
 
-  if (saved) {
-    participantId = parseInt(saved, 10);
-  } else if (phase === 'active') {
-    await restoreParticipantSession();
+  if (phase === 'active') {
+    await restoreParticipantSession({ clearWhenMissing: true });
+  } else {
+    resetLocalParticipantSession();
   }
 
   if (participantId && phase === 'active') {
