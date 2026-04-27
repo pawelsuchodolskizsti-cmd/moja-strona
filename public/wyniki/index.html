@@ -1765,6 +1765,221 @@
       min-height: 150px;
     }
   }
+
+  /* ========== LIVE UPDATE INDICATOR ========== */
+  .live-ago {
+    font-size: 10px;
+    font-weight: 700;
+    color: #18c85a;
+    letter-spacing: 0;
+    transition: color 0.4s;
+  }
+
+  .live-ago.stale {
+    color: #ff9a3c;
+  }
+
+  .sync-flash {
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #18c85a;
+    opacity: 0;
+    margin-left: 4px;
+    vertical-align: middle;
+  }
+
+  .sync-flash.flashing {
+    animation: syncPop 0.6s ease forwards;
+  }
+
+  @keyframes syncPop {
+    0% { opacity: 1; transform: scale(1.6); background: #18c85a; }
+    100% { opacity: 0; transform: scale(0.5); }
+  }
+
+  /* ========== PARTICIPANTS SIDEBAR ========== */
+  .participants-sidebar {
+    display: none;
+  }
+
+  body.projection-mode .screen {
+    grid-template-columns: minmax(0, 1fr) 190px !important;
+    grid-template-rows: 56px minmax(120px, .35fr) minmax(270px, 1fr) minmax(150px, .44fr) !important;
+    grid-template-areas:
+      "branding branding"
+      "hero hero"
+      "board sidebar"
+      "cities sidebar" !important;
+  }
+
+  body.projection-mode .participants-sidebar {
+    display: flex;
+    flex-direction: column;
+    background: linear-gradient(180deg, rgba(255,255,255,0.97), rgba(255,255,255,0.92));
+    border: 1px solid rgba(255,255,255,0.72);
+    border-radius: 22px;
+    box-shadow: 0 28px 70px rgba(30,22,70,0.22);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    overflow: hidden;
+    grid-area: sidebar;
+    min-height: 0;
+    height: 100%;
+  }
+
+  .sidebar-header {
+    padding: 10px 12px 8px;
+    border-bottom: 1px solid rgba(124,106,247,0.1);
+    flex-shrink: 0;
+    background: linear-gradient(135deg, rgba(124,106,247,0.06), rgba(255,61,107,0.04));
+  }
+
+  .sidebar-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: #73688c;
+    margin-bottom: 4px;
+  }
+
+  .sidebar-count-row {
+    display: flex;
+    align-items: baseline;
+    gap: 5px;
+  }
+
+  .sidebar-count-num {
+    font-family: 'Syne', sans-serif;
+    font-size: 28px;
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -.04em;
+    color: #2f2750;
+  }
+
+  .sidebar-count-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--muted);
+  }
+
+  .sidebar-list {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 4px 0;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(124,106,247,0.2) transparent;
+  }
+
+  .sidebar-list::-webkit-scrollbar {
+    width: 3px;
+  }
+  .sidebar-list::-webkit-scrollbar-thumb {
+    background: rgba(124,106,247,0.18);
+    border-radius: 2px;
+  }
+
+  .sidebar-participant {
+    display: grid;
+    grid-template-columns: 22px minmax(0,1fr) auto;
+    grid-template-rows: auto auto;
+    align-items: center;
+    column-gap: 5px;
+    row-gap: 0;
+    padding: 4px 10px;
+    border-bottom: 1px solid rgba(124,106,247,0.05);
+    transition: background 0.15s;
+  }
+
+  .sidebar-participant:last-child {
+    border-bottom: none;
+  }
+
+  .sidebar-participant.new-arrival {
+    animation: sidebarSlideIn 0.4s cubic-bezier(.18,.92,.22,1) forwards;
+  }
+
+  .sidebar-rank {
+    grid-row: 1 / 3;
+    font-family: 'Syne', sans-serif;
+    font-size: 10px;
+    font-weight: 800;
+    color: #bbb8cc;
+    text-align: center;
+    align-self: center;
+  }
+
+  .sidebar-name {
+    font-weight: 700;
+    font-size: 11px;
+    color: #2f2750;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    line-height: 1.2;
+  }
+
+  .sidebar-score {
+    grid-row: 1 / 3;
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 13px;
+    color: var(--purple);
+    white-space: nowrap;
+    align-self: center;
+  }
+
+  .sidebar-city-tag {
+    font-size: 9px;
+    color: var(--muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1;
+  }
+
+  /* ========== RANK CHANGE ANIMATIONS ========== */
+  @keyframes rankUp {
+    0% { background: rgba(24, 200, 90, 0.2); box-shadow: inset 0 0 0 1px rgba(24,200,90,0.3); }
+    100% { background: transparent; box-shadow: none; }
+  }
+
+  @keyframes rankDown {
+    0% { background: rgba(255, 61, 107, 0.12); }
+    100% { background: transparent; }
+  }
+
+  @keyframes rankNew {
+    0% { opacity: 0; transform: translateY(10px) scale(0.97); }
+    100% { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  @keyframes sidebarSlideIn {
+    0% { opacity: 0; transform: translateX(10px); }
+    100% { opacity: 1; transform: translateX(0); }
+  }
+
+  @keyframes scoreFlash {
+    0% { color: #18c85a; }
+    60% { color: #18c85a; }
+    100% { color: inherit; }
+  }
+
+  @keyframes liveRipple {
+    0% { box-shadow: 0 0 0 0 rgba(24,200,90,0.4); }
+    100% { box-shadow: 0 0 0 10px rgba(24,200,90,0); }
+  }
+
+  .list-item.rank-up { animation: rankUp 1.5s ease forwards; }
+  .list-item.rank-down { animation: rankDown 1.5s ease forwards; }
+  .list-item.rank-new { animation: rankNew 0.45s cubic-bezier(.18,.92,.22,1) forwards; }
+  .list-score strong.score-changed { animation: scoreFlash 1s ease forwards; }
+  .live-dot.ripple { animation: liveRipple 0.6s ease; }
 </style>
 </head>
 <body>
@@ -1785,8 +2000,8 @@
         <div class="headline" id="headline">Ranking na żywo</div>
         <div class="subline" id="subline">Najwazniejsze informacje dla widowni: czas, liderzy i czytelny obraz tego, kto prowadzi w finale gry.</div>
         <div class="hero-meta">
-          <div class="meta-pill"><span class="live-dot"></span> Ekran wydarzenia</div>
-          <div class="meta-pill" id="last-updated">Aktualizacja: --:--</div>
+          <div class="meta-pill"><span class="live-dot" id="live-dot"></span> Na żywo</div>
+          <div class="meta-pill" id="last-updated">Akt: <span id="live-ago" class="live-ago">--</span><span class="sync-flash" id="sync-flash"></span></div>
           <button class="meta-pill meta-button" id="projection-toggle" type="button" aria-pressed="false">Tryb projekcyjny</button>
         </div>
       </div>
@@ -1852,6 +2067,17 @@
       <div class="city-grid" id="city-ranking"></div>
     </section>
 
+    <aside class="participants-sidebar" id="participants-sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-title">Uczestnicy</div>
+        <div class="sidebar-count-row">
+          <span class="sidebar-count-num" id="sidebar-count">0</span>
+          <span class="sidebar-count-label">graczy</span>
+        </div>
+      </div>
+      <div class="sidebar-list" id="sidebar-list"></div>
+    </aside>
+
   </div>
 
 <script>
@@ -1869,6 +2095,11 @@ let scoreboardState = {
   cityStats: []
 };
 
+// Track previous ranks for animation
+let prevRanks = {}; // participantId -> rank
+let prevScores = {}; // participantId -> score
+let knownParticipantIds = new Set();
+
 let scoreboardSort = 'score';
 let cityPodiumMode = 'total';
 let scoreboardLoadPromise = null;
@@ -1884,8 +2115,8 @@ let cachedCityLeaders = [];
 let lastRawRevealState = { participants: null, cities: null };
 let lastResultsLockKey = '';
 
-const SCOREBOARD_CACHE_MS = 4000;
-const SCOREBOARD_SYNC_COOLDOWN_MS = 1200;
+const SCOREBOARD_CACHE_MS = 2000;
+const SCOREBOARD_SYNC_COOLDOWN_MS = 800;
 const SUSPENSE_THRESHOLD_MS = 3 * 60000;
 
 function isSafariBrowser() {
@@ -2164,9 +2395,12 @@ function renderAnnouncement() {
 }
 
 function renderStats() {
-  const lastUpdated = document.getElementById('last-updated');
-  if (lastUpdated) {
-    lastUpdated.textContent = `Aktualizacja: ${formatDateTime(scoreboardState.updatedAt)}`;
+  const liveAgo = document.getElementById('live-ago');
+  if (liveAgo && scoreboardFetchedAt) {
+    const secs = Math.round((Date.now() - scoreboardFetchedAt) / 1000);
+    const stale = secs > 10;
+    liveAgo.textContent = secs < 60 ? `${secs}s temu` : `${Math.floor(secs/60)}m temu`;
+    liveAgo.classList.toggle('stale', stale);
   }
 }
 
@@ -2252,19 +2486,106 @@ function renderLeaderboardList() {
     return;
   }
 
-  container.innerHTML = sorted.map((participant) => `
-    <div class="list-item">
+  const newPrevRanks = {};
+  const newPrevScores = {};
+
+  container.innerHTML = sorted.map((participant) => {
+    const id = participant.id || participant.name;
+    const oldRank = prevRanks[id];
+    const oldScore = prevScores[id];
+    const isNew = oldRank === undefined;
+    const movedUp = !isNew && participant.rank < oldRank;
+    const movedDown = !isNew && participant.rank > oldRank;
+    const scoreChanged = !isNew && participant.score !== oldScore;
+
+    newPrevRanks[id] = participant.rank;
+    newPrevScores[id] = participant.score;
+
+    let animClass = '';
+    if (isNew) animClass = 'rank-new';
+    else if (movedUp) animClass = 'rank-up';
+    else if (movedDown) animClass = 'rank-down';
+
+    return `
+    <div class="list-item ${animClass}" data-id="${id}">
       <div class="list-rank">${participant.rank}</div>
       <div class="list-main">
         <div class="list-name">${participant.name}</div>
         <div class="list-city">${participant.city || 'Bez miasta'}</div>
       </div>
       <div class="list-score">
-        <strong>${participant.score} pkt</strong>
+        <strong class="${scoreChanged ? 'score-changed' : ''}">${participant.score} pkt</strong>
         <span>${participant.answeredCount || 0} odpowiedzi</span>
       </div>
     </div>
-  `).join('');
+  `;
+  }).join('');
+
+  // Update tracking after render
+  Object.assign(prevRanks, newPrevRanks);
+  Object.assign(prevScores, newPrevScores);
+}
+
+let cachedSidebarKey = '';
+
+function renderSidebar() {
+  const sidebar = document.getElementById('participants-sidebar');
+  const countEl = document.getElementById('sidebar-count');
+  const listEl = document.getElementById('sidebar-list');
+  if (!sidebar || !listEl) return;
+
+  const projectionMode = document.body.classList.contains('projection-mode');
+  if (!projectionMode) return;
+
+  const all = scoreboardState.leaderboard || [];
+  const total = scoreboardState.stats?.participants || all.length;
+
+  // Only re-render if data changed
+  const sidebarKey = `${scoreboardState.updatedAt || 'none'}|${all.length}|${total}`;
+  if (sidebarKey === cachedSidebarKey) return;
+  cachedSidebarKey = sidebarKey;
+
+  if (countEl) countEl.textContent = total;
+
+  if (!all.length) {
+    listEl.innerHTML = '<div style="padding:12px;font-size:11px;color:#9e98bb;text-align:center;">Brak danych</div>';
+    return;
+  }
+
+  const sorted = [...all].sort((a, b) => (b.score || 0) - (a.score || 0));
+  const newIds = new Set(sorted.map(p => p.id || p.name));
+
+  listEl.innerHTML = sorted.map((p, i) => {
+    const id = p.id || p.name;
+    const isNew = !knownParticipantIds.has(id);
+    return `
+      <div class="sidebar-participant ${isNew ? 'new-arrival' : ''}" data-id="${id}">
+        <span class="sidebar-rank">${i + 1}</span>
+        <span class="sidebar-name">${p.name}</span>
+        <span class="sidebar-score">${p.score}</span>
+        <span class="sidebar-city-tag">${p.city || ''}</span>
+      </div>
+    `;
+  }).join('');
+
+  // Update known set
+  newIds.forEach(id => knownParticipantIds.add(id));
+}
+
+function triggerSyncFlash() {
+  const flash = document.getElementById('sync-flash');
+  const dot = document.getElementById('live-dot');
+  if (flash) {
+    flash.classList.remove('flashing');
+    void flash.offsetWidth;
+    flash.classList.add('flashing');
+  }
+  if (dot) {
+    dot.classList.remove('ripple');
+    void dot.offsetWidth;
+    dot.classList.add('ripple');
+    setTimeout(() => dot.classList.remove('ripple'), 700);
+  }
 }
 
 function renderAll() {
@@ -2274,6 +2595,8 @@ function renderAll() {
   renderCityStats();
   renderCityPodium();
   renderLeaderboardList();
+  renderSidebar();
+  triggerSyncFlash();
 }
 
 async function loadScoreboard(force = false) {
@@ -2366,6 +2689,7 @@ function updateProjectionButton() {
   document.body.classList.toggle('projection-mode', active);
   renderCityStats();
   renderLeaderboardList();
+  renderSidebar();
   if (!button) return;
   button.classList.toggle('active', active);
   button.setAttribute('aria-pressed', active ? 'true' : 'false');
@@ -2415,6 +2739,7 @@ window.onload = async () => {
   document.addEventListener('msfullscreenchange', updateProjectionButton);
   setInterval(() => {
     renderHeader();
+    renderStats();
     const nextLockKey = JSON.stringify(getResultsRevealState());
     if (nextLockKey !== lastResultsLockKey) {
       lastResultsLockKey = nextLockKey;
@@ -2422,12 +2747,14 @@ window.onload = async () => {
       renderCityPodium();
       renderLeaderboardList();
     }
+    // Sidebar updates separately (non-disruptive)
+    renderSidebar();
   }, 1000);
   setInterval(() => {
     if (!document.hidden) {
       scheduleScoreboardRefresh();
     }
-  }, 12000);
+  }, 3000);
   window.addEventListener('focus', () => {
     scheduleScoreboardRefresh(true);
   });
