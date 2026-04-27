@@ -2531,6 +2531,18 @@ function goToHomeFromBonus() {
   window.location.href = '/';
 }
 
+function adoptParticipantIdFromResponse(data) {
+  const nextParticipantId = data?.participantId ? String(data.participantId) : '';
+  if (!nextParticipantId || String(participantId || '') === nextParticipantId) return;
+
+  participantId = nextParticipantId;
+  rememberParticipantSession(participantId);
+  participantStatsFetchedAt = 0;
+  bonusLabelFetchedAt = 0;
+  bonusCountFetchedAt = 0;
+  bonusLabelCacheKey = '';
+  cachedBonusLabelData = null;
+}
 function clearBonusAccess(message = 'To konto jest przypisane do innego urządzenia. Zaloguj się ponownie.') {
   participantId = null;
   bonusLabelFetchedAt = 0;
@@ -2739,6 +2751,7 @@ async function loadBonusLabel(options = {}) {
         const retryRes = await fetch(retryQuery, { cache: 'no-store' });
         const retryData = await retryRes.json();
         if (retryRes.ok && !retryData.error) {
+          adoptParticipantIdFromResponse(retryData);
           setBonusLabel(retryData.label || 'Podaj has\u0142o do tego bonusu.');
           bonusLabelFetchedAt = Date.now();
           cachedBonusLabelData = retryData;
@@ -2749,6 +2762,7 @@ async function loadBonusLabel(options = {}) {
       return null;
     }
     const data = await res.json();
+    adoptParticipantIdFromResponse(data);
     setBonusLabel(data.label || 'Podaj has\u0142o do tego bonusu.');
     bonusLabelFetchedAt = Date.now();
     cachedBonusLabelData = data;
@@ -3030,6 +3044,8 @@ async function submitSecret() {
         return;
       }
     }
+
+    adoptParticipantIdFromResponse(data);
 
     if (data.correct) {
       const bonusCount = data.stats

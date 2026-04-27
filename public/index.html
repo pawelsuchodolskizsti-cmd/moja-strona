@@ -2962,6 +2962,17 @@ async function recoverParticipantSessionAfterAuthError(message = '') {
   return true;
 }
 
+function adoptParticipantIdFromResponse(data) {
+  const nextParticipantId = Number(data?.participantId || 0);
+  if (!nextParticipantId || Number(participantId) === nextParticipantId) return;
+
+  participantId = nextParticipantId;
+  rememberParticipantSession(participantId);
+  participantStatsFetchedAt = 0;
+  questionFetchedAt = 0;
+  questionRequestKey = '';
+  questionLoadPromise = null;
+}
 function clearParticipantAccess(message = 'To konto jest przypisane do innego urządzenia. Zaloguj się ponownie.') {
   participantId = null;
   currentQuestion = null;
@@ -3102,6 +3113,7 @@ async function refreshParticipantStats(options = {}) {
           const retryRes = await fetch(`/api/participant-stats?pid=${participantId}&token=${encodeURIComponent(deviceToken)}`, { cache: 'no-store' });
           const retryData = await retryRes.json();
           if (retryRes.ok && !retryData.error) {
+            adoptParticipantIdFromResponse(retryData);
             renderParticipantStats(retryData);
             return;
           }
@@ -3111,6 +3123,7 @@ async function refreshParticipantStats(options = {}) {
       }
       const data = await res.json();
       if (!data.error) {
+        adoptParticipantIdFromResponse(data);
         renderParticipantStats(data);
       }
     } catch (e) {
@@ -3286,6 +3299,7 @@ async function fetchQuestionData(options = {}) {
     const res = await fetch(`/api/question?q=${q}&pid=${participantId}&token=${encodeURIComponent(deviceToken)}&track=${trackOpen ? '1' : '0'}`);
     const data = await res.json();
     if (res.ok && !data.error) {
+      adoptParticipantIdFromResponse(data);
       currentQuestion = data;
       questionFetchedAt = Date.now();
       if (data.stats) {
@@ -3378,6 +3392,8 @@ async function refreshQuestionState(options = {}) {
       }
       return;
     }
+
+    adoptParticipantIdFromResponse(data);
 
     if (currentQuestion?.id !== data.id) {
       currentQuestion = data;
@@ -3485,6 +3501,7 @@ async function submitAnswer() {
     if (!res.ok || data.error) {
       throw new Error(data.error || 'Nie udało się zapisać odpowiedzi.');
     }
+    adoptParticipantIdFromResponse(data);
     if (data.stats) {
       renderParticipantStats(data.stats);
     }
