@@ -439,7 +439,7 @@
   }
 
   body.projection-mode.suspense-mode .status-value.timer {
-    font-size: clamp(72px, 7.2vw, 122px);
+    font-size: clamp(52px, 5.4vw, 96px);
   }
 
   body.projection-mode.suspense-mode .empty-state {
@@ -1655,7 +1655,7 @@
     min-height: 0;
     padding: 10px;
     gap: 10px;
-    grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr);
+    grid-template-columns: minmax(0, .72fr) minmax(0, 1.28fr);
   }
 
   body.projection-mode .hero-main {
@@ -1678,17 +1678,21 @@
 
   body.projection-mode .status-box.timer-box {
     min-height: 0;
-    padding: 14px 22px;
+    padding: 12px 20px;
+    align-items: stretch;
   }
 
   body.projection-mode .status-value.timer {
-    font-size: clamp(64px, 7vw, 132px);
-    transform: scaleX(.94);
-    transform-origin: left center;
+    font-size: clamp(50px, 5.4vw, 98px);
+    line-height: .86;
+    text-align: center;
+    transform: scaleX(.92);
+    transform-origin: center center;
   }
 
   body.projection-mode .board {
     gap: 8px;
+    grid-template-columns: minmax(0, .78fr) minmax(0, 1.22fr);
   }
 
   body.projection-mode .board-card {
@@ -1805,7 +1809,7 @@
   }
 
   body.projection-mode .screen {
-    grid-template-columns: minmax(0, 1fr) 190px !important;
+    grid-template-columns: minmax(0, 1fr) 390px !important;
     grid-template-rows: 56px minmax(120px, .35fr) minmax(270px, 1fr) minmax(150px, .44fr) !important;
     grid-template-areas:
       "branding branding"
@@ -1830,7 +1834,7 @@
   }
 
   .sidebar-header {
-    padding: 10px 12px 8px;
+    padding: 9px 10px 7px;
     border-bottom: 1px solid rgba(124,106,247,0.1);
     flex-shrink: 0;
     background: linear-gradient(135deg, rgba(124,106,247,0.06), rgba(255,61,107,0.04));
@@ -1886,12 +1890,12 @@
 
   .sidebar-participant {
     display: grid;
-    grid-template-columns: 22px minmax(0,1fr) auto;
+    grid-template-columns: 24px minmax(0,1fr) auto;
     grid-template-rows: auto auto;
     align-items: center;
     column-gap: 5px;
     row-gap: 0;
-    padding: 4px 10px;
+    padding: 6px 12px;
     border-bottom: 1px solid rgba(124,106,247,0.05);
     transition: background 0.15s;
   }
@@ -1943,6 +1947,43 @@
     line-height: 1;
   }
 
+
+  .participants-sidebar.locked .sidebar-count-num {
+    color: #73688c;
+  }
+
+  .participants-sidebar.locked .sidebar-list {
+    padding: 10px;
+  }
+
+  .participants-sidebar.locked .reveal-lock {
+    min-height: 100%;
+    padding: 18px 14px;
+    border-radius: 18px;
+  }
+
+  .participants-sidebar.locked .reveal-stage-title {
+    font-size: clamp(18px, 1.35vw, 24px);
+    line-height: 1.04;
+  }
+
+  .participants-sidebar.locked .reveal-stage-copy {
+    font-size: 11px;
+    line-height: 1.35;
+  }
+
+  .sidebar-participant.rank-up {
+    animation: sidebarRankUp 0.72s cubic-bezier(.18,.92,.22,1) forwards;
+  }
+
+  .sidebar-participant.rank-down {
+    animation: sidebarRankDown 0.72s cubic-bezier(.18,.92,.22,1) forwards;
+  }
+
+  .sidebar-score.score-changed {
+    animation: scoreFlash 1s ease forwards;
+  }
+
   /* ========== RANK CHANGE ANIMATIONS ========== */
   @keyframes rankUp {
     0% { background: rgba(24, 200, 90, 0.2); box-shadow: inset 0 0 0 1px rgba(24,200,90,0.3); }
@@ -1964,6 +2005,18 @@
     100% { opacity: 1; transform: translateX(0); }
   }
 
+
+  @keyframes sidebarRankUp {
+    0% { transform: translateY(14px) scale(.985); background: rgba(24, 200, 90, 0.18); box-shadow: inset 0 0 0 1px rgba(24,200,90,0.28); }
+    55% { transform: translateY(-3px) scale(1.01); background: rgba(200, 255, 57, 0.16); }
+    100% { transform: translateY(0) scale(1); background: transparent; box-shadow: none; }
+  }
+
+  @keyframes sidebarRankDown {
+    0% { transform: translateY(-12px) scale(.985); background: rgba(255, 61, 107, 0.12); }
+    60% { transform: translateY(2px) scale(1); background: rgba(124, 106, 247, 0.08); }
+    100% { transform: translateY(0) scale(1); background: transparent; }
+  }
   @keyframes scoreFlash {
     0% { color: #18c85a; }
     60% { color: #18c85a; }
@@ -2527,6 +2580,8 @@ function renderLeaderboardList() {
 }
 
 let cachedSidebarKey = '';
+let sidebarPrevRanks = {};
+let sidebarPrevScores = {};
 
 function renderSidebar() {
   const sidebar = document.getElementById('participants-sidebar');
@@ -2537,41 +2592,68 @@ function renderSidebar() {
   const projectionMode = document.body.classList.contains('projection-mode');
   if (!projectionMode) return;
 
+  const revealState = getResultsRevealState();
   const all = scoreboardState.leaderboard || [];
   const total = scoreboardState.stats?.participants || all.length;
-
-  // Only re-render if data changed
-  const sidebarKey = `${scoreboardState.updatedAt || 'none'}|${all.length}|${total}`;
+  const sorted = [...all].sort((a, b) =>
+    (b.score || 0) - (a.score || 0) ||
+    (b.answeredCount || 0) - (a.answeredCount || 0) ||
+    String(a.name || '').localeCompare(String(b.name || ''), 'pl')
+  );
+  const sidebarSignature = sorted.map((p, i) => `${p.id || p.name}:${i + 1}:${p.score || 0}`).join('|');
+  const sidebarKey = `${scoreboardState.updatedAt || 'none'}|${revealState.participantsVisible}|${total}|${sidebarSignature}`;
   if (sidebarKey === cachedSidebarKey) return;
   cachedSidebarKey = sidebarKey;
 
-  if (countEl) countEl.textContent = total;
+  sidebar.classList.toggle('locked', !revealState.participantsVisible);
+  if (countEl) countEl.textContent = revealState.participantsVisible ? total : '—';
+
+  if (!revealState.participantsVisible) {
+    listEl.innerHTML = getRevealLockMarkup('Uczestnicy zasłonięci', 'Lista graczy wróci przy pierwszym odsłonięciu wyników przez administratora.', 'Pierwszy etap odsłonięcia');
+    return;
+  }
 
   if (!all.length) {
     listEl.innerHTML = '<div style="padding:12px;font-size:11px;color:#9e98bb;text-align:center;">Brak danych</div>';
     return;
   }
 
-  const sorted = [...all].sort((a, b) => (b.score || 0) - (a.score || 0));
   const newIds = new Set(sorted.map(p => p.id || p.name));
+  const nextSidebarRanks = {};
+  const nextSidebarScores = {};
 
   listEl.innerHTML = sorted.map((p, i) => {
     const id = p.id || p.name;
-    const isNew = !knownParticipantIds.has(id);
+    const rank = i + 1;
+    const score = Number(p.score || 0);
+    const oldRank = sidebarPrevRanks[id];
+    const oldScore = sidebarPrevScores[id];
+    const isNew = !knownParticipantIds.has(id) || oldRank === undefined;
+    const movedUp = !isNew && rank < oldRank;
+    const movedDown = !isNew && rank > oldRank;
+    const scoreChanged = !isNew && score !== oldScore;
+    let animClass = '';
+    if (isNew) animClass = 'new-arrival';
+    else if (movedUp) animClass = 'rank-up';
+    else if (movedDown) animClass = 'rank-down';
+
+    nextSidebarRanks[id] = rank;
+    nextSidebarScores[id] = score;
+
     return `
-      <div class="sidebar-participant ${isNew ? 'new-arrival' : ''}" data-id="${id}">
-        <span class="sidebar-rank">${i + 1}</span>
+      <div class="sidebar-participant ${animClass}" data-id="${id}">
+        <span class="sidebar-rank">${rank}</span>
         <span class="sidebar-name">${p.name}</span>
-        <span class="sidebar-score">${p.score}</span>
+        <span class="sidebar-score ${scoreChanged ? 'score-changed' : ''}">${score}</span>
         <span class="sidebar-city-tag">${p.city || ''}</span>
       </div>
     `;
   }).join('');
 
-  // Update known set
+  sidebarPrevRanks = nextSidebarRanks;
+  sidebarPrevScores = nextSidebarScores;
   newIds.forEach(id => knownParticipantIds.add(id));
 }
-
 function triggerSyncFlash() {
   const flash = document.getElementById('sync-flash');
   const dot = document.getElementById('live-dot');
