@@ -1620,11 +1620,11 @@ const bonusQrScannerVideoEl = document.getElementById('bonus-qr-scanner-video');
 const bonusQrScannerCloseEl = document.getElementById('bonus-qr-scanner-close');
 const bonusQrScannerStatusEl = document.getElementById('bonus-qr-scanner-status');
 
-const GAME_STATE_CACHE_MS = 2500;
-const BONUS_LABEL_CACHE_MS = 4000;
-const BONUS_COUNT_CACHE_MS = 4000;
-const PARTICIPANT_STATS_CACHE_MS = 4000;
-const BONUS_SYNC_COOLDOWN_MS = 1200;
+const GAME_STATE_CACHE_MS = 5000;
+const BONUS_LABEL_CACHE_MS = 10000;
+const BONUS_COUNT_CACHE_MS = 10000;
+const PARTICIPANT_STATS_CACHE_MS = 10000;
+const BONUS_SYNC_COOLDOWN_MS = 3000;
 const JS_QR_SCRIPT_URL = 'https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js';
 const PARTICIPANT_GAME_STORAGE_KEY = 'participantGameStartedAt';
 const bonusQrCameraState = { detector: null, busy: false, bound: false, active: false, stream: null, scanTimer: null, jsQrPromise: null, canvas: null };
@@ -2855,7 +2855,7 @@ window.onload = async () => {
     if (!document.hidden) {
       syncBonusView();
     }
-  }, 10000);
+  }, 15000);
   window.addEventListener('focus', () => {
     scheduleBonusSync({ force: true });
   });
