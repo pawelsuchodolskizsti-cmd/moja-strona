@@ -3,12 +3,9 @@
   "version": "1.0.0",
   "description": "Gra terenowa oparta na kodach QR z baza Neon (PostgreSQL) i Vercel API",
   "scripts": {
-    "dev": "vercel dev"
+    "dev": "npx vercel dev"
   },
   "dependencies": {
     "@neondatabase/serverless": "^0.9.0"
-  },
-  "devDependencies": {
-    "vercel": "^39.1.0"
   }
 }
