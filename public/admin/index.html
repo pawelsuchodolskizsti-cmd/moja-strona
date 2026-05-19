@@ -4680,6 +4680,8 @@ function renderLeaderboard() {
     return;
   }
 
+  const activeQuestionCount = questionCatalog.length || 30;
+
   body.innerHTML = list.map((participant, index) => {
     const rankClass = index === 0 ? 'rank-1' : index === 1 ? 'rank-2' : index === 2 ? 'rank-3' : '';
     const lastActivity = participant.lastActivity
@@ -4696,7 +4698,7 @@ function renderLeaderboard() {
           <span class="score-pill">${participant.score || 0} pkt</span>
           <span class="score-note">pytania + bonusy</span>
         </td>
-        <td class="muted">${participant.answeredCount || 0} / 30</td>
+        <td class="muted">${participant.answeredCount || 0} / ${activeQuestionCount}</td>
         <td class="muted detail-col">${lastActivity}</td>
       </tr>
     `;
@@ -5105,7 +5107,12 @@ function refreshQrAdminSummary() {
     return;
   }
 
-  const grouped = window.groupQrCatalog(window.location.origin);
+  const grouped = window.groupQrCatalog(window.location.origin, {
+    questionCatalog,
+    questionCount: questionCatalog.length || 30,
+    bonusCatalog,
+    bonusCount: bonusCatalog.length || 10
+  });
   const totalEl = document.getElementById('qr-admin-total');
   const questionsEl = document.getElementById('qr-admin-questions');
   const bonusesEl = document.getElementById('qr-admin-bonuses');

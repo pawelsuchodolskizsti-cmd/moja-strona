@@ -439,6 +439,44 @@ h1 {
   line-height:1.4;
 }
 
+.catalog-edit-settings {
+  display:none;
+  grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));
+  gap:12px;
+  margin:0 0 14px;
+  padding:14px;
+  border-radius:18px;
+  border:1px solid rgba(200, 255, 73, 0.2);
+  background:rgba(200, 255, 73, 0.06);
+}
+
+.catalog-edit-settings.active {
+  display:grid;
+}
+
+.catalog-small-field label {
+  display:block;
+  margin-bottom:7px;
+  color:var(--muted);
+  font-size:12px;
+  font-weight:800;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+}
+
+.catalog-small-field input {
+  width:100%;
+  min-height:44px;
+  border-radius:14px;
+  border:1px solid rgba(180, 198, 255, 0.18);
+  background:rgba(5, 10, 17, 0.78);
+  color:var(--text);
+  padding:0 12px;
+  font-size:15px;
+  font-weight:800;
+  outline:none;
+}
+
 .qr-btn {
   flex:1 1 0;
   min-height:40px;
@@ -620,14 +658,24 @@ h1 {
       <div class="section-head">
         <div>
           <h2 class="section-title">Lista link&oacute;w i odpowiedzi</h2>
-          <p class="section-copy">Pe&#322;na lista organizacyjna do druku albo przekazania ekipie technicznej. Pytania i poprawne odpowiedzi mo&#380;esz edytowa&#263; bez zmiany kod&oacute;w QR.</p>
+          <p class="section-copy">Pe&#322;na lista organizacyjna do druku albo przekazania ekipie technicznej. Liczb&#281; pyta&#324;, tre&#347;&#263;, odpowiedzi i has&#322;a bonus&oacute;w mo&#380;esz edytowa&#263; bez zmiany sta&#322;ych ko&#324;c&oacute;wek QR.</p>
         </div>
         <div class="details-actions">
-          <button class="btn lime" type="button" id="btn-edit-catalog" onclick="enterQuestionEditMode()">Edytuj pytania</button>
+          <button class="btn lime" type="button" id="btn-edit-catalog" onclick="enterQuestionEditMode()">Edytuj katalog</button>
           <button class="btn primary" type="button" id="btn-save-catalog" onclick="saveEditedQuestions()" hidden>Zapisz zmiany</button>
           <button class="btn ghost" type="button" id="btn-cancel-catalog" onclick="cancelQuestionEditMode()" hidden>Anuluj</button>
           <button class="btn primary" type="button" onclick="downloadCatalogCsv()">Pobierz CSV</button>
           <button class="btn ghost" type="button" onclick="downloadCatalogTxt()">Pobierz TXT</button>
+        </div>
+      </div>
+      <div class="catalog-edit-settings" id="catalog-edit-settings">
+        <div class="catalog-small-field">
+          <label for="question-count-input">Liczba aktywnych pyta&#324;</label>
+          <input id="question-count-input" type="number" min="1" max="30" step="1" value="30" oninput="renderDetailsRows()">
+        </div>
+        <div class="catalog-small-field">
+          <label>Bonusy</label>
+          <input type="text" value="Has&#322;a i nazwy edytujesz poni&#380;ej" readonly>
         </div>
       </div>
       <div class="link-table-wrap">
@@ -672,6 +720,13 @@ h1 {
   let qrGroups = { screens: [], questions: [], bonuses: [], all: [] };
   let qrDetailsRows = [];
   let catalogEditMode = false;
+  let catalogData = {
+    questionCatalog: [],
+    questionCatalogAll: [],
+    questionCount: 30,
+    bonusCatalog: [],
+    bonusCatalogAll: []
+  };
 
   function normalizeOrigin(value) {
     const raw = String(value || '').trim();
@@ -738,15 +793,27 @@ h1 {
     document.getElementById('count-bonuses').textContent = `${qrGroups.bonuses.length} kod\u00f3w`;
   }
 
-  function renderCatalog() {
+  function getCatalogOptions() {
+    return {
+      questionCatalog: catalogData.questionCatalog,
+      questionCount: catalogData.questionCount || 30,
+      bonusCatalog: catalogData.bonusCatalog
+    };
+  }
+
+  function renderCatalogGrids() {
     const origin = normalizeOrigin(document.getElementById('base-origin').value);
     document.getElementById('base-origin').value = origin;
-    qrGroups = window.groupQrCatalog(origin);
+    qrGroups = window.groupQrCatalog(origin, getCatalogOptions());
 
     document.getElementById('grid-screens').innerHTML = qrGroups.screens.map(renderQrCard).join('');
     document.getElementById('grid-questions').innerHTML = qrGroups.questions.map(renderQrCard).join('');
     document.getElementById('grid-bonuses').innerHTML = qrGroups.bonuses.map(renderQrCard).join('');
     updateCounters();
+  }
+
+  function renderCatalog() {
+    renderCatalogGrids();
     setDownloadStatus('Kody zosta\u0142y przeliczone dla aktualnego adresu strony.', 'success');
     loadDetailsCatalog();
   }
@@ -819,7 +886,11 @@ h1 {
   }
 
   function buildDetailsRows(origin, adminData) {
-    const grouped = window.groupQrCatalog(origin);
+    const grouped = window.groupQrCatalog(origin, {
+      questionCatalog: adminData.questionCatalog || [],
+      questionCount: adminData.questionCount || (adminData.questionCatalog || []).length || 30,
+      bonusCatalog: adminData.bonusCatalog || []
+    });
     const questionUrlMap = new Map(grouped.questions.map((item) => [String(item.id).replace('question-', ''), item.url]));
     const bonusUrlMap = new Map(grouped.bonuses.map((item) => [item.shortLabel, item.url]));
 
@@ -837,7 +908,7 @@ h1 {
     const bonusRows = (adminData.bonusCatalog || []).map((bonus) => ({
       type: 'Bonus',
       typeClass: 'bonus',
-      editable: false,
+      editable: true,
       id: bonus.id,
       label: bonus.label || bonus.id,
       text: bonus.label || bonus.id,
@@ -848,28 +919,55 @@ h1 {
     return [...questionRows, ...bonusRows];
   }
 
+  function getQuestionCountForEdit() {
+    const input = document.getElementById('question-count-input');
+    const raw = Number.parseInt(input?.value || catalogData.questionCount || 30, 10);
+    return Math.max(1, Math.min(30, Number.isFinite(raw) ? raw : 30));
+  }
+
+  function getEditableDetailsRows(origin) {
+    const questionCount = getQuestionCountForEdit();
+    const allQuestions = catalogData.questionCatalogAll.length
+      ? catalogData.questionCatalogAll
+      : catalogData.questionCatalog;
+    const allBonuses = catalogData.bonusCatalogAll.length
+      ? catalogData.bonusCatalogAll
+      : catalogData.bonusCatalog;
+
+    return buildDetailsRows(origin, {
+      questionCatalog: allQuestions.slice(0, questionCount),
+      questionCount,
+      bonusCatalog: allBonuses
+    });
+  }
+
   function renderDetailsRows() {
     const body = document.getElementById('details-body');
     const editButton = document.getElementById('btn-edit-catalog');
     const saveButton = document.getElementById('btn-save-catalog');
     const cancelButton = document.getElementById('btn-cancel-catalog');
+    const editSettings = document.getElementById('catalog-edit-settings');
 
     if (editButton) editButton.hidden = catalogEditMode;
     if (saveButton) saveButton.hidden = !catalogEditMode;
     if (cancelButton) cancelButton.hidden = !catalogEditMode;
+    if (editSettings) editSettings.classList.toggle('active', catalogEditMode);
 
-    if (!qrDetailsRows.length) {
+    const origin = normalizeOrigin(document.getElementById('base-origin').value);
+    const rows = catalogEditMode ? getEditableDetailsRows(origin) : qrDetailsRows;
+
+    if (!rows.length) {
       body.innerHTML = '<tr><td colspan="4">Nie uda&#322;o si&#281; pobra&#263; listy link&oacute;w i odpowiedzi.</td></tr>';
       return;
     }
 
-    body.innerHTML = qrDetailsRows.map((row) => `
+    body.innerHTML = rows.map((row) => `
       <tr>
         <td><span class="link-type ${row.typeClass === 'bonus' ? 'bonus' : ''}">${escapeHtml(row.type)}</span></td>
         <td>
           ${catalogEditMode && row.editable ? `
             <span class="question-title">${escapeHtml(row.label)}</span>
-            <textarea class="catalog-edit-field" data-question-id="${row.id}" data-field="text">${escapeHtml(row.text)}</textarea>
+            <textarea class="catalog-edit-field" data-catalog-type="${row.typeClass}" data-catalog-id="${row.id}" data-field="text">${escapeHtml(row.text)}</textarea>
           ` : `
             <span class="question-title">${escapeHtml(row.label)}</span>
             <div class="question-preview">${escapeHtml(row.text || row.label)}</div>
@@ -878,8 +976,8 @@ h1 {
         <td>${escapeHtml(row.url)}</td>
         <td>
           ${catalogEditMode && row.editable ? `
-            <textarea class="catalog-edit-field answers" data-question-id="${row.id}" data-field="answers">${escapeHtml(row.answer)}</textarea>
-            <div class="catalog-edit-note">Kilka poprawnych odpowiedzi oddziel znakiem /, średnikiem albo nową linią.</div>
+            <textarea class="catalog-edit-field answers" data-catalog-type="${row.typeClass}" data-catalog-id="${row.id}" data-field="answer">${escapeHtml(row.answer)}</textarea>
+            <div class="catalog-edit-note">${row.typeClass === 'bonus' ? 'To hasło będzie wymagane przy odbiorze bonusu.' : 'Kilka poprawnych odpowiedzi oddziel znakiem /, średnikiem albo nową linią.'}</div>
           ` : escapeHtml(row.answer)}
         </td>
       </tr>
@@ -892,9 +990,11 @@ h1 {
       return;
     }
 
+    const countInput = document.getElementById('question-count-input');
+    if (countInput) countInput.value = String(catalogData.questionCount || qrDetailsRows.filter((row) => row.typeClass === 'question').length || 30);
     catalogEditMode = true;
     renderDetailsRows();
-    setDownloadStatus('Tryb edycji włączony. Zmieniasz treść pytań i poprawne odpowiedzi dla kodów QR.', 'success');
+    setDownloadStatus('Tryb edycji włączony. Zmieniasz liczbę pytań, treść, odpowiedzi i hasła bonusów.', 'success');
   }
 
   function cancelQuestionEditMode() {
@@ -903,17 +1003,18 @@ h1 {
     setDownloadStatus('Edycja anulowana. Nie zapisano zmian w bazie.', '');
   }
 
-  function collectEditedQuestions() {
+  function collectEditedCatalog() {
     const questions = [];
+    const bonuses = [];
     const ids = [...new Set(
-      Array.from(document.querySelectorAll('[data-question-id]'))
-        .map((item) => Number(item.dataset.questionId))
+      Array.from(document.querySelectorAll('[data-catalog-type="question"]'))
+        .map((item) => Number(item.dataset.catalogId))
         .filter(Boolean)
     )];
 
     ids.forEach((id) => {
-      const textField = document.querySelector(`[data-question-id="${id}"][data-field="text"]`);
-      const answerField = document.querySelector(`[data-question-id="${id}"][data-field="answers"]`);
+      const textField = document.querySelector(`[data-catalog-type="question"][data-catalog-id="${id}"][data-field="text"]`);
+      const answerField = document.querySelector(`[data-catalog-type="question"][data-catalog-id="${id}"][data-field="answer"]`);
       questions.push({
         id,
         text: textField?.value || '',
@@ -921,30 +1022,66 @@ h1 {
       });
     });
 
-    return questions;
+    const bonusIds = [...new Set(
+      Array.from(document.querySelectorAll('[data-catalog-type="bonus"]'))
+        .map((item) => item.dataset.catalogId)
+        .filter(Boolean)
+    )];
+
+    bonusIds.forEach((id, index) => {
+      const labelField = document.querySelector(`[data-catalog-type="bonus"][data-catalog-id="${id}"][data-field="text"]`);
+      const secretField = document.querySelector(`[data-catalog-type="bonus"][data-catalog-id="${id}"][data-field="answer"]`);
+      bonuses.push({
+        id,
+        label: labelField?.value || id,
+        secret: secretField?.value || '',
+        active: true,
+        sortOrder: index + 1
+      });
+    });
+
+    return {
+      questionCount: getQuestionCountForEdit(),
+      questions,
+      bonuses
+    };
   }
 
   function getAdminQuestionPassword() {
-    const cached = sessionStorage.getItem('god_admin_question_secret') || '';
-    if (cached) return cached;
+    try {
+      const cached = sessionStorage.getItem('god_admin_question_secret') || '';
+      if (cached) return cached;
+    } catch (error) {
+      // Safari w trybie prywatnym potrafi zablokować sessionStorage.
+    }
 
-    const password = window.prompt('Podaj hasło administratora, aby zapisać pytania w bazie:');
+    const password = window.prompt('Podaj hasło administratora, aby zapisać katalog w bazie:');
     if (password) {
-      sessionStorage.setItem('god_admin_question_secret', password);
+      try {
+        sessionStorage.setItem('god_admin_question_secret', password);
+      } catch (error) {
+        // Hasło zostanie użyte tylko w tym zapisie.
+      }
     }
     return password || '';
   }
 
   async function saveEditedQuestions() {
-    const questions = collectEditedQuestions();
-    if (!questions.length) {
-      setDownloadStatus('Nie znaleziono pytań do zapisania.', 'error');
+    const catalog = collectEditedCatalog();
+    if (!catalog.questions.length && !catalog.bonuses.length) {
+      setDownloadStatus('Nie znaleziono katalogu do zapisania.', 'error');
       return;
     }
 
-    const invalid = questions.find((question) => !question.text.trim() || !question.answers.trim());
+    const invalid = catalog.questions.find((question) => !question.text.trim() || !question.answers.trim());
     if (invalid) {
       setDownloadStatus(`Pytanie ${invalid.id} musi mieć treść i co najmniej jedną poprawną odpowiedź.`, 'error');
+      return;
+    }
+
+    const invalidBonus = catalog.bonuses.find((bonus) => !bonus.label.trim() || !bonus.secret.trim());
+    if (invalidBonus) {
+      setDownloadStatus(`Bonus ${invalidBonus.id} musi mieć nazwę i hasło.`, 'error');
       return;
     }
 
@@ -954,7 +1091,7 @@ h1 {
       return;
     }
 
-    setDownloadStatus('Zapisuję pytania i odpowiedzi w bazie...', 'success');
+    setDownloadStatus('Zapisuję katalog pytań i bonusów w bazie...', 'success');
 
     try {
       const response = await fetch('/api/admin-question-catalog', {
@@ -963,32 +1100,29 @@ h1 {
         body: JSON.stringify({
           adminLogin: 'admin',
           adminPassword,
-          questions
+          questionCount: catalog.questionCount,
+          questions: catalog.questions,
+          bonuses: catalog.bonuses
         })
       });
 
       const data = await response.json().catch(() => ({}));
       if (!response.ok || data.error) {
         if (response.status === 401) {
-          sessionStorage.removeItem('god_admin_question_secret');
+          try {
+            sessionStorage.removeItem('god_admin_question_secret');
+          } catch (error) {
+            // Brak dostępu do storage nie powinien blokować komunikatu błędu.
+          }
         }
-        throw new Error(data.error || 'Nie udało się zapisać pytań.');
+        throw new Error(data.error || 'Nie udało się zapisać katalogu.');
       }
 
       catalogEditMode = false;
-      const origin = normalizeOrigin(document.getElementById('base-origin').value);
-      qrDetailsRows = buildDetailsRows(origin, {
-        questionCatalog: data.questionCatalog || [],
-        bonusCatalog: qrDetailsRows.filter((row) => row.typeClass === 'bonus').map((row) => ({
-          id: row.id,
-          label: row.label,
-          secret: row.answer
-        }))
-      });
       await loadDetailsCatalog();
-      setDownloadStatus(data.message || 'Pytania i odpowiedzi zostały zapisane w bazie.', 'success');
+      setDownloadStatus(data.message || 'Katalog został zapisany w bazie.', 'success');
     } catch (error) {
-      setDownloadStatus(error.message || 'Nie udało się zapisać pytań.', 'error');
+      setDownloadStatus(error.message || 'Nie udało się zapisać katalogu.', 'error');
     }
   }
 
@@ -1006,9 +1140,9 @@ h1 {
 
   function downloadCatalogCsv() {
     if (!qrDetailsRows.length) return;
-    const header = 'Typ,Nazwa,Link,Odpowied\u017a lub has\u0142o\n';
+    const header = 'Typ,Nazwa,Treść lub opis,Link,Odpowiedź lub hasło\n';
     const rows = qrDetailsRows.map((row) => {
-      const safe = [row.type, row.label, row.url, row.answer].map((value) => `"${String(value).replace(/"/g, '""')}"`);
+      const safe = [row.type, row.label, row.text || row.label, row.url, row.answer].map((value) => `"${String(value).replace(/"/g, '""')}"`);
       return safe.join(',');
     }).join('\n');
     downloadFile(header + rows, 'lista-linkow-i-odpowiedzi.csv', 'text/csv;charset=utf-8');
@@ -1016,7 +1150,7 @@ h1 {
 
   function downloadCatalogTxt() {
     if (!qrDetailsRows.length) return;
-    const content = qrDetailsRows.map((row) => `${row.type}: ${row.label}\nLink: ${row.url}\nOdpowied\u017a / has\u0142o: ${row.answer}\n`).join('\n');
+    const content = qrDetailsRows.map((row) => `${row.type}: ${row.label}\nTreść / opis: ${row.text || row.label}\nLink: ${row.url}\nOdpowiedź / hasło: ${row.answer}\n`).join('\n');
     downloadFile(content, 'lista-linkow-i-odpowiedzi.txt', 'text/plain;charset=utf-8');
   }
 
@@ -1028,6 +1162,14 @@ h1 {
       if (!response.ok || data.error) {
         throw new Error(data.error || 'Nie uda\u0142o si\u0119 pobra\u0107 listy organizacyjnej.');
       }
+      catalogData = {
+        questionCatalog: data.questionCatalog || [],
+        questionCatalogAll: data.questionCatalogAll || data.questionCatalog || [],
+        questionCount: Number(data.questionCount || (data.questionCatalog || []).length || 30),
+        bonusCatalog: data.bonusCatalog || [],
+        bonusCatalogAll: data.bonusCatalogAll || data.bonusCatalog || []
+      };
+      renderCatalogGrids();
       qrDetailsRows = buildDetailsRows(origin, data);
       renderDetailsRows();
     } catch (error) {
