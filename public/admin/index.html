@@ -2371,10 +2371,10 @@
 
     <section class="ops-card qr-admin-card">
       <div class="ops-title">Stałe kody QR</div>
-      <div class="ops-copy">W jednym miejscu przygotujesz QR do strony głównej, publicznej tablicy wyników, 30 pytań i 10 bonusów. Każdy kod ma stałą końcówkę linku i jest gotowy do druku.</div>
+      <div class="ops-copy">W jednym miejscu przygotujesz QR do strony głównej, publicznej tablicy wyników, aktywnych pytań i bonusów. Liczbę pytań ustawisz w generatorze, a kody utworzą się automatycznie.</div>
       <div class="qr-admin-summary">
         <div class="qr-admin-pill" id="qr-admin-total">42 kody łącznie</div>
-        <div class="qr-admin-pill" id="qr-admin-questions">30 pytań</div>
+        <div class="qr-admin-pill" id="qr-admin-questions">Pytania</div>
         <div class="qr-admin-pill" id="qr-admin-bonuses">10 bonusów</div>
       </div>
       <div class="qr-admin-routes">
@@ -2388,7 +2388,7 @@
         </div>
         <div class="qr-admin-route">
           <span>Pytania</span>
-          <strong>/?q=1...30</strong>
+          <strong id="qr-admin-question-range">/?q=1...</strong>
         </div>
         <div class="qr-admin-route">
           <span>Bonusy</span>
@@ -3945,7 +3945,7 @@ function buildStartSimulation(participantCount = 35) {
   const firstNames = ['Paweł', 'Julia', 'Maja', 'Kacper', 'Zuzanna', 'Jan', 'Lena', 'Antoni', 'Oliwia', 'Michał', 'Natalia', 'Szymon'];
   const lastNames = ['Nowak', 'Kowalski', 'Wiśniewski', 'Wójcik', 'Kaczmarek', 'Mazur', 'Zieliński', 'Sikora', 'Kamińska', 'Król', 'Lewandowski', 'Sokołowska'];
   const cities = ['ELBLĄG', 'MALBORK', 'GDAŃSK', 'GDYNIA', 'OLSZTYN', 'WARSZAWA', 'TORUŃ', 'SOPOT'];
-  const questionsTotal = Math.max(Number(questionCatalog.length || 0), 30);
+  const questionsTotal = Number(questionCatalog.length || 0) || 30;
   const bonusesTotal = Math.max(Number(bonusCatalog.length || 0), 10);
   const participants = [];
   const answers = [];
@@ -5117,11 +5117,13 @@ function refreshQrAdminSummary() {
   const questionsEl = document.getElementById('qr-admin-questions');
   const bonusesEl = document.getElementById('qr-admin-bonuses');
   const metaEl = document.getElementById('qr-admin-meta');
+  const questionRangeEl = document.getElementById('qr-admin-question-range');
 
   if (totalEl) totalEl.textContent = `${grouped.all.length} kody łącznie`;
   if (questionsEl) questionsEl.textContent = `${grouped.questions.length} pytań`;
   if (bonusesEl) bonusesEl.textContent = `${grouped.bonuses.length} bonusów`;
   if (metaEl) metaEl.textContent = `Stały adres generatora: ${getQrCenterUrl()}`;
+  if (questionRangeEl) questionRangeEl.textContent = `/?q=1...${grouped.questions.length || 0}`;
 }
 
 function refreshDiplomaAdminSummary() {

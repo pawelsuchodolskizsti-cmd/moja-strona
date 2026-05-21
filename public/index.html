@@ -342,6 +342,12 @@ h1 {
   box-shadow:0 20px 36px rgba(84, 97, 18, 0.14);
 }
 
+.micro-toast.badge {
+  background:linear-gradient(135deg, rgba(255,255,255,0.99), rgba(255,247,214,0.98), rgba(238,255,186,0.96));
+  border-color:rgba(210, 255, 70, 0.42);
+  box-shadow:0 20px 42px rgba(118, 92, 12, 0.16);
+}
+
 .micro-toast.warning {
   background:linear-gradient(135deg, rgba(255,255,255,0.98), rgba(255,243,232,0.96));
   border-color:rgba(255,61,107,0.18);
@@ -932,8 +938,11 @@ textarea {
   margin-top: 14px;
   padding: 14px;
   border-radius: 16px;
-  background: rgba(255,255,255,0.78);
-  border: 1px solid rgba(124,106,247,0.12);
+  background:
+    radial-gradient(circle at 12% 0%, rgba(255, 215, 84, 0.16), transparent 30%),
+    radial-gradient(circle at 100% 30%, rgba(196, 255, 62, 0.14), transparent 36%),
+    rgba(255,255,255,0.82);
+  border: 1px solid rgba(124,106,247,0.14);
 }
 
 .badge-board-title {
@@ -951,6 +960,8 @@ textarea {
 }
 
 .badge-chip {
+  position: relative;
+  overflow: hidden;
   display: flex;
   align-items: flex-start;
   gap: 10px;
@@ -958,6 +969,39 @@ textarea {
   border-radius: 14px;
   background: linear-gradient(135deg, rgba(124,106,247,0.1), rgba(240,61,120,0.08));
   border: 1px solid rgba(124,106,247,0.18);
+}
+
+.badge-chip::after {
+  content:'';
+  position:absolute;
+  inset:-40% auto -40% -70%;
+  width:55%;
+  transform:rotate(18deg);
+  background:linear-gradient(90deg, transparent, rgba(255,255,255,0.58), transparent);
+  opacity:0;
+}
+
+.badge-chip.badge-fresh {
+  animation:badgePop .62s cubic-bezier(.18,.86,.28,1.18);
+}
+
+.badge-chip.badge-fresh::after {
+  animation:badgeShine .92s ease .08s;
+}
+
+.badge-chip.gold {
+  background:linear-gradient(135deg, rgba(255,246,201,0.96), rgba(255,255,255,0.82));
+  border-color:rgba(255, 197, 46, 0.32);
+}
+
+.badge-chip.lime {
+  background:linear-gradient(135deg, rgba(244,255,207,0.96), rgba(255,255,255,0.82));
+  border-color:rgba(174, 255, 43, 0.34);
+}
+
+.badge-chip.blue {
+  background:linear-gradient(135deg, rgba(232,241,255,0.96), rgba(255,255,255,0.82));
+  border-color:rgba(119, 143, 255, 0.24);
 }
 
 .badge-chip-icon {
@@ -973,6 +1017,20 @@ textarea {
   font-family: 'Syne';
   font-size: 18px;
   font-weight: 800;
+}
+
+.badge-chip.gold .badge-chip-icon {
+  background:linear-gradient(135deg, #ffb92d, #fff15a);
+  color:#3d3000;
+}
+
+.badge-chip.lime .badge-chip-icon {
+  background:linear-gradient(135deg, #9ee800, #d8ff4d);
+  color:#263400;
+}
+
+.badge-chip.blue .badge-chip-icon {
+  background:linear-gradient(135deg, #4777ff, #8c63ff);
 }
 
 .badge-chip-name {
@@ -997,6 +1055,18 @@ textarea {
   text-align: center;
   font-size: 13px;
   color: #6a6482;
+}
+
+@keyframes badgePop {
+  0% { opacity:0; transform:translateY(12px) scale(.92); }
+  62% { opacity:1; transform:translateY(-2px) scale(1.025); }
+  100% { opacity:1; transform:translateY(0) scale(1); }
+}
+
+@keyframes badgeShine {
+  0% { opacity:0; left:-70%; }
+  18% { opacity:1; }
+  100% { opacity:0; left:120%; }
 }
 
 .game-remaining {
@@ -1955,6 +2025,7 @@ let summaryRemainingElements = [];
 let announcementElements = [];
 let statsHydrated = false;
 let shownMicroToastKeys = new Set();
+let shownBadgeIds = new Set();
 let gameStateFetchedAt = 0;
 let participantStatsFetchedAt = 0;
 let questionFetchedAt = 0;
@@ -2119,15 +2190,15 @@ function showMicroToast(message, type = 'info', title = 'Aktualizacja', key = ''
   stack.appendChild(toast);
 
   requestAnimationFrame(() => {
-    if (type === 'success' || type === 'bonus') {
+    if (type === 'success' || type === 'bonus' || type === 'badge') {
       toast.classList.add('celebrate');
     }
     toast.classList.add('show');
   });
 
-  if (type === 'success' || type === 'bonus') {
+  if (type === 'success' || type === 'bonus' || type === 'badge') {
     triggerHaptic([18, 55, 18]);
-    playFeedbackTone(type === 'bonus' ? 'bonus' : 'success');
+    playFeedbackTone(type === 'bonus' || type === 'badge' ? 'bonus' : 'success');
   } else if (type === 'warning') {
     triggerHaptic([28, 60, 20]);
   } else if (type === 'info') {
@@ -2575,6 +2646,7 @@ function resetLocalParticipantSession() {
   currentQuestion = null;
   participantStats = { answers: 0, bonuses: 0 };
   statsHydrated = false;
+  shownBadgeIds = new Set();
   participantStatsFetchedAt = 0;
   questionFetchedAt = 0;
   questionRequestKey = '';
@@ -3005,6 +3077,7 @@ function renderParticipantStats(stats) {
     answers: Number(stats?.answers || 0),
     bonuses: Number(stats?.bonuses || 0)
   };
+  const shouldAnnounceBadges = statsHydrated;
 
   if (statsHydrated && nextStats.bonuses > participantStats.bonuses) {
     showMicroToast(
@@ -3028,7 +3101,7 @@ function renderParticipantStats(stats) {
     el.innerText = participantStats.bonuses;
   });
   participantStatsFetchedAt = Date.now();
-  renderParticipantBadges();
+  renderParticipantBadges({ announce: shouldAnnounceBadges });
 }
 
 function getGameRemainingMs() {
@@ -3037,7 +3110,7 @@ function getGameRemainingMs() {
   return endTime - Date.now();
 }
 
-function getParticipantBadges() {
+function getParticipantBadgesLegacy() {
   const badges = [];
   const remainingMs = getGameRemainingMs();
 
@@ -3068,21 +3141,108 @@ function getParticipantBadges() {
   return badges;
 }
 
-function renderParticipantBadges() {
+function getParticipantBadges() {
+  const badges = [];
+  const remainingMs = getGameRemainingMs();
+
+  if (participantStats.answers >= 1) {
+    badges.push({
+      id: 'first-clue',
+      icon: '1',
+      tone: 'blue',
+      name: 'Pierwszy Trop',
+      text: 'Pierwszy kod za Tobą. Gra właśnie nabrała tempa.'
+    });
+  }
+
+  if (participantStats.bonuses >= 1) {
+    badges.push({
+      id: 'spark-hunter',
+      icon: '+',
+      tone: 'lime',
+      name: 'Łowca Iskier',
+      text: 'Masz bonus. Złapałeś dodatkową okazję na trasie.'
+    });
+  }
+
+  if (participantStats.bonuses >= 2) {
+    badges.push({
+      id: 'volunteer-talker',
+      icon: 'W',
+      tone: 'gold',
+      name: 'Rozmówca Wolontariuszy',
+      text: 'Bonusy mówią jasno: rozmawiasz, szukasz i jesteś w grze.'
+    });
+  }
+
+  if (participantStats.answers >= 8) {
+    badges.push({
+      id: 'quiet-star',
+      icon: '*',
+      tone: 'blue',
+      name: 'Cicha Gwiazda',
+      text: 'Robisz swoje bez hałasu, ale Twój postęp naprawdę widać.'
+    });
+  }
+
+  if (participantStats.answers >= 10) {
+    badges.push({
+      id: 'unstoppable',
+      icon: 'N',
+      tone: 'gold',
+      name: 'Nie do zatrzymania',
+      text: 'Masz dwucyfrowy wynik odpowiedzi. To już konkretna seria.'
+    });
+  }
+
+  if (remainingMs !== null && remainingMs <= 15 * 60000 && participantStats.answers >= 1) {
+    badges.push({
+      id: 'final-sprinter',
+      icon: 'S',
+      tone: 'lime',
+      name: 'Finałowy Sprinter',
+      text: 'Ostatnie minuty, a Ty nadal jesteś w ruchu.'
+    });
+  }
+
+  return badges;
+}
+
+function renderParticipantBadges(options = {}) {
+  const { announce = false } = options;
   const badges = getParticipantBadges();
+  const freshBadgeIds = [];
+
+  badges.forEach((badge) => {
+    if (!shownBadgeIds.has(badge.id)) {
+      freshBadgeIds.push(badge.id);
+      shownBadgeIds.add(badge.id);
+
+      if (announce) {
+        showMicroToast(
+          badge.text,
+          'badge',
+          `Nowa odznaka: ${badge.name}`,
+          `badge-${badge.id}`
+        );
+      }
+    }
+  });
 
   badgeListElements.forEach((list) => {
     if (badges.length === 0) {
+      list.innerHTML = '<div class="badge-empty">Pierwsza odznaka pojawi się po zaliczonym pytaniu albo bonusie.</div>';
+      return;
       list.innerHTML = '<div class="badge-empty">Jeszcze chwila i pojawi się tutaj pierwsza odznaka.</div>';
       return;
     }
 
     list.innerHTML = badges.map((badge) => `
-      <div class="badge-chip">
-        <div class="badge-chip-icon">${badge.icon}</div>
+      <div class="badge-chip ${escHtml(badge.tone || '')} ${freshBadgeIds.includes(badge.id) ? 'badge-fresh' : ''}">
+        <div class="badge-chip-icon">${escHtml(badge.icon)}</div>
         <div>
-          <div class="badge-chip-name">${badge.name}</div>
-          <div class="badge-chip-text">${badge.text}</div>
+          <div class="badge-chip-name">${escHtml(badge.name)}</div>
+          <div class="badge-chip-text">${escHtml(badge.text)}</div>
         </div>
       </div>
     `).join('');

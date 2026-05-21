@@ -477,6 +477,45 @@ h1 {
   outline:none;
 }
 
+.question-count-control {
+  display:grid;
+  grid-template-columns:1fr minmax(74px, 96px) 1fr;
+  gap:8px;
+  align-items:center;
+}
+
+.catalog-count-btn {
+  min-height:44px;
+  border:1px solid rgba(200, 255, 73, 0.24);
+  border-radius:14px;
+  background:rgba(200, 255, 73, 0.1);
+  color:#eaffb7;
+  font-weight:900;
+  cursor:pointer;
+}
+
+.catalog-count-btn.danger {
+  border-color:rgba(255, 91, 139, 0.3);
+  background:rgba(255, 91, 139, 0.1);
+  color:#ffd0dd;
+}
+
+.catalog-count-btn:disabled {
+  opacity:.42;
+  cursor:not-allowed;
+}
+
+.question-count-control input {
+  text-align:center;
+}
+
+.catalog-count-help {
+  margin-top:8px;
+  color:var(--muted);
+  font-size:12px;
+  line-height:1.35;
+}
+
 .qr-btn {
   flex:1 1 0;
   min-height:40px;
@@ -586,7 +625,7 @@ h1 {
       <section class="panel">
         <div class="eyebrow">Sta&#322;e kody QR</div>
         <h1>Generator i magazyn kod&oacute;w QR dla ca&#322;ej gry</h1>
-        <p class="lead">Tutaj masz w jednym miejscu gotowe, sta&#322;e kody do strony g&#322;&oacute;wnej, tablicy wynik&oacute;w, 30 pyta&#324; i 10 bonus&oacute;w. Mo&#380;esz je otworzy&#263;, pobra&#263; jako JPG albo od razu wydrukowa&#263; do PDF.</p>
+        <p class="lead">Tutaj masz w jednym miejscu gotowe, sta&#322;e kody do strony g&#322;&oacute;wnej, tablicy wynik&oacute;w, aktywnych pyta&#324; i bonus&oacute;w. Mo&#380;esz je otworzy&#263;, pobra&#263; jako JPG albo od razu wydrukowa&#263; do PDF.</p>
         <div class="stats">
           <div class="stat">
             <div class="stat-value" id="stat-all">42</div>
@@ -615,7 +654,7 @@ h1 {
             <button class="btn ghost" type="button" onclick="window.print()">PDF / Drukuj</button>
           </div>
         </div>
-        <div class="toolbar-note">Ko&#324;c&oacute;wki s&#261; sta&#322;e: `/?q=1...30`, `/bonus/?b=B01...B10`, `/wyniki/` oraz `/` dla strony g&#322;&oacute;wnej. Je&#347;li przepiszesz domen&#281; wy&#380;ej, wszystkie kody od razu przelicz&#261; si&#281; na nowy adres.</div>
+        <div class="toolbar-note" id="qr-range-note">Ko&#324;c&oacute;wki s&#261; sta&#322;e: `/?q=1...`, `/bonus/?b=B01...`, `/wyniki/` oraz `/` dla strony g&#322;&oacute;wnej. Je&#347;li przepiszesz domen&#281; wy&#380;ej, wszystkie kody od razu przelicz&#261; si&#281; na nowy adres.</div>
         <div class="download-status" id="download-status">Kody s&#261; gotowe do podgl&#261;du i pobrania.</div>
         <div class="print-note">Tryb druku ukrywa przyciski, ko&#324;c&oacute;wki link&oacute;w i opisy, zostawiaj&#261;c wy&#322;&#261;cznie same kody QR.</div>
       </section>
@@ -636,7 +675,7 @@ h1 {
       <div class="section-head">
         <div>
           <h2 class="section-title">Pytania</h2>
-          <p class="section-copy">Pe&#322;ny pakiet 30 sta&#322;ych kod&oacute;w do rozmieszczenia na trasie gry.</p>
+          <p class="section-copy">Pe&#322;ny pakiet aktywnych kod&oacute;w pyta&#324; do rozmieszczenia na trasie gry.</p>
         </div>
         <div class="section-count" id="count-questions">30 kod&oacute;w</div>
       </div>
@@ -671,7 +710,12 @@ h1 {
       <div class="catalog-edit-settings" id="catalog-edit-settings">
         <div class="catalog-small-field">
           <label for="question-count-input">Liczba aktywnych pyta&#324;</label>
-          <input id="question-count-input" type="number" min="1" max="30" step="1" value="30" oninput="renderDetailsRows()">
+          <div class="question-count-control">
+            <button class="catalog-count-btn danger" type="button" id="btn-remove-question" onclick="adjustQuestionCount(-1)">Usu&#324; pytanie</button>
+            <input id="question-count-input" type="number" min="1" step="1" value="30" oninput="handleQuestionCountInput()">
+            <button class="catalog-count-btn" type="button" id="btn-add-question" onclick="adjustQuestionCount(1)">Dodaj pytanie</button>
+          </div>
+          <div class="catalog-count-help" id="question-count-help">Aktywne s&#261; pytania od 1 do wybranej liczby. Kody QR wygeneruj&#261; si&#281; automatycznie.</div>
         </div>
         <div class="catalog-small-field">
           <label>Bonusy</label>
@@ -720,10 +764,12 @@ h1 {
   let qrGroups = { screens: [], questions: [], bonuses: [], all: [] };
   let qrDetailsRows = [];
   let catalogEditMode = false;
+  const DEFAULT_QUESTION_COUNT = 30;
+  const QUESTION_COUNT_LIMIT = 300;
   let catalogData = {
     questionCatalog: [],
     questionCatalogAll: [],
-    questionCount: 30,
+    questionCount: DEFAULT_QUESTION_COUNT,
     bonusCatalog: [],
     bonusCatalogAll: []
   };
@@ -791,12 +837,18 @@ h1 {
     document.getElementById('count-screens').textContent = `${qrGroups.screens.length} kody`;
     document.getElementById('count-questions').textContent = `${qrGroups.questions.length} kod\u00f3w`;
     document.getElementById('count-bonuses').textContent = `${qrGroups.bonuses.length} kod\u00f3w`;
+    const rangeNote = document.getElementById('qr-range-note');
+    if (rangeNote) {
+      const lastQuestion = qrGroups.questions.length || 0;
+      const lastBonus = qrGroups.bonuses[qrGroups.bonuses.length - 1]?.shortLabel || 'B10';
+      rangeNote.textContent = `Końcówki są stałe: /?q=1...${lastQuestion}, /bonus/?b=B01...${lastBonus}, /wyniki/ oraz / dla strony głównej. Jeśli przepiszesz domenę wyżej, wszystkie kody od razu przeliczą się na nowy adres.`;
+    }
   }
 
   function getCatalogOptions() {
     return {
       questionCatalog: catalogData.questionCatalog,
-      questionCount: catalogData.questionCount || 30,
+      questionCount: catalogData.questionCount || DEFAULT_QUESTION_COUNT,
       bonusCatalog: catalogData.bonusCatalog
     };
   }
@@ -888,7 +940,7 @@ h1 {
   function buildDetailsRows(origin, adminData) {
     const grouped = window.groupQrCatalog(origin, {
       questionCatalog: adminData.questionCatalog || [],
-      questionCount: adminData.questionCount || (adminData.questionCatalog || []).length || 30,
+      questionCount: adminData.questionCount || (adminData.questionCatalog || []).length || DEFAULT_QUESTION_COUNT,
       bonusCatalog: adminData.bonusCatalog || []
     });
     const questionUrlMap = new Map(grouped.questions.map((item) => [String(item.id).replace('question-', ''), item.url]));
@@ -921,15 +973,48 @@ h1 {
 
   function getQuestionCountForEdit() {
     const input = document.getElementById('question-count-input');
-    const raw = Number.parseInt(input?.value || catalogData.questionCount || 30, 10);
-    return Math.max(1, Math.min(30, Number.isFinite(raw) ? raw : 30));
+    const raw = Number.parseInt(input?.value || catalogData.questionCount || DEFAULT_QUESTION_COUNT, 10);
+    return Math.max(1, Math.min(QUESTION_COUNT_LIMIT, Number.isFinite(raw) ? raw : DEFAULT_QUESTION_COUNT));
+  }
+
+  function setQuestionCountForEdit(nextCount, shouldAnnounce = false) {
+    const input = document.getElementById('question-count-input');
+    const safeCount = Math.max(1, Math.min(QUESTION_COUNT_LIMIT, Number.parseInt(nextCount, 10) || catalogData.questionCount || DEFAULT_QUESTION_COUNT));
+    if (input) {
+      input.value = String(safeCount);
+    }
+    renderDetailsRows();
+
+    if (shouldAnnounce) {
+      setDownloadStatus(`Ustawiono ${safeCount} aktywnych pytań. Po zapisie wygeneruje się ${safeCount} kodów QR do pytań.`, 'success');
+    }
+  }
+
+  function adjustQuestionCount(delta) {
+    setQuestionCountForEdit(getQuestionCountForEdit() + delta, true);
+  }
+
+  function handleQuestionCountInput() {
+    setQuestionCountForEdit(getQuestionCountForEdit(), false);
   }
 
   function getEditableDetailsRows(origin) {
     const questionCount = getQuestionCountForEdit();
-    const allQuestions = catalogData.questionCatalogAll.length
+    const sourceQuestions = catalogData.questionCatalogAll.length
       ? catalogData.questionCatalogAll
       : catalogData.questionCatalog;
+    const sourceQuestionMap = new Map(sourceQuestions.map((question) => [Number(question.id), question]));
+    const highestSourceId = sourceQuestions.reduce((max, question) => Math.max(max, Number(question.id) || 0), 0);
+    const allQuestionCount = Math.max(questionCount, highestSourceId, DEFAULT_QUESTION_COUNT);
+    const allQuestions = Array.from({ length: Math.min(allQuestionCount, QUESTION_COUNT_LIMIT) }, (_, index) => {
+      const id = index + 1;
+      return sourceQuestionMap.get(id) || {
+        id,
+        text: `Pytanie ${id}`,
+        answers: [],
+        active: false
+      };
+    });
     const allBonuses = catalogData.bonusCatalogAll.length
       ? catalogData.bonusCatalogAll
       : catalogData.bonusCatalog;
@@ -947,6 +1032,9 @@ h1 {
     const saveButton = document.getElementById('btn-save-catalog');
     const cancelButton = document.getElementById('btn-cancel-catalog');
     const editSettings = document.getElementById('catalog-edit-settings');
+    const addQuestionButton = document.getElementById('btn-add-question');
+    const removeQuestionButton = document.getElementById('btn-remove-question');
+    const questionHelp = document.getElementById('question-count-help');
 
     if (editButton) editButton.hidden = catalogEditMode;
     if (saveButton) saveButton.hidden = !catalogEditMode;
@@ -955,6 +1043,13 @@ h1 {
 
     const origin = normalizeOrigin(document.getElementById('base-origin').value);
     const rows = catalogEditMode ? getEditableDetailsRows(origin) : qrDetailsRows;
+    const questionCount = getQuestionCountForEdit();
+
+    if (addQuestionButton) addQuestionButton.disabled = questionCount >= QUESTION_COUNT_LIMIT;
+    if (removeQuestionButton) removeQuestionButton.disabled = questionCount <= 1;
+    if (questionHelp) {
+      questionHelp.textContent = `Po zapisie aktywne będą pytania 1-${questionCount}, a generator utworzy ${questionCount} kodów QR do pytań.`;
+    }
 
     if (!rows.length) {
       body.innerHTML = '<tr><td colspan="4">Nie uda&#322;o si&#281; pobra&#263; listy link&oacute;w i odpowiedzi.</td></tr>';
@@ -991,7 +1086,7 @@ h1 {
     }
 
     const countInput = document.getElementById('question-count-input');
-    if (countInput) countInput.value = String(catalogData.questionCount || qrDetailsRows.filter((row) => row.typeClass === 'question').length || 30);
+    if (countInput) countInput.value = String(catalogData.questionCount || qrDetailsRows.filter((row) => row.typeClass === 'question').length || DEFAULT_QUESTION_COUNT);
     catalogEditMode = true;
     renderDetailsRows();
     setDownloadStatus('Tryb edycji włączony. Zmieniasz liczbę pytań, treść, odpowiedzi i hasła bonusów.', 'success');
@@ -1165,7 +1260,7 @@ h1 {
       catalogData = {
         questionCatalog: data.questionCatalog || [],
         questionCatalogAll: data.questionCatalogAll || data.questionCatalog || [],
-        questionCount: Number(data.questionCount || (data.questionCatalog || []).length || 30),
+        questionCount: Number(data.questionCount || (data.questionCatalog || []).length || DEFAULT_QUESTION_COUNT),
         bonusCatalog: data.bonusCatalog || [],
         bonusCatalogAll: data.bonusCatalogAll || data.bonusCatalog || []
       };
