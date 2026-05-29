@@ -1984,15 +1984,47 @@
     animation: scoreFlash 1s ease forwards;
   }
 
+  .rank-change-pill {
+    display: inline-flex;
+    align-items: center;
+    margin-left: 10px;
+    padding: 4px 8px;
+    border-radius: 999px;
+    font-family: 'Syne', sans-serif;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: .02em;
+    vertical-align: middle;
+    white-space: nowrap;
+  }
+
+  .rank-change-pill.up {
+    color: #254116;
+    background: linear-gradient(135deg, rgba(200, 255, 57, .95), rgba(255, 244, 129, .9));
+    box-shadow: 0 8px 24px rgba(200, 255, 57, .24);
+  }
+
+  .rank-change-pill.down {
+    color: #8e214a;
+    background: rgba(255, 61, 107, .12);
+  }
+
+  .rank-change-pill.score {
+    color: #3b3070;
+    background: rgba(124, 106, 247, .12);
+  }
+
   /* ========== RANK CHANGE ANIMATIONS ========== */
   @keyframes rankUp {
-    0% { background: rgba(24, 200, 90, 0.2); box-shadow: inset 0 0 0 1px rgba(24,200,90,0.3); }
-    100% { background: transparent; box-shadow: none; }
+    0% { transform: translateY(12px) scale(.985); background: rgba(200, 255, 57, 0.2); box-shadow: 0 18px 44px rgba(200,255,57,0.18), inset 0 0 0 1px rgba(24,200,90,0.24); }
+    45% { transform: translateY(-4px) scale(1.012); background: rgba(255, 244, 129, 0.25); }
+    100% { transform: translateY(0) scale(1); background: transparent; box-shadow: none; }
   }
 
   @keyframes rankDown {
-    0% { background: rgba(255, 61, 107, 0.12); }
-    100% { background: transparent; }
+    0% { transform: translateY(-10px) scale(.985); background: rgba(255, 61, 107, 0.12); }
+    65% { transform: translateY(2px) scale(1); background: rgba(124, 106, 247, 0.08); }
+    100% { transform: translateY(0) scale(1); background: transparent; }
   }
 
   @keyframes rankNew {
@@ -2028,8 +2060,8 @@
     100% { box-shadow: 0 0 0 10px rgba(24,200,90,0); }
   }
 
-  .list-item.rank-up { animation: rankUp 1.5s ease forwards; }
-  .list-item.rank-down { animation: rankDown 1.5s ease forwards; }
+  .list-item.rank-up { animation: rankUp 1.5s ease; }
+  .list-item.rank-down { animation: rankDown 1.5s ease; }
   .list-item.rank-new { animation: rankNew 0.45s cubic-bezier(.18,.92,.22,1) forwards; }
   .list-score strong.score-changed { animation: scoreFlash 1s ease forwards; }
   .live-dot.ripple { animation: liveRipple 0.6s ease; }
@@ -2143,6 +2175,7 @@ let scoreboardState = {
   announcementText: '',
   announcementUpdatedAt: null,
   updatedAt: null,
+  versionKey: '',
   stats: { participants: 0, answers: 0, bonuses: 0 },
   leaderboard: [],
   cityStats: []
@@ -2167,9 +2200,12 @@ let cachedCityLeadersKey = '';
 let cachedCityLeaders = [];
 let lastRawRevealState = { participants: null, cities: null };
 let lastResultsLockKey = '';
+let rankMovements = new Map();
+let rankMovementsExpiresAt = 0;
 
-const SCOREBOARD_CACHE_MS = 3000;
-const SCOREBOARD_SYNC_COOLDOWN_MS = 2500;
+const SCOREBOARD_CACHE_MS = 1000;
+const SCOREBOARD_SYNC_COOLDOWN_MS = 1200;
+const SCOREBOARD_LIVE_REFRESH_MS = 1500;
 const SUSPENSE_THRESHOLD_MS = 3 * 60000;
 
 function isSafariBrowser() {
@@ -2263,6 +2299,43 @@ function getRevealLockMarkup(title, copy, stage) {
   `;
 }
 
+function getParticipantKey(participant) {
+  return String(participant?.id || `${participant?.name || 'uczestnik'}-${participant?.city || ''}`).trim();
+}
+
+function buildParticipantStateMap(list) {
+  const map = new Map();
+  (Array.isArray(list) ? list : []).forEach((participant, index) => {
+    const key = getParticipantKey(participant);
+    if (!key) return;
+    map.set(key, {
+      rank: Number(participant.rank || index + 1),
+      score: Number(participant.score || 0),
+      answeredCount: Number(participant.answeredCount || 0)
+    });
+  });
+  return map;
+}
+
+function getMovementPill(movement) {
+  if (!movement || (!movement.delta && !movement.scoreDelta)) return '';
+  if (movement.delta > 0) {
+    return `<span class="rank-change-pill up">Awans +${movement.delta}</span>`;
+  }
+  if (movement.delta < 0) {
+    return `<span class="rank-change-pill down">Spadek ${movement.delta}</span>`;
+  }
+  if (movement.scoreDelta > 0) {
+    return `<span class="rank-change-pill score">+${movement.scoreDelta} pkt</span>`;
+  }
+  return '';
+}
+
+function getActiveRankMovement(id) {
+  if (!rankMovementsExpiresAt || Date.now() > rankMovementsExpiresAt) return null;
+  return rankMovements.get(id) || null;
+}
+
 function triggerRevealMoment(type) {
   const existing = document.querySelector('.reveal-flash');
   if (existing) existing.remove();
@@ -2279,7 +2352,7 @@ function triggerRevealMoment(type) {
   setTimeout(() => overlay.remove(), 2300);
 }
 function getCityStats() {
-  const cacheKey = `${scoreboardState.updatedAt || 'none'}|${scoreboardState.leaderboard.length}|${scoreboardState.cityStats.length}`;
+  const cacheKey = `${scoreboardState.versionKey || scoreboardState.updatedAt || 'none'}|${scoreboardState.leaderboard.length}|${scoreboardState.cityStats.length}`;
   if (cachedCityStatsKey === cacheKey) {
     return cachedCityStats;
   }
@@ -2316,7 +2389,7 @@ function getCityStats() {
 }
 
 function getSortedLeaderboard() {
-  const cacheKey = `${scoreboardState.updatedAt || 'none'}|${scoreboardSort}`;
+  const cacheKey = `${scoreboardState.versionKey || scoreboardState.updatedAt || 'none'}|${scoreboardSort}`;
   if (cachedLeaderboardKey === cacheKey) {
     return cachedSortedLeaderboard;
   }
@@ -2346,7 +2419,7 @@ function getSortedLeaderboard() {
 }
 
 function getCityLeaders() {
-  const cacheKey = `${scoreboardState.updatedAt || 'none'}|${cityPodiumMode}`;
+  const cacheKey = `${scoreboardState.versionKey || scoreboardState.updatedAt || 'none'}|${cityPodiumMode}`;
   if (cachedCityLeadersKey === cacheKey) {
     return cachedCityLeaders;
   }
@@ -2539,20 +2612,15 @@ function renderLeaderboardList() {
     return;
   }
 
-  const newPrevRanks = {};
-  const newPrevScores = {};
-
   container.innerHTML = sorted.map((participant) => {
-    const id = participant.id || participant.name;
+    const id = getParticipantKey(participant);
+    const movement = getActiveRankMovement(id);
     const oldRank = prevRanks[id];
     const oldScore = prevScores[id];
-    const isNew = oldRank === undefined;
-    const movedUp = !isNew && participant.rank < oldRank;
-    const movedDown = !isNew && participant.rank > oldRank;
-    const scoreChanged = !isNew && participant.score !== oldScore;
-
-    newPrevRanks[id] = participant.rank;
-    newPrevScores[id] = participant.score;
+    const isNew = oldRank === undefined && !movement;
+    const movedUp = movement ? movement.delta > 0 : (!isNew && participant.rank < oldRank);
+    const movedDown = movement ? movement.delta < 0 : (!isNew && participant.rank > oldRank);
+    const scoreChanged = movement ? movement.scoreDelta !== 0 : (!isNew && participant.score !== oldScore);
 
     let animClass = '';
     if (isNew) animClass = 'rank-new';
@@ -2563,7 +2631,7 @@ function renderLeaderboardList() {
     <div class="list-item ${animClass}" data-id="${id}">
       <div class="list-rank">${participant.rank}</div>
       <div class="list-main">
-        <div class="list-name">${participant.name}</div>
+        <div class="list-name">${participant.name}${getMovementPill(movement)}</div>
         <div class="list-city">${participant.city || 'Bez miasta'}</div>
       </div>
       <div class="list-score">
@@ -2574,9 +2642,11 @@ function renderLeaderboardList() {
   `;
   }).join('');
 
-  // Update tracking after render
-  Object.assign(prevRanks, newPrevRanks);
-  Object.assign(prevScores, newPrevScores);
+  sorted.forEach((participant) => {
+    const id = getParticipantKey(participant);
+    prevRanks[id] = participant.rank;
+    prevScores[id] = participant.score;
+  });
 }
 
 let cachedSidebarKey = '';
@@ -2600,7 +2670,7 @@ function renderSidebar() {
     (b.answeredCount || 0) - (a.answeredCount || 0) ||
     String(a.name || '').localeCompare(String(b.name || ''), 'pl')
   );
-  const sidebarSignature = sorted.map((p, i) => `${p.id || p.name}:${i + 1}:${p.score || 0}`).join('|');
+  const sidebarSignature = sorted.map((p, i) => `${getParticipantKey(p)}:${i + 1}:${p.score || 0}`).join('|');
   const sidebarKey = `${scoreboardState.updatedAt || 'none'}|${revealState.participantsVisible}|${total}|${sidebarSignature}`;
   if (sidebarKey === cachedSidebarKey) return;
   cachedSidebarKey = sidebarKey;
@@ -2618,20 +2688,21 @@ function renderSidebar() {
     return;
   }
 
-  const newIds = new Set(sorted.map(p => p.id || p.name));
+  const newIds = new Set(sorted.map(p => getParticipantKey(p)));
   const nextSidebarRanks = {};
   const nextSidebarScores = {};
 
   listEl.innerHTML = sorted.map((p, i) => {
-    const id = p.id || p.name;
+    const id = getParticipantKey(p);
     const rank = i + 1;
     const score = Number(p.score || 0);
+    const movement = getActiveRankMovement(id);
     const oldRank = sidebarPrevRanks[id];
     const oldScore = sidebarPrevScores[id];
-    const isNew = !knownParticipantIds.has(id) || oldRank === undefined;
-    const movedUp = !isNew && rank < oldRank;
-    const movedDown = !isNew && rank > oldRank;
-    const scoreChanged = !isNew && score !== oldScore;
+    const isNew = (!knownParticipantIds.has(id) || oldRank === undefined) && !movement;
+    const movedUp = movement ? movement.delta > 0 : (!isNew && rank < oldRank);
+    const movedDown = movement ? movement.delta < 0 : (!isNew && rank > oldRank);
+    const scoreChanged = movement ? movement.scoreDelta !== 0 : (!isNew && score !== oldScore);
     let animClass = '';
     if (isNew) animClass = 'new-arrival';
     else if (movedUp) animClass = 'rank-up';
@@ -2695,6 +2766,37 @@ async function loadScoreboard(force = false) {
         throw new Error(data.error || 'Nie udało się pobrać danych ekranu wyników.');
       }
 
+      const incomingLeaderboard = Array.isArray(data.leaderboard) ? data.leaderboard : [];
+      const incomingCityStats = Array.isArray(data.cityStats) ? data.cityStats : [];
+      const previousParticipantState = buildParticipantStateMap(scoreboardState.leaderboard);
+      const nextRankMovements = new Map();
+
+      incomingLeaderboard.forEach((participant, index) => {
+        const id = getParticipantKey(participant);
+        const previous = previousParticipantState.get(id);
+        if (!previous) return;
+
+        const rank = Number(participant.rank || index + 1);
+        const score = Number(participant.score || 0);
+        const answeredCount = Number(participant.answeredCount || 0);
+        const delta = previous.rank - rank;
+        const scoreDelta = score - previous.score;
+        const answerDelta = answeredCount - previous.answeredCount;
+
+        if (delta || scoreDelta || answerDelta) {
+          nextRankMovements.set(id, { delta, scoreDelta, answerDelta });
+        }
+      });
+
+      rankMovements = nextRankMovements;
+      rankMovementsExpiresAt = nextRankMovements.size ? Date.now() + 2600 : 0;
+
+      const leaderboardSignature = incomingLeaderboard
+        .map((p, index) => `${getParticipantKey(p)}:${p.rank || index + 1}:${p.score || 0}:${p.answeredCount || 0}`)
+        .join(',');
+      const citySignature = incomingCityStats
+        .map((c) => `${c.city || ''}:${c.score || 0}:${c.participants || 0}:${c.answers || 0}`)
+        .join(',');
       const nextVersion = [
         data.updatedAt || 'none',
         data.phase || 'idle',
@@ -2703,8 +2805,8 @@ async function loadScoreboard(force = false) {
         data.endedAt || '',
         data.summaryAt || '',
         data.durationMinutes || 0,
-        Array.isArray(data.leaderboard) ? data.leaderboard.length : 0,
-        Array.isArray(data.cityStats) ? data.cityStats.length : 0,
+        leaderboardSignature,
+        citySignature,
         data.resultsReveal?.participantsAt || '',
         data.resultsReveal?.citiesAt || ''
       ].join('|');
@@ -2712,9 +2814,10 @@ async function loadScoreboard(force = false) {
       scoreboardState = {
         ...scoreboardState,
         ...data,
+        versionKey: nextVersion,
         stats: data.stats || { participants: 0, answers: 0, bonuses: 0 },
-        leaderboard: Array.isArray(data.leaderboard) ? data.leaderboard : [],
-        cityStats: Array.isArray(data.cityStats) ? data.cityStats : [],
+        leaderboard: incomingLeaderboard,
+        cityStats: incomingCityStats,
         resultsReveal: data.resultsReveal || { participantsAt: null, citiesAt: null }
       };
       scoreboardFetchedAt = Date.now();
@@ -2836,7 +2939,7 @@ window.onload = async () => {
     if (!document.hidden) {
       scheduleScoreboardRefresh();
     }
-  }, 3000);
+  }, SCOREBOARD_LIVE_REFRESH_MS);
   window.addEventListener('focus', () => {
     scheduleScoreboardRefresh(true);
   });

@@ -2033,10 +2033,10 @@ let questionRequestKey = '';
 let lastSyncPlayerViewAt = 0;
 let activeScreenId = '';
 
-const GAME_STATE_CACHE_MS = 5000;
-const PARTICIPANT_STATS_CACHE_MS = 10000;
-const QUESTION_CACHE_MS = 5000;
-const VIEW_SYNC_COOLDOWN_MS = 3000;
+const GAME_STATE_CACHE_MS = 2500;
+const PARTICIPANT_STATS_CACHE_MS = 5000;
+const QUESTION_CACHE_MS = 2500;
+const VIEW_SYNC_COOLDOWN_MS = 2500;
 const screenIds = ['login-screen', 'question-screen', 'no-q-screen', 'end-screen', 'thanks-screen'];
 const screenElements = Object.fromEntries(screenIds.map((id) => [id, document.getElementById(id)]));
 const loginFormEl = document.getElementById('login-form');
@@ -3233,8 +3233,6 @@ function renderParticipantBadges(options = {}) {
     if (badges.length === 0) {
       list.innerHTML = '<div class="badge-empty">Pierwsza odznaka pojawi się po zaliczonym pytaniu albo bonusie.</div>';
       return;
-      list.innerHTML = '<div class="badge-empty">Jeszcze chwila i pojawi się tutaj pierwsza odznaka.</div>';
-      return;
     }
 
     list.innerHTML = badges.map((badge) => `
@@ -3776,7 +3774,7 @@ window.onload = async () => {
     if (!document.hidden) {
       syncPlayerView();
     }
-  }, 15000);
+  }, 5000);
   window.addEventListener('focus', () => {
     schedulePlayerSync({ force: true });
   });

@@ -2889,10 +2889,10 @@ function bootAdminPanel() {
     pollingStarted = true;
     setInterval(() => {
       if (adminUnlocked && !document.hidden) loadData();
-    }, 12000);
+    }, 8000);
     setInterval(() => {
       if (adminUnlocked && !document.hidden) loadGameState();
-    }, 12000);
+    }, 5000);
   }
 }
 
@@ -4363,7 +4363,8 @@ async function loadData() {
 
   isDataLoading = true;
   try {
-    const res = await fetch('/api/admin-results');
+    const gameStatePromise = loadGameState();
+    const res = await fetch('/api/admin-results', { cache: 'no-store' });
     const data = await res.json();
 
     if (data.answers && data.answers.length > prevAnswersCount) {
@@ -4383,7 +4384,7 @@ async function loadData() {
     bonusCatalog = data.bonusCatalog || [];
     liveActivity = data.liveActivity || { liveParticipants: [], hottestQuestions: [], recentActivity: [] };
     questionStats = computeQuestionStats(allAnswers);
-    await loadGameState();
+    await gameStatePromise;
 
     updateSystemHealth({
       data: 'ok',
