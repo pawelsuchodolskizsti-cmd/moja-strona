@@ -855,8 +855,28 @@
     gap: 10px;
   }
 
+  .simulator-actions-single {
+    grid-template-columns: 1fr;
+  }
+
   .simulator-actions .btn {
     width: 100%;
+  }
+
+  .simulator-mega-btn {
+    min-height: 92px;
+    border-radius: 22px;
+    font-size: clamp(18px, 1.9vw, 26px);
+    box-shadow: 0 22px 60px rgba(124, 106, 247, 0.22), 0 0 34px rgba(200, 255, 73, 0.12);
+  }
+
+  .simulator-mega-btn small {
+    display: block;
+    margin-top: 8px;
+    font-size: 12px;
+    line-height: 1.35;
+    letter-spacing: .02em;
+    color: rgba(255, 255, 255, 0.78);
   }
 
   .simulator-meta {
@@ -2208,9 +2228,9 @@
           +10 minut gry
           <small>Przedłuża aktywną turę bez resetu</small>
         </button>
-        <button class="action-btn simulate" id="btn-start-simulator" onclick="runStartSimulator(35)">
-          Symulator startu
-          <small>35 uczestnikow testowych zapisanych w bazie</small>
+        <button class="action-btn simulate" id="btn-start-simulator" onclick="runStartSimulator()">
+          Test 300 osób
+          <small>Pełna próba gry zapisana w bazie</small>
         </button>
       </div>
 
@@ -2326,15 +2346,13 @@
     </section>
 
     <section class="ops-card simulator-card">
-      <div class="ops-title">Symulator startu</div>
-      <div class="ops-copy">Generuje oddzielne dane testowe w bazie i przełącza panel oraz tablicę wyników na bezpieczny tryb podglądowy bez dotykania prawdziwej gry.</div>
-      <div class="simulator-actions">
-        <button class="btn outline" type="button" onclick="runStartSimulator(20)">20 uczestników</button>
-        <button class="btn primary" type="button" onclick="runStartSimulator(35)">35 uczestników</button>
-        <button class="btn outline" type="button" onclick="runStartSimulator(50)">50 uczestników</button>
-        <button class="btn outline" type="button" onclick="toggleTestMode('enable')">Pokaż test</button>
-        <button class="btn outline" type="button" onclick="toggleTestMode('disable')">Wróć do żywych</button>
-        <button class="btn outline" type="button" onclick="toggleTestMode('clear')">Wyczyść test</button>
+      <div class="ops-title">Wielki test startu</div>
+      <div class="ops-copy">Jednym kliknięciem uruchamiasz próbę na 300 uczestników. System zapisuje test w bazie, przełącza panel i tablicę wyników na bezpieczny tryb testowy, a odpowiedzi oraz bonusy wpadają stopniowo jak w prawdziwej grze.</div>
+      <div class="simulator-actions simulator-actions-single">
+        <button class="btn primary simulator-mega-btn" type="button" onclick="runStartSimulator()">
+          Uruchom test 300 uczestników
+          <small>Ranking, miasta, odpowiedzi i bonusy będą aktualizować się live</small>
+        </button>
       </div>
       <div class="qr-admin-summary">
         <div class="qr-admin-pill" id="sim-total-participants">0 uczestników</div>
@@ -2345,13 +2363,13 @@
       <div class="checklist" id="simulator-results">
         <div class="check-item pending">
           <div class="check-item-head">
-            <div class="check-item-title">Brak ostatniej symulacji</div>
+            <div class="check-item-title">Wielki test nie jest uruchomiony</div>
             <div class="check-badge pending">Czeka</div>
           </div>
-          <div class="check-item-sub">Uruchom 20, 35 lub 50 uczestników, aby sprawdzić liczenie punktów, topkę i ranking miast.</div>
+          <div class="check-item-sub">Kliknij jeden duży przycisk, aby wystartować próbę 300 uczestników z progresywnymi odpowiedziami i bonusami.</div>
         </div>
       </div>
-      <div class="simulator-meta" id="simulator-meta">Symulator zapisuje oddzielne dane testowe w bazie i może przełączyć na nie panel admina oraz tablicę wyników.</div>
+      <div class="simulator-meta" id="simulator-meta">Test działa w oddzielnym trybie danych i nie dotyka prawdziwych wyników live.</div>
     </section>
 
     <section class="ops-card">
@@ -3911,17 +3929,18 @@ async function scanPublicResource({ label, url, response = null, validate = null
   }
 }
 
-async function runStartSimulator(participantCount = 35) {
-  const button = document.getElementById('btn-start-simulator');
-  if (button) button.disabled = true;
+async function runStartSimulator() {
+  const participantCount = 300;
+  const buttons = document.querySelectorAll('[onclick="runStartSimulator()"]');
+  buttons.forEach((button) => { button.disabled = true; });
 
-  setAdminFeedback(`Generuję ${participantCount} uczestników testowych w bazie i przełączam panel na dane testowe...`);
+  setAdminFeedback('Uruchamiam wielki test 300 uczestników. Panel i tablica przejdą na dane testowe, a odpowiedzi zaczną wpadać stopniowo...');
 
   try {
     const res = await fetch('/api/test-mode', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'seed', participantCount })
+      body: JSON.stringify({ action: 'start-large' })
     });
     const data = await res.json();
 
@@ -3932,12 +3951,12 @@ async function runStartSimulator(participantCount = 35) {
     await loadData();
     await loadGameState();
     renderSimulatorSnapshot();
-    setAdminFeedback(data.message || `Wygenerowano ${participantCount} uczestników testowych.`, 'success');
+    setAdminFeedback(data.message || `Uruchomiono test ${participantCount} uczestników.`, 'success');
   } catch (error) {
     console.error(error);
-    setAdminFeedback(error.message || 'Nie udało się uruchomić trybu testowego.', 'error');
+    setAdminFeedback(error.message || 'Nie udało się uruchomić wielkiego testu 300 uczestników.', 'error');
   } finally {
-    if (button) button.disabled = false;
+    buttons.forEach((button) => { button.disabled = false; });
   }
 }
 
@@ -4109,7 +4128,7 @@ function renderStartSimulation(report) {
 
   meta.textContent = report.topParticipant && report.topCity
     ? `Lider testu: ${report.topParticipant.firstName} ${report.topParticipant.lastName} (${report.topParticipant.score} pkt) | Lider miast: ${report.topCity.city} (${report.topCity.score} pkt).`
-    : 'Symulator korzysta z tych samych zasad liczenia co panel, ale nie modyfikuje prawdziwych wyników.';
+    : 'Wielki test korzysta z tych samych tabel i zasad liczenia co panel, ale działa w oddzielnym trybie danych.';
 }
 
 function buildPersistedSimulationReport() {
@@ -4125,7 +4144,7 @@ function buildPersistedSimulationReport() {
   const cityStats = [...cityMap.values()].sort((a, b) => b.score - a.score || a.city.localeCompare(b.city, 'pl'));
   const topParticipant = [...allParticipants].sort((a, b) => (b.score || 0) - (a.score || 0) || (b.answeredCount || 0) - (a.answeredCount || 0))[0] || null;
   const topCity = cityStats[0] || null;
-  const answersOk = allAnswers.length >= allParticipants.length;
+  const answersOk = allAnswers.length > 0 || allBonuses.length > 0;
   const cityOk = cityStats.length >= 2;
   const rankOk = allParticipants.every((participant, index, list) => {
     if (index === 0) return true;
@@ -4158,10 +4177,10 @@ function buildPersistedSimulationReport() {
           : 'Brak zapisanych uczestników testowych.'
       },
       {
-        label: 'Odpowiedzi i bonusy',
+        label: 'Live odpowiedzi i bonusy',
         status: answersOk ? 'ok' : 'warning',
         badge: answersOk ? 'OK' : 'Uwaga',
-        message: `Baza zwróciła ${allAnswers.length} odpowiedzi oraz ${allBonuses.length} bonusów dla danych testowych.`
+        message: `Baza zwróciła ${allAnswers.length} odpowiedzi oraz ${allBonuses.length} bonusów. Te liczby rosną stopniowo przy odświeżaniu panelu i tablicy.`
       },
       {
         label: 'Punkty miast',
@@ -4189,7 +4208,7 @@ function renderSimulatorSnapshot() {
           label: 'Tryb danych',
           status: 'pending',
           badge: 'LIVE',
-          message: 'Panel pokazuje obecnie dane żywe. Wygeneruj test albo włącz ostatni zapisany tryb testowy.'
+          message: 'Panel pokazuje obecnie dane żywe. Uruchom wielki test 300 uczestników, aby przejść na ranking symulacyjny.'
         }
       ]
     });
@@ -4197,8 +4216,8 @@ function renderSimulatorSnapshot() {
     const meta = document.getElementById('simulator-meta');
     if (meta) {
       meta.textContent = testModeParticipantCount
-        ? `W bazie czeka zapisany test dla ${testModeParticipantCount} uczestników. Kliknij "Pokaż test", aby przełączyć widoki.`
-        : 'Tryb testowy jest wyłączony. Wygeneruj dane testowe, aby przejść na ranking symulacyjny.';
+        ? `W bazie istnieje poprzedni test dla ${testModeParticipantCount} uczestników. Kliknięcie dużego przycisku uruchomi świeżą próbę 300 osób.`
+        : 'Tryb testowy jest wyłączony. Uruchom wielki test 300 uczestników, aby przejść na ranking symulacyjny.';
     }
     return;
   }
