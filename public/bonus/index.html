@@ -1353,6 +1353,7 @@ input:focus {
     grid-template-columns: 1fr;
   }
 }
+.bonus-announcement{padding:12px;margin-bottom:16px;border-radius:12px;background:#fff3c4;color:#34295e;overflow-wrap:anywhere;font-weight:700}.bonus-announcement[hidden]{display:none}
 </style>
 </head>
 <body>
@@ -1816,6 +1817,7 @@ function escHtml(value) {
 }
 
 function bindUppercaseLoginFields() {
+  acceptRulesBonusEl?.addEventListener('change',updateBonusConsentState);updateBonusConsentState();
   document.querySelectorAll('[data-uppercase-login]').forEach((element) => {
     element.addEventListener('input', () => {
       const normalized = normalizeLoginValue(element.value);
@@ -2348,7 +2350,7 @@ function getGamePhase() {
 
   if (startedAt) {
     const endTime = startedAt + durationMs;
-    if (Date.now() < endTime) return 'active';
+    if (Date.now() < endTime) return activeGameState.technicalPauseActive ? 'paused' : 'active';
     if (summaryAt && Date.now() >= summaryAt) return 'thanks';
     return 'ended';
   }
@@ -2623,9 +2625,11 @@ async function loadGameState(options = {}) {
       startedAt: data.started_at || null,
       endedAt: data.ended_at || null,
       summaryAt: data.summary_at || null,
-      durationMinutes: Number(data.duration_minutes || 10)
+      durationMinutes: Number(data.duration_minutes || 10),
+      technicalPauseActive:!!data.technical_pause_active,technicalPauseText:data.technical_pause_text||'',announcementText:data.announcement_text||''
     };
     gameStateFetchedAt = Date.now();
+    renderBonusAnnouncement();
     renderGameRemaining();
     return getGamePhase();
   })();
@@ -2748,7 +2752,11 @@ async function showSecret(existingBonusData = null, options = {}) {
   setActiveBonusScreen('secret-screen');
 }
 
+function renderBonusAnnouncement() {
+  Object.values(bonusScreenElements).forEach(el=>{if(!el)return;let box=el.querySelector('.bonus-announcement');if(!box){box=document.createElement('div');box.className='bonus-announcement';el.prepend(box);}box.textContent=activeGameState.announcementText||'';box.hidden=!box.textContent;});
+}
 function showBonusPhaseState(phase) {
+  if(phase==='paused'){showBonusResult({title:'Pauza techniczna',subtitle:activeGameState.technicalPauseText||'Za chwilę wracamy.',copy:'Twoje postępy są zapisane. Pozostań na stronie.',badge:'Pauza',icon:'II',animate:false});return;}
   if (phase === 'idle') {
     showBonusResult({
       title: 'Bonus b\u0119dzie aktywny po starcie gry',
@@ -2845,7 +2853,7 @@ window.onload = async () => {
   const saved = getStoredParticipantIdForCurrentGame();
   if (saved) {
     participantId = saved;
-  } else if (phase === 'active' && !participantId) {
+  } else if ((phase === 'active' || phase === 'paused') && !participantId) {
     await restoreParticipantSession();
   }
 
@@ -2915,6 +2923,7 @@ async function doNameLogin() {
       deviceToken,
       acceptedRules
     });
+    if(res.status===423){delete btn.dataset.busy;updateBonusConsentState();await syncBonusView({force:true});return;}
     if (!res.ok || !data.id) {
       throw new Error(data.error || 'B\u0142\u0105d logowania.');
     }
@@ -2960,7 +2969,7 @@ async function submitSecret() {
     });
 
     const data = await res.json();
-
+    if(res.status===423){btn.disabled=false;await syncBonusView({force:true});return;}
     if (res.status === 403 && /urzadzen|urządzen|przypisane/i.test(String(data.error || ''))) {
       clearBonusAccess(data.error);
       btn.disabled = false;

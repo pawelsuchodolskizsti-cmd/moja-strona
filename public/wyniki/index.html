@@ -2065,6 +2065,51 @@
   .list-item.rank-new { animation: rankNew 0.45s cubic-bezier(.18,.92,.22,1) forwards; }
   .list-score strong.score-changed { animation: scoreFlash 1s ease forwards; }
   .live-dot.ripple { animation: liveRipple 0.6s ease; }
+
+body.projection-mode .hero-meta{display:flex;position:fixed;right:16px;bottom:16px;z-index:1000;margin:0}
+body.projection-mode .hero-meta > :not(#projection-toggle){display:none}
+body.projection-mode #projection-toggle{display:inline-flex;background:#fff;color:#241443;box-shadow:0 2px 12px #0004}
+.list-city{overflow-wrap:anywhere;min-width:0}
+.hero-broadcast{margin-top:12px;padding:10px 12px;border-radius:12px;background:#fff1b8;color:#302443;font-weight:700;overflow-wrap:anywhere;white-space:pre-wrap}
+body.projection-mode .hero-broadcast{margin-top:6px;padding:6px 10px;max-height:64px;overflow:auto;font-size:14px}
+.sidebar-rank{grid-column:1}.sidebar-name{grid-column:2;grid-row:1}.sidebar-city-tag{grid-column:2;grid-row:2}.sidebar-score{grid-column:3}
+body.projection-mode .screen{grid-template-rows:68px minmax(160px,.6fr) minmax(300px,1fr) minmax(190px,.65fr)!important}
+body.projection-mode .brand-strip{height:100%;min-height:0;margin:0;padding:0;align-self:stretch}
+body.projection-mode .brand-block{height:100%;min-height:0;padding:4px 16px}
+body.projection-mode .partner-logo{max-height:44px;width:auto}
+body.projection-mode .brand-title{font-size:clamp(16px,2vw,26px)}
+body.projection-mode .headline{font-size:clamp(30px,3.5vw,50px);line-height:1.02}
+body.projection-mode .hero-main{padding:8px 14px}
+body.projection-mode .podium-item{grid-template-columns:48px minmax(0,1fr);grid-template-areas:"rank name" "rank score" "rank meta";gap:4px 8px;min-height:0;padding:8px 10px}
+body.projection-mode .podium-name{font-size:20px;white-space:normal;line-height:1.05}
+body.projection-mode .podium-rank{font-size:9px;letter-spacing:.08em}
+body.projection-mode .podium-score{font-size:25px;border-left:0;padding-left:0;justify-self:start;text-align:left}
+body.projection-mode .podium-meta{font-size:9px;white-space:normal;overflow:visible}
+body.projection-mode .city-card{display:flex;flex-direction:column;min-height:0;padding:12px 16px}
+body.projection-mode .city-card .section-head{margin-bottom:8px;flex-shrink:0}
+body.projection-mode .city-card .section-title{font-size:26px}
+body.projection-mode .city-grid{flex:1;min-height:0;grid-template-rows:repeat(2,minmax(0,1fr));gap:6px}
+body.projection-mode .city-item{min-height:0;padding:6px 8px}
+body.projection-mode .city-item-name{font-size:14px}
+body.projection-mode .city-item-score{font-size:24px}
+body.projection-mode .city-item-meta{font-size:9px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media(max-width:640px){
+ .screen,.hero,.hero-main,.hero-side,.board,.board-card,.city-card,.announcement-card,.brand-block,.podium-item,.list-item{min-width:0;max-width:100%;box-sizing:border-box}
+ .brand-strip{display:flex;flex-direction:column;align-items:stretch;gap:12px;min-width:0}
+ .brand-block{width:100%;min-width:0}.brand-title{white-space:normal;overflow-wrap:anywhere;text-align:center;font-size:clamp(16px,5vw,24px);letter-spacing:2px}
+ .partners-row{max-width:100%;flex-wrap:wrap}.partner-logo{max-width:45%;height:auto}
+ .section-head{flex-wrap:wrap;gap:12px}.board-tools{max-width:100%;min-width:0;flex-wrap:wrap}
+ .sort-select{max-width:100%;min-width:0}.podium-grid,.list,.city-grid{min-width:0;width:100%}
+ .podium-name,.list-name,.city-item-name{overflow-wrap:anywhere;min-width:0}
+ .list-item{grid-template-columns:38px minmax(0,1fr);gap:10px}
+ .list-score{grid-column:2;padding-left:0;border-left:0;min-width:0}
+ .list-name{white-space:normal}
+ .podium-item{grid-template-columns:52px minmax(0,1fr);grid-template-areas:"rank name" "rank meta" "rank score";gap:8px}
+ .podium-rank{font-size:9px;letter-spacing:.08em;overflow-wrap:anywhere;min-width:0}
+ .podium-name{white-space:normal}
+ .podium-score{grid-column:2;grid-row:auto;border-left:0;padding-left:0;text-align:left;min-width:0}
+ .podium-meta{grid-column:2;overflow-wrap:anywhere}
+}
 </style>
 </head>
 <body>
@@ -2089,6 +2134,7 @@
           <div class="meta-pill" id="last-updated">Akt: <span id="live-ago" class="live-ago">--</span><span class="sync-flash" id="sync-flash"></span></div>
           <button class="meta-pill meta-button" id="projection-toggle" type="button" aria-pressed="false">Tryb projekcyjny</button>
         </div>
+        <div class="hero-broadcast" id="hero-broadcast" role="status" hidden></div>
       </div>
       <div class="hero-side">
         <div class="timer-stack">
@@ -2166,6 +2212,8 @@
   </div>
 
 <script>
+function escHtml(value){return String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+
 let scoreboardState = {
   phase: 'idle',
   startedAt: null,
@@ -2240,7 +2288,7 @@ function formatTimer(ms) {
 }
 
 function getRemainingMs() {
-  if (scoreboardState.phase === 'active' && scoreboardState.startedAt) {
+  if (['active','paused'].includes(scoreboardState.phase) && scoreboardState.startedAt) {
     const endTime = new Date(scoreboardState.startedAt).getTime() + Number(scoreboardState.durationMinutes || 10) * 60000;
     return endTime - Date.now();
   }
@@ -2264,7 +2312,7 @@ function getRemainingMs() {
 }
 
 function isSuspenseMode() {
-  if (scoreboardState.phase !== 'active') return false;
+  if (!['active','paused'].includes(scoreboardState.phase)) return false;
   const remaining = getRemainingMs();
   return remaining !== null && remaining > 0 && remaining <= SUSPENSE_THRESHOLD_MS;
 }
@@ -2465,7 +2513,9 @@ function renderHeader() {
   document.body.classList.toggle('suspense-mode', suspenseMode);
   headline.classList.toggle('phase-ended', scoreboardState.phase === 'ended');
 
-  if (scoreboardState.phase === 'active') {
+  if (scoreboardState.phase === 'paused') {
+    headline.textContent='Pauza techniczna';subline.textContent=scoreboardState.technicalPauseText||'Za chwilę wracamy.';timerLabel.textContent='Do końca gry';
+  } else if (scoreboardState.phase === 'active') {
     headline.textContent = suspenseMode ? 'Finałowa końcówka' : 'Ranking na żywo';
     subline.textContent = suspenseMode
       ? 'Ostatnie 3 minuty. Top 3 miast i najlepsi uczestnicy zostały właśnie ukryte, a pełny wynik wróci dopiero po zakończeniu gry.'
@@ -2493,6 +2543,10 @@ function renderHeader() {
 }
 
 function renderAnnouncement() {
+  const broadcast=document.getElementById('hero-broadcast');
+  const message=String(scoreboardState.announcementText||'').trim();
+  broadcast.hidden=!message;
+  broadcast.textContent=message;
   const copy = document.getElementById('announcement-copy');
   const meta = document.getElementById('announcement-meta');
   const suspenseMode = isSuspenseMode();
@@ -2552,7 +2606,7 @@ function renderCityStats() {
 
   container.innerHTML = visibleCities.map((item) => `
     <div class="city-item">
-      <div class="city-item-name">${item.city}</div>
+      <div class="city-item-name">${escHtml(item.city)}</div>
       <div class="city-item-score">${item.score} pkt</div>
       <div class="city-item-meta">${item.participants} uczestników | średnio ${item.averageScore.toFixed(1)} pkt na osobe</div>
     </div>
@@ -2589,7 +2643,7 @@ function renderCityPodium() {
   podium.innerHTML = top.map((item, index) => `
     <div class="podium-item ${variants[index] || ''}">
       <div class="podium-rank">Miejsce ${index + 1}</div>
-      <div class="podium-name">${item.city}</div>
+      <div class="podium-name">${escHtml(item.city)}</div>
       <div class="podium-score">${cityPodiumMode === 'average' ? `${item.averageScore.toFixed(1)} pkt/os` : `${item.score} pkt`}</div>
       <div class="podium-meta">${item.participants} uczestnikow | suma ${item.score} pkt</div>
     </div>
@@ -2631,8 +2685,8 @@ function renderLeaderboardList() {
     <div class="list-item ${animClass}" data-id="${id}">
       <div class="list-rank">${participant.rank}</div>
       <div class="list-main">
-        <div class="list-name">${participant.name}${getMovementPill(movement)}</div>
-        <div class="list-city">${participant.city || 'Bez miasta'}</div>
+        <div class="list-name">${escHtml(participant.name)}${getMovementPill(movement)}</div>
+        <div class="list-city">${escHtml(participant.city || 'Bez miasta')}</div>
       </div>
       <div class="list-score">
         <strong class="${scoreChanged ? 'score-changed' : ''}">${participant.score} pkt</strong>
@@ -2665,11 +2719,7 @@ function renderSidebar() {
   const revealState = getResultsRevealState();
   const all = scoreboardState.leaderboard || [];
   const total = scoreboardState.stats?.participants || all.length;
-  const sorted = [...all].sort((a, b) =>
-    (b.score || 0) - (a.score || 0) ||
-    (b.answeredCount || 0) - (a.answeredCount || 0) ||
-    String(a.name || '').localeCompare(String(b.name || ''), 'pl')
-  );
+  const sorted = [...all].sort((a, b) => a.rank - b.rank);
   const sidebarSignature = sorted.map((p, i) => `${getParticipantKey(p)}:${i + 1}:${p.score || 0}`).join('|');
   const sidebarKey = `${scoreboardState.updatedAt || 'none'}|${revealState.participantsVisible}|${total}|${sidebarSignature}`;
   if (sidebarKey === cachedSidebarKey) return;
@@ -2714,9 +2764,9 @@ function renderSidebar() {
     return `
       <div class="sidebar-participant ${animClass}" data-id="${id}">
         <span class="sidebar-rank">${rank}</span>
-        <span class="sidebar-name">${p.name}</span>
+        <span class="sidebar-name">${escHtml(p.name)}</span>
         <span class="sidebar-score ${scoreChanged ? 'score-changed' : ''}">${score}</span>
-        <span class="sidebar-city-tag">${p.city || ''}</span>
+        <span class="sidebar-city-tag">${escHtml(p.city || '')}</span>
       </div>
     `;
   }).join('');
@@ -2799,7 +2849,7 @@ async function loadScoreboard(force = false) {
         .join(',');
       const nextVersion = [
         data.updatedAt || 'none',
-        data.phase || 'idle',
+        data.phase || 'idle',data.technicalPauseText||'',
         data.announcementUpdatedAt || '',
         data.startedAt || '',
         data.endedAt || '',

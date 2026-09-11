@@ -2523,6 +2523,7 @@ function setQrScannerStatus(message) {
 }
 
 function stopQrScanner() {
+  qrCameraState.requestId=(qrCameraState.requestId||0)+1;
   qrCameraState.active = false;
   qrCameraState.busy = false;
   if (qrCameraState.scanTimer) {
@@ -2576,6 +2577,7 @@ async function scanQrVideoFrame() {
 
 async function openQrCameraCapture() {
   if (qrCameraState.active) return;
+  const requestId=qrCameraState.requestId=(qrCameraState.requestId||0)+1;
   primeFeedbackAudio();
   triggerHaptic(12);
 
@@ -2602,14 +2604,20 @@ async function openQrCameraCapture() {
         height: { ideal: 720 }
       }
     });
+    if(!qrCameraState.active || qrCameraState.requestId!==requestId) {
+      stream.getTracks().forEach(track=>track.stop());
+      return;
+    }
     qrCameraState.stream = stream;
     qrScannerVideoEl.srcObject = stream;
     await qrScannerVideoEl.play();
+    if(!qrCameraState.active || qrCameraState.requestId!==requestId) return;
     setQrScannerStatus(getQrBarcodeDetector()
       ? 'Nakieruj aparat na kod QR. Skanowanie działa automatycznie.'
       : 'Safari używa trybu zgodności. Trzymaj kod w środku ramki.');
     scanQrVideoFrame();
   } catch (error) {
+    if(qrCameraState.requestId!==requestId) return;
     stopQrScanner();
     showMicroToast('Nie udało się uruchomić aparatu. Sprawdź zgodę na kamerę w przeglądarce.', 'info', 'Aparat');
   }
@@ -2730,6 +2738,7 @@ function rememberParticipantSession(id) {
 }
 
 function resetLocalParticipantSession() {
+  delete loginBtnEl.dataset.busy;updateLoginConsentState();
   participantId = null;
   currentQuestion = null;
   participantStats = { answers: 0, bonuses: 0 };
@@ -3452,15 +3461,17 @@ async function loadGameState(options = {}) {
   gameStateLoadPromise = (async () => {
     try {
       const res  = await fetch('/api/game-state');
+      if(!res.ok)throw Error('Nie udało się pobrać stanu gry.');
       const data = await res.json();
-
+      if(activeGameState.startedAt && data.started_at && activeGameState.startedAt!==data.started_at)resetLocalParticipantSession();
       activeGameState = {
         startedAt: data.started_at || null,
         endedAt: data.ended_at || null,
         summaryAt: data.summary_at || null,
         durationMinutes: Number(data.duration_minutes || 10),
         announcementText: data.announcement_text || '',
-        announcementUpdatedAt: data.announcement_updated_at || null
+        announcementUpdatedAt: data.announcement_updated_at || null,
+        technicalPauseActive:!!data.technical_pause_active,technicalPauseText:data.technical_pause_text||''
       };
       gameStateFetchedAt = Date.now();
       renderGameRemaining();
@@ -3569,7 +3580,7 @@ async function fetchQuestionData(options = {}) {
 
   questionRequestKey = requestKey;
   questionLoadPromise = (async () => {
-    const res = await fetch(`/api/question?q=${q}&pid=${participantId}&token=${encodeURIComponent(deviceToken)}&track=${trackOpen ? '1' : '0'}`, { cache: 'no-store' });
+    const res = await fetch(`/api/question?q=${encodeURIComponent(q)}&pid=${participantId}&token=${encodeURIComponent(deviceToken)}&track=${trackOpen ? '1' : '0'}`, { cache: 'no-store' });
     const data = await res.json();
     if (res.ok && !data.error) {
       currentQuestion = data;
@@ -3621,7 +3632,8 @@ async function showQuestionScreen(options = {}) {
         await loadGameState();
         return;
       }
-      loginMsgEl.innerText = data.error;
+      if(res.status===423){await loadGameState({force:true});return;}
+      setActiveScreen('question-screen');qTextEl.innerText=data.error;answerAreaEl.style.display='none';resultAreaEl.innerHTML='';
       return;
     }
 
@@ -3639,7 +3651,7 @@ async function showQuestionScreen(options = {}) {
       showAnsweredState('', 'To pytanie masz już wykonane.', false, 'completed');
     }
   } catch(e) {
-    loginMsgEl.innerText = 'Błąd połączenia';
+    setActiveScreen('question-screen');qTextEl.innerText='Nie udało się pobrać pytania. Wróć do ekranu głównego i spróbuj ponownie.';answerAreaEl.style.display='none';
   }
 }
 
@@ -3665,7 +3677,7 @@ async function refreshQuestionState(options = {}) {
       return;
     }
 
-    if (currentQuestion?.id !== data.id) {
+    if (qTextEl.innerText !== data.text) {
       currentQuestion = data;
       qTextEl.innerText = data.text;
     }
@@ -3705,7 +3717,7 @@ async function syncPlayerView(options = {}) {
     }
 
     if (getQuestionParam()) {
-      if (currentQuestion) {
+      if (currentQuestion && activeScreenId==='question-screen') {
         await refreshQuestionState({ force });
       } else {
         await showQuestionScreen({ force });
@@ -3764,6 +3776,7 @@ async function submitAnswer() {
       })
     });
     const data = await res.json();
+    if(res.status===423){await loadGameState({force:true});return;}
     if (res.status === 403 && /urzadzen|urządzen|przypisane/i.test(String(data.error || ''))) {
       clearParticipantAccess(data.error);
       return;
@@ -3790,7 +3803,7 @@ async function submitAnswer() {
 
   } catch(e) {
     if (/zakonczona|zakończona|wystartowala|wystartowała/i.test(String(e.message || ''))) {
-      await loadGameState();
+      await loadGameState({force:true});
       return;
     }
     msg.className = 'msg error';
@@ -3867,7 +3880,7 @@ window.onload = async () => {
 
   const phase = await loadGameState({ manageScreens: false, force: true });
 
-  if (phase === 'active') {
+  if (phase === 'active' || phase === 'paused') {
     await restoreParticipantSession({ clearWhenMissing: true });
   } else {
     resetLocalParticipantSession();

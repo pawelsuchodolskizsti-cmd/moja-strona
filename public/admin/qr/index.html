@@ -618,6 +618,7 @@ h1 {
   }
 }
 </style>
+<script src="/admin/qr/qr-zip.js"></script>
 </head>
 <body>
   <div class="page">
@@ -651,7 +652,7 @@ h1 {
           <div class="actions">
             <button class="btn primary" type="button" onclick="renderCatalog()">Od&#347;wie&#380; kody</button>
             <button class="btn lime" type="button" onclick="downloadAllAsJpg()">ZIP z JPG</button>
-            <button class="btn ghost" type="button" onclick="window.print()">PDF / Drukuj</button>
+            <button class="btn ghost" type="button" onclick="printQrCatalog()">PDF / Drukuj</button>
           </div>
         </div>
         <div class="toolbar-note" id="qr-range-note">Ko&#324;c&oacute;wki s&#261; sta&#322;e: `/?q=1...`, `/bonus/?b=B01...`, `/wyniki/` oraz `/` dla strony g&#322;&oacute;wnej. Je&#347;li przepiszesz domen&#281; wy&#380;ej, wszystkie kody od razu przelicz&#261; si&#281; na nowy adres.</div>
@@ -740,7 +741,8 @@ h1 {
     </section>
   </div>
 
-  <script src="/admin/qr-catalog.js"></script>
+  <script src="/admin/admin-session.js"></script>
+<script src="/admin/qr-catalog.js"></script>
   <script>
   function isSafariBrowser() {
     const ua = navigator.userAgent || '';
@@ -764,6 +766,7 @@ h1 {
   let qrGroups = { screens: [], questions: [], bonuses: [], all: [] };
   let qrDetailsRows = [];
   let catalogEditMode = false;
+  let catalogDraft = null;
   const DEFAULT_QUESTION_COUNT = 30;
   const QUESTION_COUNT_LIMIT = 300;
   let catalogData = {
@@ -774,11 +777,7 @@ h1 {
     bonusCatalogAll: []
   };
 
-  function normalizeOrigin(value) {
-    const raw = String(value || '').trim();
-    if (!raw) return window.location.origin;
-    return raw.replace(/\/+$/, '');
-  }
+function normalizeOrigin(value) { try { const url=new URL(String(value||window.location.origin));if(!['https:','http:'].includes(url.protocol))throw Error();return url.origin; } catch { return window.location.origin; } }
 
   function getProxyQrUrl(item, format, download) {
     const params = new URLSearchParams({
@@ -814,16 +813,16 @@ h1 {
     return `
       <article class="${cssClass}">
         <div class="qr-card-head">
-          <div class="qr-card-title">${item.label}</div>
-          <div class="qr-card-chip">${item.shortLabel}</div>
+          <div class="qr-card-title">${escapeHtml(item.label)}</div>
+          <div class="qr-card-chip">${escapeHtml(item.shortLabel)}</div>
         </div>
         <div class="qr-image-wrap">
-          <img class="qr-image" src="${getProxyQrUrl(item, 'png')}" alt="${item.label}">
+          <img class="qr-image" src="${getProxyQrUrl(item, 'png')}" alt="${escapeHtml(item.label)}">
         </div>
-        <div class="qr-path">${item.path}</div>
-        <p class="qr-copy">${item.description}</p>
+        <div class="qr-path">${escapeHtml(item.path)}</div>
+        <p class="qr-copy">${escapeHtml(item.description)}</p>
         <div class="qr-actions">
-          <button class="qr-btn" type="button" onclick="window.open('${item.url}', '_blank', 'noopener')">Otw&oacute;rz</button>
+          <button class="qr-btn" type="button" data-qr-id="${escapeHtml(item.id)}" onclick="openQrLink(this.dataset.qrId)">Otw&oacute;rz</button>
           <button class="qr-btn secondary" type="button" onclick="downloadOneJpg('${item.id}')">Pobierz JPG</button>
         </div>
       </article>
@@ -864,12 +863,13 @@ h1 {
     updateCounters();
   }
 
-  function renderCatalog() {
+  async function renderCatalog() {
     renderCatalogGrids();
     setDownloadStatus('Kody zosta\u0142y przeliczone dla aktualnego adresu strony.', 'success');
-    loadDetailsCatalog();
+    await loadDetailsCatalog();
   }
 
+  function openQrLink(id) { const item=findQrItem(id);if(item)window.open(item.url,'_blank','noopener'); }
   function findQrItem(id) {
     return qrGroups.all.find((item) => item.id === id);
   }
@@ -898,7 +898,9 @@ h1 {
     setDownloadStatus(`Rozpocz\u0119to pobieranie pliku ${fileName}.`, 'success');
   }
 
+  let zipDownloadBusy=false;
   async function downloadAllAsJpg() {
+    if(zipDownloadBusy)return;
     if (!qrGroups.all.length) {
       setDownloadStatus('Najpierw wygeneruj list\u0119 kod\u00f3w QR.', 'error');
       return;
@@ -907,34 +909,29 @@ h1 {
     setDownloadStatus('Przygotowuj\u0119 jedno archiwum ZIP ze wszystkimi kodami JPG.', 'success');
 
     try {
-      const response = await fetch('/api/qr-proxy', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          format: 'jpg',
-          size: '900x900',
-          name: 'kody-qr-gwiazdka-one-day.zip',
-          items: qrGroups.all.map((item) => ({
-            id: item.id,
-            filename: `${item.id}.jpg`,
-            url: item.url
-          }))
-        })
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || 'Nie uda\u0142o si\u0119 przygotowa\u0107 archiwum ZIP.');
-      }
-
-      const blob = await response.blob();
+      zipDownloadBusy=true;
+      const items=qrGroups.all.map(item=>({...item})), entries=new Array(items.length);
+      let next=0,completed=0;
+      const downloads=await Promise.allSettled(Array.from({length:Math.min(4,items.length)},async()=>{
+        while(next<items.length){
+          const index=next++,item=items[index];
+          const response=await AdminSession.fetch(getProxyQrUrl(item,'jpg'));
+          if(!response.ok)throw Error('Nie udało się pobrać kodu '+item.label+'. Spróbuj ponownie.');
+          entries[index]={name:item.id+'.jpg',data:new Uint8Array(await response.arrayBuffer())};
+          completed++;
+          setDownloadStatus('Przygotowuję archiwum ZIP: '+completed+' z '+items.length+' kodów.','success');
+        }
+      }));
+      const failed=downloads.find(result=>result.status==='rejected');
+      if(failed)throw failed.reason;
+      const blob=QrZip.create(entries);
       const blobUrl = URL.createObjectURL(blob);
       triggerDownload(blobUrl, 'kody-qr-gwiazdka-one-day.zip');
       window.setTimeout(() => URL.revokeObjectURL(blobUrl), 1500);
       setDownloadStatus('Archiwum ZIP z kodami JPG zosta\u0142o przygotowane.', 'success');
     } catch (error) {
       setDownloadStatus(error.message || 'Nie uda\u0142o si\u0119 pobra\u0107 archiwum ZIP.', 'error');
-    }
+    } finally { zipDownloadBusy=false; }
   }
 
   function buildDetailsRows(origin, adminData) {
@@ -978,6 +975,10 @@ h1 {
   }
 
   function setQuestionCountForEdit(nextCount, shouldAnnounce = false) {
+    if(catalogEditMode && catalogDraft){const current=collectEditedCatalog();
+      for(const question of current.questions){const index=catalogDraft.questionCatalogAll.findIndex(q=>q.id===question.id);const next={...question,answers:question.answers.split(/\s*(?:\/|\n|;)\s*/).filter(Boolean)};if(index<0)catalogDraft.questionCatalogAll.push(next);else catalogDraft.questionCatalogAll[index]=next;}
+      for(const bonus of current.bonuses){const index=catalogDraft.bonusCatalogAll.findIndex(b=>b.id===bonus.id);if(index>=0)catalogDraft.bonusCatalogAll[index]={...catalogDraft.bonusCatalogAll[index],...bonus};}
+    }
     const input = document.getElementById('question-count-input');
     const safeCount = Math.max(1, Math.min(QUESTION_COUNT_LIMIT, Number.parseInt(nextCount, 10) || catalogData.questionCount || DEFAULT_QUESTION_COUNT));
     if (input) {
@@ -1000,9 +1001,8 @@ h1 {
 
   function getEditableDetailsRows(origin) {
     const questionCount = getQuestionCountForEdit();
-    const sourceQuestions = catalogData.questionCatalogAll.length
-      ? catalogData.questionCatalogAll
-      : catalogData.questionCatalog;
+    const draft=catalogDraft||catalogData;
+    const sourceQuestions = draft.questionCatalogAll.length ? draft.questionCatalogAll : draft.questionCatalog;
     const sourceQuestionMap = new Map(sourceQuestions.map((question) => [Number(question.id), question]));
     const highestSourceId = sourceQuestions.reduce((max, question) => Math.max(max, Number(question.id) || 0), 0);
     const allQuestionCount = Math.max(questionCount, highestSourceId, DEFAULT_QUESTION_COUNT);
@@ -1015,9 +1015,7 @@ h1 {
         active: false
       };
     });
-    const allBonuses = catalogData.bonusCatalogAll.length
-      ? catalogData.bonusCatalogAll
-      : catalogData.bonusCatalog;
+    const allBonuses = draft.bonusCatalogAll.length ? draft.bonusCatalogAll : draft.bonusCatalog;
 
     return buildDetailsRows(origin, {
       questionCatalog: allQuestions.slice(0, questionCount),
@@ -1087,6 +1085,7 @@ h1 {
 
     const countInput = document.getElementById('question-count-input');
     if (countInput) countInput.value = String(catalogData.questionCount || qrDetailsRows.filter((row) => row.typeClass === 'question').length || DEFAULT_QUESTION_COUNT);
+    catalogDraft=JSON.parse(JSON.stringify(catalogData));
     catalogEditMode = true;
     renderDetailsRows();
     setDownloadStatus('Tryb edycji włączony. Zmieniasz liczbę pytań, treść, odpowiedzi i hasła bonusów.', 'success');
@@ -1094,6 +1093,7 @@ h1 {
 
   function cancelQuestionEditMode() {
     catalogEditMode = false;
+    catalogDraft=null;
     renderDetailsRows();
     setDownloadStatus('Edycja anulowana. Nie zapisano zmian w bazie.', '');
   }
@@ -1130,7 +1130,7 @@ h1 {
         id,
         label: labelField?.value || id,
         secret: secretField?.value || '',
-        active: true,
+        active: catalogData.bonusCatalogAll.find(b=>b.id===id)?.active !== false,
         sortOrder: index + 1
       });
     });
@@ -1142,24 +1142,6 @@ h1 {
     };
   }
 
-  function getAdminQuestionPassword() {
-    try {
-      const cached = sessionStorage.getItem('god_admin_question_secret') || '';
-      if (cached) return cached;
-    } catch (error) {
-      // Safari w trybie prywatnym potrafi zablokować sessionStorage.
-    }
-
-    const password = window.prompt('Podaj hasło administratora, aby zapisać katalog w bazie:');
-    if (password) {
-      try {
-        sessionStorage.setItem('god_admin_question_secret', password);
-      } catch (error) {
-        // Hasło zostanie użyte tylko w tym zapisie.
-      }
-    }
-    return password || '';
-  }
 
   async function saveEditedQuestions() {
     const catalog = collectEditedCatalog();
@@ -1180,21 +1162,13 @@ h1 {
       return;
     }
 
-    const adminPassword = getAdminQuestionPassword();
-    if (!adminPassword) {
-      setDownloadStatus('Zapis przerwany. Bez hasła administratora nie zapisuję zmian w bazie.', 'error');
-      return;
-    }
-
     setDownloadStatus('Zapisuję katalog pytań i bonusów w bazie...', 'success');
 
     try {
-      const response = await fetch('/api/admin-question-catalog', {
+      const response = await AdminSession.fetch('/api/admin-question-catalog', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          adminLogin: 'admin',
-          adminPassword,
           questionCount: catalog.questionCount,
           questions: catalog.questions,
           bonuses: catalog.bonuses
@@ -1203,13 +1177,7 @@ h1 {
 
       const data = await response.json().catch(() => ({}));
       if (!response.ok || data.error) {
-        if (response.status === 401) {
-          try {
-            sessionStorage.removeItem('god_admin_question_secret');
-          } catch (error) {
-            // Brak dostępu do storage nie powinien blokować komunikatu błędu.
-          }
-        }
+
         throw new Error(data.error || 'Nie udało się zapisać katalogu.');
       }
 
@@ -1250,9 +1218,10 @@ h1 {
   }
 
   async function loadDetailsCatalog() {
+    if(!await AdminSession.check()){AdminSession.redirect();return;}
     try {
       const origin = normalizeOrigin(document.getElementById('base-origin').value);
-      const response = await fetch('/api/admin-results');
+      const response = await AdminSession.fetch('/api/admin-results');
       const data = await response.json();
       if (!response.ok || data.error) {
         throw new Error(data.error || 'Nie uda\u0142o si\u0119 pobra\u0107 listy organizacyjnej.');
@@ -1274,21 +1243,28 @@ h1 {
     }
   }
 
+  window.addEventListener('admin-session-expired',()=>AdminSession.redirect());
+  async function printQrCatalog() {
+    try {
+      const images=Array.from(document.querySelectorAll('.qr-image'));
+      await Promise.all(images.map(img=>img.decode()));
+      if(images.some(img=>!img.naturalWidth))throw Error();
+      window.print();
+    } catch { setDownloadStatus('Nie wszystkie kody zostały wygenerowane. Odśwież kody i spróbuj ponownie.','error'); }
+  }
   function handleAutostart() {
     const params = new URLSearchParams(window.location.search);
     const mode = params.get('download');
     if (mode === 'jpg') {
-      window.setTimeout(downloadAllAsJpg, 500);
+      downloadAllAsJpg();
     }
     if (mode === 'pdf') {
-      window.setTimeout(() => window.print(), 700);
+      printQrCatalog();
     }
   }
 
   document.getElementById('base-origin').value = window.location.origin;
-  renderCatalog();
-  handleAutostart();
+  renderCatalog().then(handleAutostart);
   </script>
 </body>
 </html>
-

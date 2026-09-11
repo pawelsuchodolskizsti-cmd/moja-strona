@@ -1,6 +1,7 @@
 const { runHandler } = require('../lib/run-handler');
 
 const handlers = {
+  'admin-session': require('../lib/handlers/admin-session').handler,
   'admin-adjust-participant': require('../lib/handlers/admin-adjust-participant').handler,
   'admin-question-catalog': require('../lib/handlers/admin-question-catalog').handler,
   'admin-results': require('../lib/handlers/admin-results').handler,

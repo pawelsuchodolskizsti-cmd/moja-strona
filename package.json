@@ -6,6 +6,9 @@
     "dev": "npx vercel dev"
   },
   "dependencies": {
-    "@neondatabase/serverless": "^0.9.0"
+    "@neondatabase/serverless": "^0.9.0",
+    "jpeg-js": "0.4.4",
+    "pngjs": "7.0.0",
+    "qrcode": "1.5.4"
   }
 }

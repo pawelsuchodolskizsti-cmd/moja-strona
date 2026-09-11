@@ -2228,6 +2228,7 @@
           +10 minut gry
           <small>Przedłuża aktywną turę bez resetu</small>
         </button>
+        <button class="btn outline" id="btn-technical-pause" type="button" onclick="toggleTechnicalPause()">Pauza techniczna</button>
         <button class="action-btn simulate" id="btn-start-simulator" onclick="runStartSimulator()">
           Test 300 osób
           <small>Pełna próba gry zapisana w bazie</small>
@@ -2349,6 +2350,9 @@
       <div class="ops-title">Wielki test startu</div>
       <div class="ops-copy">Jednym kliknięciem uruchamiasz próbę na 300 uczestników. System zapisuje test w bazie, przełącza panel i tablicę wyników na bezpieczny tryb testowy, a odpowiedzi oraz bonusy wpadają stopniowo jak w prawdziwej grze.</div>
       <div class="simulator-actions simulator-actions-single">
+        <button class="btn outline" type="button" onclick="toggleTestMode('disable')">Pokaż grę LIVE</button>
+        <button class="btn outline" type="button" onclick="toggleTestMode('enable')">Pokaż istniejący test</button>
+        <button class="btn outline" type="button" onclick="confirmClearSimulation()">Usuń symulację</button>
         <button class="btn primary simulator-mega-btn" type="button" onclick="runStartSimulator()">
           Uruchom test 300 uczestników
           <small>Ranking, miasta, odpowiedzi i bonusy będą aktualizować się live</small>
@@ -2746,6 +2750,8 @@
   </div>
 </div>
 
+<script src="/admin/admin-session.js"></script>
+<script src="/game-ranking.js"></script>
 <script src="/admin/qr-catalog.js"></script>
 <script>
 let allParticipants = [];
@@ -2768,6 +2774,7 @@ let resultsParticipantsRevealedAt = null;
 let resultsCitiesRevealedAt = null;
 let previewMode = 'current';
 let pendingAction = null;
+let pendingActionScope = null;
 let currentTab = 'leaderboard';
 let isStateLoading = false;
 let pendingStateReload = false;
@@ -2787,10 +2794,7 @@ let systemHealth = {
   note: 'Sprawdzam połączenie z backendem i czekam na pierwszy szybki test systemu.',
   updatedAt: null
 };
-const ADMIN_SESSION_KEY = 'god_admin_authenticated';
 const EVENT_MODE_KEY = 'god_admin_event_mode';
-const ADMIN_LOGIN = 'admin';
-const ADMIN_PASSWORD = 'final2026';
 const localMemoryStorage = new Map();
 const sessionMemoryStorage = new Map();
 
@@ -2894,9 +2898,7 @@ function applyAdminAccessState(isUnlocked) {
   }
 }
 
-function isAdminAuthenticated() {
-  return storageGet('session', ADMIN_SESSION_KEY, '0') === '1';
-}
+function isAdminAuthenticated() { return adminUnlocked; }
 
 function bootAdminPanel() {
   if (!adminUnlocked) return;
@@ -2914,43 +2916,27 @@ function bootAdminPanel() {
   }
 }
 
-function attemptAdminLogin() {
-  const loginInput = document.getElementById('admin-login');
-  const passwordInput = document.getElementById('admin-password');
-  const login = (loginInput?.value || '').trim();
-  const password = passwordInput?.value || '';
-
-  if (!login || !password) {
-    setAuthFeedback('Wpisz login i hasło administratora.', 'error');
-    return;
-  }
-
-  if (login !== ADMIN_LOGIN || password !== ADMIN_PASSWORD) {
-    setAuthFeedback('Nieprawidłowy login lub hasło.', 'error');
-    if (passwordInput) passwordInput.value = '';
-    return;
-  }
-
-  storageSet('session', ADMIN_SESSION_KEY, '1');
-
-  setAuthFeedback('Logowanie poprawne. Otwieram panel...', 'success');
-  applyAdminAccessState(true);
-  bootAdminPanel();
+async function attemptAdminLogin() {
+  const login=document.getElementById('admin-login').value.trim(), field=document.getElementById('admin-password');
+  try {
+    if(!login||!field.value)throw Error('Wpisz login i hasło administratora.');
+    await AdminSession.login(login,field.value);field.value='';applyAdminAccessState(true);
+    const next=new URLSearchParams(location.search).get('next');
+    if(next && next.startsWith('/admin/') && !next.startsWith('//') && !next.includes('\\')) { location.assign(next);return; }
+    setAuthFeedback('Logowanie poprawne.','success');bootAdminPanel();
+  } catch(error){setAuthFeedback(error.message,'error');field.value='';}
 }
 
-function logoutAdmin() {
-  storageRemove('session', ADMIN_SESSION_KEY);
-
-  applyAdminAccessState(false);
-
-  const passwordInput = document.getElementById('admin-password');
-  if (passwordInput) passwordInput.value = '';
-  setAuthFeedback('Panel został wylogowany.', 'success');
+async function logoutAdmin() {
+  try { await AdminSession.logout();applyAdminAccessState(false);document.getElementById('admin-password').value='';setAuthFeedback('Panel został wylogowany.','success'); }
+  catch(error){setAdminFeedback(error.message,'error');}
 }
 
-function initializeAdminAccess() {
+async function initializeAdminAccess() {
   applyEventMode(isEventModeEnabled());
-  applyAdminAccessState(isAdminAuthenticated());
+  applyAdminAccessState(false);
+  try { applyAdminAccessState(await AdminSession.check()); } catch { setAuthFeedback('Nie udało się sprawdzić sesji. Spróbuj ponownie.','error'); }
+  window.addEventListener('admin-session-expired',()=>{applyAdminAccessState(false);setAuthFeedback('Sesja wygasła. Zaloguj się ponownie.','error');});
 
   const passwordInput = document.getElementById('admin-password');
   const loginInput = document.getElementById('admin-login');
@@ -3361,8 +3347,12 @@ async function loadGameState() {
 
   isStateLoading = true;
   try {
-    const res = await fetch('/api/game-state?scope=active');
+    const res = await AdminSession.fetch('/api/game-state?scope=active');
     const data = await res.json();
+    if(!res.ok)throw Error(data.error||'Błąd odczytu stanu gry.');
+    const pauseButton=document.getElementById('btn-technical-pause');
+    pauseButton.dataset.paused=String(!!data.technical_pause_active);pauseButton.textContent=data.technical_pause_active?'Wznów po pauzie':'Pauza techniczna';
+    pauseButton.disabled=!data.started_at || Date.now()>=new Date(data.started_at).getTime()+Number(data.duration_minutes||10)*60000;
     announcementText = (data.announcement_text || '').trim();
     announcementUpdatedAt = data.announcement_updated_at || null;
     resultsParticipantsRevealedAt = data.results_participants_revealed_at || null;
@@ -3376,7 +3366,7 @@ async function loadGameState() {
 
       if (remaining > 0) {
         gamePhase = 'active';
-        setStatus('active', 'Gra trwa', testModeEnabled ? 'Aktywny jest zapisany w bazie tryb testowy.' : 'Uczestnicy mogą aktualnie logować się i odpowiadać.');
+        setStatus('active', data.technical_pause_active?'Pauza techniczna':'Gra trwa', data.technical_pause_active?'Zapisy są wstrzymane. Czas tury nadal biegnie.':(testModeEnabled ? 'Aktywny jest zapisany w bazie tryb testowy.' : 'Uczestnicy mogą aktualnie logować się i odpowiadać.'));
         syncActionButtons('active');
         updateLiveTimer();
         if (!timerInterval) timerInterval = setInterval(updateLiveTimer, 1000);
@@ -3403,7 +3393,7 @@ async function loadGameState() {
       clearTimer();
   gameDurationMs = (data.duration_minutes || 10) * 60 * 1000;
       gamePhase = 'idle';
-      setStatus('idle', testModeEnabled ? 'Tryb testowy gotowy' : 'Gra zatrzymana', testModeEnabled ? 'Panel pracuje na danych testowych. Możesz uruchomić testową turę albo wrócić do danych żywych.' : 'Możesz uruchomić start gry albo wyczyścić dane testowe.');
+      setStatus('idle', testModeEnabled ? 'Tryb testowy gotowy' : 'Gra zatrzymana', testModeEnabled ? 'Panel pracuje na danych testowych. Możesz uruchomić testową turę albo wrócić do danych żywych.' : 'Możesz rozpocząć nową turę. Reset usuwa dane aktualnego zakresu.');
       syncActionButtons('idle');
       document.getElementById('live-timer').textContent = '--:--';
       document.getElementById('live-timer').classList.remove('warning');
@@ -3440,6 +3430,12 @@ async function loadGameState() {
   }
 }
 
+async function toggleTechnicalPause() {
+  const button=document.getElementById('btn-technical-pause');button.disabled=true;
+  try { const r=await AdminSession.fetch('/api/game-state',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'technical-pause',scope:activeDataScope,active:!button.dataset.paused||button.dataset.paused!=='true'})});
+    const data=await r.json();if(!r.ok)throw Error(data.error);await loadGameState();setAdminFeedback('Zmieniono pauzę techniczną. Czas tury nadal biegnie; w razie potrzeby użyj przedłużenia.','success');
+  }catch(error){setAdminFeedback(error.message,'error');}finally{button.disabled=false;}
+}
 function setStatus(type, text, sub) {
   const dot = document.getElementById('status-dot');
   dot.className = 'status-dot';
@@ -3529,8 +3525,8 @@ function confirmAction(action) {
       button: 'Tak, stop gry'
     },
     reset: {
-      title: 'Wyczyścić dane testowe?',
-      copy: 'Zostaną usunięci uczestnicy, odpowiedzi i bonusy. Tej operacji nie można cofnąć.',
+      title: activeDataScope === 'test' ? 'Usunąć symulację testową?' : 'Usunąć wszystkie dane prawdziwej gry?',
+      copy: activeDataScope === 'test' ? 'Usuniesz tylko symulację. Dane prawdziwej gry pozostaną zachowane.' : 'Usuniesz uczestników, odpowiedzi i bonusy LIVE, także z poprzednich tur. Tej operacji nie można cofnąć.',
       button: 'Tak, wyczyść dane'
     },
     extend: {
@@ -3568,6 +3564,7 @@ function confirmAction(action) {
   }
 
   pendingAction = action;
+  pendingActionScope = activeDataScope;
   titleEl.textContent = content.title;
   copyEl.textContent = content.copy;
   buttonEl.textContent = content.button;
@@ -3581,6 +3578,7 @@ function hideConfirmModal() {
 
 async function confirmPendingAction() {
   const action = pendingAction;
+  if(pendingActionScope !== activeDataScope){hideConfirmModal();setAdminFeedback('Zakres danych zmienił się. Otwórz potwierdzenie ponownie.','error');return;}
   hideConfirmModal();
 
   if (action === 'start') {
@@ -3617,10 +3615,10 @@ async function startGame() {
   document.getElementById('btn-start').disabled = true;
   setAdminFeedback('Uruchamiam grę...');
   try {
-    const res = await fetch('/api/game-state', {
+    const res = await AdminSession.fetch('/api/game-state', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'start', scope: 'active' })
+      body: JSON.stringify({ action: 'start', scope: activeDataScope })
     });
 
     if (!res.ok) throw new Error('Start gry nie powiódł się.');
@@ -3644,10 +3642,10 @@ async function stopGame() {
   document.getElementById('btn-stop').disabled = true;
   setAdminFeedback('Zatrzymuję grę...');
   try {
-    const res = await fetch('/api/game-state', {
+    const res = await AdminSession.fetch('/api/game-state', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'stop', scope: 'active' })
+      body: JSON.stringify({ action: 'stop', scope: activeDataScope })
     });
 
     if (!res.ok) throw new Error('Stop gry nie powiódł się.');
@@ -3662,13 +3660,13 @@ async function stopGame() {
 }
 
 async function confirmReset() {
-  setAdminFeedback('Czyszczę dane testowe...');
+  setAdminFeedback(activeDataScope === 'test' ? 'Usuwam symulację...' : 'Usuwam dane LIVE...');
 
   try {
-    const res = await fetch('/api/game-state', {
+    const res = await AdminSession.fetch('/api/game-state', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'reset', scope: 'active' })
+      body: JSON.stringify({ action: 'reset', scope: activeDataScope })
     });
 
     if (!res.ok) throw new Error('Reset danych nie powiódł się.');
@@ -3690,7 +3688,7 @@ async function confirmReset() {
     await loadGameState();
     await loadData();
     document.getElementById('admin-message').value = '';
-    setAdminFeedback('Dane testowe zostały wyczyszczone.', 'success');
+    setAdminFeedback('Dane wybranego zakresu zostały usunięte.', 'success');
   } catch (e) {
     console.error(e);
     setAdminFeedback('Nie udało się wyczyścić danych testowych.', 'error');
@@ -3702,10 +3700,10 @@ async function extendGameTime() {
   setAdminFeedback('Dodaję 10 minut do aktywnej gry...');
 
   try {
-    const res = await fetch('/api/game-state', {
+    const res = await AdminSession.fetch('/api/game-state', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'extend-time', minutes: 10, scope: 'active' })
+      body: JSON.stringify({ action: 'extend-time', minutes: 10, scope: activeDataScope })
     });
     const data = await res.json();
 
@@ -3732,10 +3730,10 @@ async function sendAnnouncement() {
   setAdminFeedback('Wysyłam komunikat do graczy...');
 
   try {
-    const res = await fetch('/api/game-state', {
+    const res = await AdminSession.fetch('/api/game-state', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'set-announcement', message, scope: 'active' })
+      body: JSON.stringify({ action: 'set-announcement', message, scope: activeDataScope })
     });
     const data = await res.json();
 
@@ -3760,10 +3758,10 @@ async function setResultsReveal(action) {
   setAdminFeedback(labels[action] || 'Aktualizuję blokadę wyników...');
 
   try {
-    const res = await fetch('/api/game-state', {
+    const res = await AdminSession.fetch('/api/game-state', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action, scope: 'active' })
+      body: JSON.stringify({ action, scope: activeDataScope })
     });
     const data = await res.json();
 
@@ -3831,7 +3829,7 @@ async function runIntegrityScan() {
 }
 
 async function performIntegrityScan() {
-  const homeRes = await fetch('/', { cache: 'no-store' });
+  const homeRes = await AdminSession.fetch('/', { cache: 'no-store' });
   const homeHtml = await homeRes.text();
 
   const checks = await Promise.all([
@@ -3906,7 +3904,7 @@ async function performIntegrityScan() {
 
 async function scanPublicResource({ label, url, response = null, validate = null, success, failure, contentTypeIncludes = '', binary = false }) {
   try {
-    const res = response || await fetch(url, { cache: 'no-store' });
+    const res = response || await AdminSession.fetch(url, { cache: 'no-store' });
     const text = binary ? '' : (response?.text ?? await res.text());
     const contentType = res.headers?.get ? (res.headers.get('content-type') || '') : '';
     const hasContentType = !contentTypeIncludes || contentType.includes(contentTypeIncludes);
@@ -3937,7 +3935,7 @@ async function runStartSimulator() {
   setAdminFeedback('Uruchamiam wielki test 300 uczestników. Panel i tablica przejdą na dane testowe, a odpowiedzi zaczną wpadać stopniowo...');
 
   try {
-    const res = await fetch('/api/test-mode', {
+    const res = await AdminSession.fetch('/api/test-mode', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ action: 'start-large' })
@@ -4235,6 +4233,7 @@ function renderSimulatorSnapshot() {
   }
 }
 
+function confirmClearSimulation() { if(window.confirm('Usunąć tylko dane symulacji? Dane LIVE pozostaną zachowane.'))toggleTestMode('clear'); }
 async function toggleTestMode(action) {
   setAdminFeedback(
     action === 'clear'
@@ -4245,7 +4244,7 @@ async function toggleTestMode(action) {
   );
 
   try {
-    const res = await fetch('/api/test-mode', {
+    const res = await AdminSession.fetch('/api/test-mode', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ action })
@@ -4277,9 +4276,9 @@ async function runQuickTest() {
 
   try {
     const [stateRes, adminRes, homeRes] = await Promise.all([
-      fetch('/api/game-state?scope=active'),
-      fetch('/api/admin-results'),
-      fetch('/')
+      AdminSession.fetch('/api/game-state?scope=active'),
+      AdminSession.fetch('/api/admin-results'),
+      AdminSession.fetch('/')
     ]);
 
     const [stateData, adminData, homeHtml] = await Promise.all([
@@ -4343,7 +4342,7 @@ async function runQuickTest() {
 
     setAdminFeedback(
       dbOk && timerOk && startedOk && summaryOk && questionsOk && bonusesOk && linksOk
-        ? 'Szybki test zakończył się powodzeniem. System wygląda na gotowy do startu.'
+        ? 'Szybki test zakończył się powodzeniem. Sprawdzane połączenia działają. Wykonaj też próbę gry na telefonach.'
         : 'Szybki test wykrył problem. Sprawdź listę po prawej stronie.',
       dbOk && timerOk && startedOk && summaryOk && questionsOk && bonusesOk && linksOk ? 'success' : 'error'
     );
@@ -4383,7 +4382,7 @@ async function loadData() {
   isDataLoading = true;
   try {
     const gameStatePromise = loadGameState();
-    const res = await fetch('/api/admin-results', { cache: 'no-store' });
+    const res = await AdminSession.fetch('/api/admin-results', { cache: 'no-store' });
     const data = await res.json();
 
     if (data.answers && data.answers.length > prevAnswersCount) {
@@ -4409,7 +4408,7 @@ async function loadData() {
       data: 'ok',
       note: systemHealth.quickTest === 'ok'
         ? 'Dane uczestników i odpowiedzi odświeżyły się poprawnie. System wygląda stabilnie.'
-        : 'Dane panelu odświeżyły się poprawnie. Dla pełnej pewności uruchom szybki test systemu.'
+        : 'Dane panelu odświeżyły się poprawnie. Szybki test sprawdza połączenia, nie wszystkie scenariusze gry.'
     });
 
     renderVisibleData();
@@ -4678,18 +4677,18 @@ function renderLeaderboard() {
       if (sortMode === 'city') {
         return cityA.localeCompare(cityB, 'pl') ||
           (b.score || 0) - (a.score || 0) ||
-          new Date(a.lastActivity || 0) - new Date(b.lastActivity || 0);
+          GameRanking.compareParticipants(a,b);
       }
 
       if (sortMode === 'city-score') {
         return (cityScores.get(cityB) || 0) - (cityScores.get(cityA) || 0) ||
           cityA.localeCompare(cityB, 'pl') ||
           (b.score || 0) - (a.score || 0) ||
-          new Date(a.lastActivity || 0) - new Date(b.lastActivity || 0);
+          GameRanking.compareParticipants(a,b);
       }
 
       return (b.score || 0) - (a.score || 0) ||
-        new Date(a.lastActivity || 0) - new Date(b.lastActivity || 0);
+        GameRanking.compareParticipants(a,b);
     });
 
   meta.textContent = `Pokazano ${list.length} z ${allParticipants.length} uczestników. Kliknij wiersz, aby otworzyć szczegóły.`;
@@ -5001,19 +5000,19 @@ function openParticipantModal(participantId) {
   document.getElementById('participant-modal-last-activity').textContent =
     participant.lastActivity ? new Date(participant.lastActivity).toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' }) : '-';
 
-  document.getElementById('participant-modal-device').textContent = participant.deviceToken || 'Brak danych';
+  document.getElementById('participant-modal-device').textContent = participant.hasDevice ? 'Urządzenie przypisane' : 'Urządzenie odblokowane';
   document.getElementById('participant-modal-user-agent').textContent = participant.lastUserAgent || 'Brak danych';
   document.getElementById('participant-modal-ip').textContent = participant.lastIp || 'Brak danych';
   const releaseBtn = document.getElementById('participant-release-device-btn');
   const releaseNote = document.getElementById('participant-release-device-note');
   if (releaseBtn) {
-    releaseBtn.disabled = !participant.deviceToken;
-    releaseBtn.textContent = participant.deviceToken
+    releaseBtn.disabled = !participant.hasDevice;
+    releaseBtn.textContent = participant.hasDevice
       ? 'Odblokuj logowanie na nowym urządzeniu'
       : 'Urządzenie już odblokowane';
   }
   if (releaseNote) {
-    releaseNote.textContent = participant.deviceToken
+    releaseNote.textContent = participant.hasDevice
       ? 'Po użyciu tego przycisku stare urządzenie straci przypisanie, a uczestnik zaloguje się ponownie na nowym telefonie.'
       : 'To konto nie jest teraz przypisane do urządzenia. Następne logowanie uczestnika podepnie nowe urządzenie do tego samego konta.';
   }
@@ -5069,7 +5068,7 @@ async function adjustParticipant(action) {
   setParticipantAdjustFeedback('Zapisywanie korekty...');
 
   try {
-    const res = await fetch('/api/admin-adjust-participant', {
+    const res = await AdminSession.fetch('/api/admin-adjust-participant', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -5201,7 +5200,7 @@ function exportCSV() {
   let csv = 'Miejsce,Imię,Nazwisko,Miasto,E-mail,Punkty,Odpowiedzi\n';
 
   [...allParticipants]
-    .sort((a, b) => (b.score || 0) - (a.score || 0))
+    .sort(GameRanking.compareParticipants)
     .forEach((participant, index) => {
       csv += `${index + 1},${safeCsv(participant.firstName)},${safeCsv(participant.lastName)},${safeCsv(participant.city || '')},${safeCsv(participant.email || '')},${participant.score || 0},${participant.answeredCount || 0}\n`;
     });
@@ -5299,25 +5298,9 @@ function openDiplomaCenter() {
   setAdminFeedback('Otworzyłem pakiet dyplomów i umów. W nowej karcie możesz od razu drukować lub zapisać całość do PDF.', 'success');
 }
 
-function getParticipantDiplomaRanking() {
-  return [...allParticipants]
-    .sort((a, b) =>
-      (b.score || 0) - (a.score || 0) ||
-      (b.answeredCount || 0) - (a.answeredCount || 0) ||
-      (a.lastName || '').localeCompare(b.lastName || '', 'pl') ||
-      (a.firstName || '').localeCompare(b.firstName || '', 'pl')
-    );
-}
+function getParticipantDiplomaRanking() { return [...allParticipants].sort(GameRanking.compareParticipants); }
 
-function getCityDiplomaRanking() {
-  return [...getCityStats()]
-    .sort((a, b) =>
-      (b.score || 0) - (a.score || 0) ||
-      (b.answers || 0) - (a.answers || 0) ||
-      (b.participants || 0) - (a.participants || 0) ||
-      (a.city || '').localeCompare(b.city || '', 'pl')
-    );
-}
+function getCityDiplomaRanking() { return [...getCityStats()].sort(GameRanking.compareCities); }
 
 function buildParticipantPacket(participant, place, isAppreciation) {
   const fullName = `${participant.firstName || ''} ${participant.lastName || ''}`.trim() || 'Uczestnik';
