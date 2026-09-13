@@ -18,22 +18,16 @@
   const clone=group.cloneNode(true);clone.dataset.postsClone='';clone.setAttribute('aria-hidden','true');clone.removeAttribute('role');clone.querySelectorAll('a').forEach(link=>link.tabIndex=-1);track.append(clone);
   track.querySelectorAll('img').forEach(img=>{const failed=()=>img.parentElement.classList.add('image-unavailable');img.addEventListener('error',failed);if(img.complete&&!img.naturalWidth)failed();});
   root.hidden=false;
-  const pauseButton=root.querySelector('[data-posts-pause]'),reduced=matchMedia('(prefers-reduced-motion: reduce)');
-  let paused=false,hovered=false,visible=false,pointerDown=false,resumeAt=0,last=0,position=0;
-  function updatePause(){pauseButton.textContent=paused?'▶':'Ⅱ';pauseButton.setAttribute('aria-label',paused?'Wznów przesuwanie postów':'Zatrzymaj przesuwanie postów');pauseButton.setAttribute('aria-pressed',String(paused));pauseButton.hidden=reduced.matches;}
-  pauseButton.onclick=()=>{paused=!paused;updatePause();};reduced.addEventListener('change',updatePause);updatePause();
+  const reduced=matchMedia('(prefers-reduced-motion: reduce)');
+  let hovered=false,visible=false,pointerDown=false,resumeAt=0,last=0,position=0;
   const hold=()=>{resumeAt=performance.now()+6000;position=viewport.scrollLeft;};
   viewport.addEventListener('pointerenter',event=>{if(event.pointerType==='mouse')hovered=true;});viewport.addEventListener('pointerleave',()=>{hovered=false;});
   viewport.addEventListener('pointerdown',()=>{pointerDown=true;hold();});window.addEventListener('pointerup',()=>{if(pointerDown){pointerDown=false;hold();}});window.addEventListener('pointercancel',()=>{pointerDown=false;hold();});
   viewport.addEventListener('wheel',hold,{passive:true});viewport.addEventListener('touchend',hold,{passive:true});viewport.addEventListener('keydown',hold);
-  for(const [selector,direction]of [['[data-posts-prev]',-1],['[data-posts-next]',1]])root.querySelector(selector).onclick=()=>{
-    const width=group.getBoundingClientRect().width,step=group.firstElementChild.getBoundingClientRect().width+12;
-    if(!width)return;position=(viewport.scrollLeft+direction*step+width)%width;viewport.scrollLeft=position;hold();
-  };
   new IntersectionObserver(entries=>{visible=entries[0].isIntersecting;last=0;},{threshold:.05}).observe(root);
   function tick(now){
     const delta=last?Math.min(now-last,60):0;last=now;
-    if(visible&&!document.hidden&&!paused&&!reduced.matches&&!hovered&&!pointerDown&&now>=resumeAt&&!viewport.contains(document.activeElement)){
+    if(visible&&!document.hidden&&!reduced.matches&&!hovered&&!pointerDown&&now>=resumeAt&&!viewport.contains(document.activeElement)){
       const width=group.getBoundingClientRect().width;
       if(width){if(Math.abs(viewport.scrollLeft-position)>2)position=viewport.scrollLeft;position=(position+delta*.023)%width;viewport.scrollLeft=position;}
     } else position=viewport.scrollLeft;
