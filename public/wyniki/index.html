@@ -94,7 +94,7 @@
           <div class="section-copy">Kompaktowy przeglad wszystkich placówek, bez przeladowania ekranu dodatkowymi tabelami.</div>
         </div>
       </div>
-      <div class="city-grid" id="city-ranking"></div>
+      <div class="city-grid" id="city-ranking" tabindex="0" aria-label="Ranking wszystkich placówek"></div>
     </section>
 
     <aside class="participants-sidebar" id="participants-sidebar">
@@ -491,8 +491,6 @@ function renderCityStats() {
   const container = document.getElementById('city-ranking');
   const revealState = getResultsRevealState();
   const cityStats = getCityStats();
-  const projectionMode = document.body.classList.contains('projection-mode');
-
   if (!revealState.citiesVisible) {
     container.innerHTML = getRevealLockMarkup('Punkty placówek są zasłonięte', 'Placówki odsłonimy w drugim kroku, kiedy organizator uruchomi finałowe pokazanie rankingu.', 'Placówki czekają na odsłonięcie');
     return;
@@ -503,22 +501,13 @@ function renderCityStats() {
     return;
   }
 
-  const maxVisibleCities = projectionMode ? (cityStats.length > 8 ? 7 : 8) : 8;
-  const visibleCities = cityStats.slice(0, maxVisibleCities);
-  const extraCities = cityStats.length - visibleCities.length;
-
-  container.innerHTML = visibleCities.map((item) => `
+  container.innerHTML = cityStats.map((item) => `
     <div class="city-item">
       <div class="city-item-name">${escHtml(item.city)}</div>
       <div class="city-item-score">${item.score} pkt</div>
       <div class="city-item-meta">${item.participants} uczestników | średnio ${item.averageScore.toFixed(1)} pkt na osobe</div>
     </div>
-  `).join('') + (extraCities > 0 ? `
-    <div class="city-item more">
-      <div class="city-item-name">+${extraCities}</div>
-      <div class="city-item-meta">kolejnych placówek w rankingu</div>
-    </div>
-  ` : '');
+  `).join('');
 }
 
 function renderCityPodium() {
@@ -545,7 +534,7 @@ function renderCityPodium() {
 
   podium.innerHTML = top.map((item, index) => `
     <div class="podium-item ${variants[index] || ''}">
-      <div class="podium-rank">Miejsce ${index + 1}</div>
+      <div class="podium-rank" aria-label="Miejsce ${index + 1}"><span class="podium-number" aria-hidden="true">${String(index + 1).padStart(2,'0')}</span><span class="podium-rank-label" aria-hidden="true">Miejsce</span></div>
       <div class="podium-name">${escHtml(item.city)}</div>
       <div class="podium-score">${cityPodiumMode === 'average' ? `${item.averageScore.toFixed(1)} pkt/os` : `${item.score} pkt`}</div>
       <div class="podium-meta">${item.participants} uczestnikow | suma ${item.score} pkt</div>
@@ -622,7 +611,7 @@ function renderSidebar() {
   const all = scoreboardState.leaderboard || [];
   const total = scoreboardState.stats?.participants || all.length;
   const sorted = [...all].sort((a, b) => a.rank - b.rank);
-  const sidebarSignature = sorted.map((p, i) => `${getParticipantKey(p)}:${i + 1}:${p.score || 0}`).join('|');
+  const sidebarSignature = JSON.stringify(sorted.map(p => [getParticipantKey(p),p.rank,p.name,p.city,p.score]));
   const sidebarKey = `${scoreboardState.updatedAt || 'none'}|${revealState.participantsVisible}|${total}|${sidebarSignature}`;
   if (sidebarKey === cachedSidebarKey) return;
   cachedSidebarKey = sidebarKey;
@@ -743,12 +732,10 @@ async function loadScoreboard(force = false) {
       rankMovements = nextRankMovements;
       rankMovementsExpiresAt = nextRankMovements.size ? Date.now() + 2600 : 0;
 
-      const leaderboardSignature = incomingLeaderboard
-        .map((p, index) => `${getParticipantKey(p)}:${p.rank || index + 1}:${p.score || 0}:${p.answeredCount || 0}`)
-        .join(',');
-      const citySignature = incomingCityStats
-        .map((c) => `${c.city || ''}:${c.score || 0}:${c.participants || 0}:${c.answers || 0}`)
-        .join(',');
+      const leaderboardSignature = JSON.stringify(incomingLeaderboard.map((p,index) =>
+        [getParticipantKey(p),p.rank||index+1,p.name,p.city,p.institutionId,p.score,p.answeredCount]));
+      const citySignature = JSON.stringify(incomingCityStats.map(c =>
+        [c.city,c.institutionId,c.score,c.participants,c.answers,c.averageScore]));
       const nextVersion = [
         data.updatedAt || 'none',
         data.phase || 'idle',data.technicalPauseText||'',

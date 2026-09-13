@@ -51,6 +51,8 @@ Widok `/wyniki/` zachowuje tło i logotypy wydarzenia, wyróżnia odliczanie ora
 
 Na dużym ekranie długie listy i komunikaty przewijają się automatycznie. Wskazanie kursorem, użycie klawiatury lub ręczne przewijanie wstrzymuje ruch. Ustawienie systemowe ograniczające animacje wyłącza automatyczne przewijanie. Pełne nazwy i teksty pozostają dostępne. Zasłanianie ostatnich trzech minut i etapowe odsłanianie finału obowiązuje we wszystkich rankingach, również na bocznej liście. Po chwilowej utracie połączenia widok odzyskuje prawidłowy komunikat także wtedy, gdy dane się nie zmieniły.
 
+Tablica używa jasnych kart i różowo-fioletowych akcentów ekranu gracza; licznik powtarza jego pastelowe tło. Numery podium mają osobną kolumnę z odstępem od nazw. Lista placówek pokazuje wszystkie pozycje, bez wcześniejszego ograniczenia do ośmiu. Sprawdzono zestaw 50 placówek i 500 uczestników, dostęp do ostatnich pozycji, aktualizacje nazw, sumy oraz finał. Na małych ekranach listy mają ograniczoną wysokość i można je przewijać. To test danych i renderowania, a nie jednoczesnej gry na 500 fizycznych telefonach.
+
 ## Posty na stronie głównej
 
 Pod ikonami mediów społecznościowych znajduje się zapętlona karuzela dziewięciu postów. Zdjęcia i podpisy otwierają wskazane wpisy Instagrama w nowej karcie. Miniatury pochodzą z tych wpisów i są zapisane w `public/social-posts/`, więc strona nie pobiera osadzeń ani skryptów Instagrama. Podpisy, linki i kolejność ustala `public/social-posts/posts.js`. „Projekt Uważni” pozostaje ukryty na życzenie organizatora, do czasu dodania linku i zdjęcia.
