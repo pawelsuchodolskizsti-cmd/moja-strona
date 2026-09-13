@@ -3509,6 +3509,21 @@ async function fetchQuestionData(options = {}) {
   }
 }
 
+function showQuestionUnavailable(message) {
+  currentQuestion = null;
+  questionFetchedAt = 0;
+  setActiveScreen('question-screen');
+  qTextEl.innerText = message;
+  answerAreaEl.style.display = 'none';
+  qMsgEl.innerText = '';
+  resultAreaEl.innerHTML = '';
+  const retry = document.createElement('button');
+  retry.type = 'button'; retry.className = 'btn secondary';
+  retry.id = 'question-retry'; retry.textContent = 'Sprawdź ponownie';
+  retry.onclick = async () => { retry.disabled = true; await syncPlayerView({force:true}); };
+  resultAreaEl.append(retry);
+}
+
 async function showQuestionScreen(options = {}) {
   if (PlayerExperience.instruction(setActiveScreen, () => syncPlayerView({force:true}))) return;
   const { force = false } = options;
@@ -3542,8 +3557,9 @@ async function showQuestionScreen(options = {}) {
         await loadGameState();
         return;
       }
+      if(data.contentBlocked){showQuestionUnavailable(data.error);return;}
       if(res.status===423){await loadGameState({force:true});return;}
-      setActiveScreen('question-screen');qTextEl.innerText=data.error;answerAreaEl.style.display='none';resultAreaEl.innerHTML='';
+      showQuestionUnavailable(data.error);
       return;
     }
 
@@ -3561,7 +3577,7 @@ async function showQuestionScreen(options = {}) {
       showAnsweredState('', 'To pytanie masz już wykonane.', false, 'completed');
     }
   } catch(e) {
-    setActiveScreen('question-screen');qTextEl.innerText='Nie udało się pobrać pytania. Wróć do ekranu głównego i spróbuj ponownie.';answerAreaEl.style.display='none';
+    showQuestionUnavailable('Nie udało się pobrać pytania. Sprawdź połączenie i spróbuj ponownie.');
   }
 }
 
@@ -3580,6 +3596,7 @@ async function refreshQuestionState(options = {}) {
       return;
     }
 
+    if (data.contentBlocked) { showQuestionUnavailable(data.error); return; }
     if (!res.ok || data.error) {
       if (res.status === 403) {
         await loadGameState({ force: true });
@@ -3687,6 +3704,7 @@ async function submitAnswer() {
       })
     });
     const data = await res.json();
+    if(data.contentBlocked){showQuestionUnavailable(data.error);return;}
     if(res.status===423){await loadGameState({force:true});return;}
     if (res.status === 403 && /urzadzen|urządzen|przypisane/i.test(String(data.error || ''))) {
       clearParticipantAccess(data.error);

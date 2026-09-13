@@ -1354,6 +1354,8 @@ input:focus {
   }
 }
 .bonus-announcement{padding:12px;margin-bottom:16px;border-radius:12px;background:#fff3c4;color:#34295e;overflow-wrap:anywhere;font-weight:700}.bonus-announcement[hidden]{display:none}
+#success-screen.is-unavailable .bonus-special-tag,#success-screen.is-unavailable .bonus-highlight{display:none}
+#success-screen.is-unavailable .q-badge,#success-screen.is-unavailable .success-icon{background:linear-gradient(135deg,#ede8ff,#fce3ed);color:#392563;box-shadow:none}
 </style>
 <link rel="stylesheet" href="/player-experience.css">
 </head>
@@ -2416,6 +2418,8 @@ function showBonusResult(options = {}) {
     mode = 'default'
   } = options;
 
+  const retry = document.getElementById('bonus-retry');
+  if (retry) retry.hidden = true;
   const isFinaleLayout = layout === 'finale';
   const defaultSection = document.getElementById('bonus-result-default');
   const finaleSection = document.getElementById('bonus-result-finale');
@@ -2425,6 +2429,7 @@ function showBonusResult(options = {}) {
   setActiveBonusScreen('success-screen');
   if (successScreen) {
     successScreen.classList.toggle('is-completed', mode === 'completed');
+    successScreen.classList.toggle('is-unavailable', mode === 'unavailable');
   }
 
   if (defaultSection) {
@@ -2651,6 +2656,23 @@ async function restoreParticipantSession() {
   }
 }
 
+function showBonusUnavailable(data = {}) {
+  showBonusResult({
+    title: data.contentBlocked ? 'Bonus chwilowo wyłączony' : 'Nie udało się wczytać bonusu',
+    subtitle: data.error || 'Sprawdź połączenie i spróbuj ponownie.',
+    copy: 'Możesz wrócić do gry i skanować inne kody QR. Twoje dotychczasowe punkty pozostają zapisane.',
+    badge: 'Spróbuj później', icon: 'QR', animate: false, mode: 'unavailable'
+  });
+  let retry = document.getElementById('bonus-retry');
+  if (!retry) {
+    retry = document.createElement('button'); retry.id = 'bonus-retry';
+    retry.type = 'button'; retry.className = 'btn secondary'; retry.textContent = 'Sprawdź ponownie';
+    document.getElementById('bonus-result-default').append(retry);
+  }
+  retry.hidden = false; retry.disabled = false;
+  retry.onclick = async () => { retry.disabled = true; await syncBonusView({force:true}); };
+}
+
 async function loadBonusLabel(options = {}) {
   const { force = false } = options;
   const cacheKey = `${bonusId}:${participantId || 'guest'}`;
@@ -2666,7 +2688,7 @@ async function loadBonusLabel(options = {}) {
     const query = participantId
       ? `/api/bonus?b=${encodeURIComponent(bonusId)}&pid=${encodeURIComponent(participantId)}&token=${encodeURIComponent(deviceToken)}`
       : `/api/bonus?b=${encodeURIComponent(bonusId)}`;
-    const res = await fetch(query);
+    const res = await fetch(query, {cache:'no-store'});
     if (res.status === 403) {
       const data = await res.json();
       if (data?.inactive) {
@@ -2686,6 +2708,11 @@ async function loadBonusLabel(options = {}) {
       return null;
     }
     const data = await res.json();
+    if (!res.ok || data.error) {
+      bonusLabelFetchedAt = 0;
+      cachedBonusLabelData = {unavailable:true, ...data};
+      return cachedBonusLabelData;
+    }
     setBonusLabel(data.label || 'Podaj has\u0142o do tego bonusu.');
     bonusLabelFetchedAt = Date.now();
     cachedBonusLabelData = data;
@@ -2696,8 +2723,9 @@ async function loadBonusLabel(options = {}) {
     return await bonusLabelLoadPromise;
   } catch (e) {
     setBonusLabel('Podaj has\u0142o do tego bonusu.');
-    cachedBonusLabelData = null;
-    return null;
+    bonusLabelFetchedAt = 0;
+    cachedBonusLabelData = {unavailable:true};
+    return cachedBonusLabelData;
   } finally {
     bonusLabelLoadPromise = null;
   }
@@ -2718,6 +2746,8 @@ async function showSecret(existingBonusData = null, options = {}) {
   const { force = false } = options;
   const bonusData = existingBonusData || await loadBonusLabel({ force });
 
+  if (!bonusData || !participantId) return;
+  if (bonusData?.unavailable) { showBonusUnavailable(bonusData); return; }
   if (bonusData?.inactive) {
     return;
   }
@@ -2740,6 +2770,7 @@ async function showSecret(existingBonusData = null, options = {}) {
     return;
   }
 
+  secretBtnEl.disabled = false;
   setActiveBonusScreen('secret-screen');
 }
 
@@ -2797,6 +2828,8 @@ async function syncBonusView(options = {}) {
 
     if (participantId && PlayerExperience.instruction(setActiveBonusScreen, () => syncBonusView({force:true}))) return phase;
     const bonusData = await loadBonusLabel({ force });
+    if (!bonusData) return phase;
+    if (bonusData?.unavailable) { showBonusUnavailable(bonusData); return phase; }
     if (bonusData?.inactive) {
       return phase;
     }
@@ -2962,6 +2995,7 @@ async function submitSecret() {
     });
 
     const data = await res.json();
+    if(data.contentBlocked){bonusLabelFetchedAt=0;showBonusUnavailable(data);return;}
     if(res.status===423){btn.disabled=false;await syncBonusView({force:true});return;}
     if (res.status === 403 && /urzadzen|urządzen|przypisane/i.test(String(data.error || ''))) {
       clearBonusAccess(data.error);

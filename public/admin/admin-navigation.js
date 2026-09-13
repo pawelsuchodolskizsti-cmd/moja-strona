@@ -1,10 +1,11 @@
 window.AdminNavigation = (() => {
   const groups = [
-    ['Gra', [['home','Pulpit'],['live','Na żywo'],['announcements','Komunikaty'],['preview','Podgląd gracza']]],
+    ['Gra', [['home','Pulpit'],['live','Na żywo'],['announcements','Komunikaty'],['content-blocks','Blokady techniczne'],['preview','Podgląd gracza']]],
     ['Uczestnicy', [['leaderboard','Ranking'],['institution-ranking','Ranking placówek'],['institutions','Placówki','/admin/placowki/'],['answers','Odpowiedzi'],['bonuses','Bonusy'],['question-stats','Statystyki pytań']]],
     ['Organizacja', [['finale','Finał i wyniki'],['qr','Kody QR i pytania','/admin/qr/'],['documents','Dyplomy i pliki'],['diagnostics','Testy i ustawienia']]]
   ];
   const descriptions = {
+    'content-blocks':'Czasowo wyłącz pojedynczy kod QR i przywróć go po naprawie.',
     home:'Stan rundy i najważniejsze sterowanie grą.',live:'Aktywność uczestników i ruch przy pytaniach.',
     leaderboard:'Wyniki uczestników, szczegóły kont i eksport danych.', 'institution-ranking':'Wspólne wyniki uczestników każdej placówki.',
     answers:'Przeglądaj odpowiedzi i filtruj ich wyniki.',bonuses:'Sprawdź odebrane bonusy uczestników.',
@@ -70,6 +71,7 @@ window.AdminNavigation = (() => {
     const sections=document.createElement('div');sections.className='admin-sections';
     for(const [id] of Object.entries(descriptions))sections.append(panel(id));
     main.append(sections);
+    window.ContentControls.init(panels.get('content-blocks'));
     const home=panels.get('home'),diagnostics=panels.get('diagnostics');
     const stats=main.querySelector(':scope > .stats-row');const extraStats=document.createElement('div');extraStats.className='stats-row';
     [...stats.children].slice(3).forEach(node=>extraStats.append(node));home.append(stats);
@@ -102,7 +104,7 @@ window.AdminNavigation = (() => {
     sidebar.querySelectorAll('[data-section]').forEach(link=>{if(link.dataset.section===id)link.setAttribute('aria-current','page');else link.removeAttribute('aria-current');});
     document.getElementById('admin-section-title').textContent=titles[id];document.getElementById('admin-section-description').textContent=descriptions[id];
     document.title=titles[id]+' — Panel One Day';
-    currentTab=id;renderVisibleData();if(id==='institution-ranking')renderCityRanking();
+    currentTab=id;renderVisibleData();if(id==='content-blocks')window.ContentControls.refresh();if(id==='institution-ranking')renderCityRanking();
     if(options.history!==false&&location.hash!=='#'+id)history.pushState(null,'','#'+id);
     drawer(false,false);
     if(options.focus!==false){window.scrollTo({top:0,behavior:'instant'});document.getElementById('admin-section-title').focus({preventScroll:true});}
