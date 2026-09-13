@@ -2185,12 +2185,12 @@
   <div class="event-mode-banner" id="event-mode-banner"><strong>Tryb wydarzenia</strong> Aktywny jest uproszczony widok z większymi przyciskami, większym tekstem i mniejszą liczbą szczegółów.</div>
 
   <div class="stats-row">
-    <div class="stat"><div class="stat-val" id="s-participants">—</div><div class="stat-lbl">Uczestników</div></div>
-    <div class="stat"><div class="stat-val" id="s-answers">—</div><div class="stat-lbl">Odpowiedzi</div></div>
-    <div class="stat"><div class="stat-val" id="s-bonuses">—</div><div class="stat-lbl">Bonusów</div></div>
-    <div class="stat"><div class="stat-val" id="s-correct">—</div><div class="stat-lbl">Poprawnych</div></div>
-    <div class="stat"><div class="stat-val" id="s-wrong">—</div><div class="stat-lbl">Błędnych</div></div>
-    <div class="stat"><div class="stat-val" id="s-avg">—</div><div class="stat-lbl">Śr. punktów</div></div>
+    <div class="stat"><div class="stat-val" id="s-participants">-</div><div class="stat-lbl">Uczestników</div></div>
+    <div class="stat"><div class="stat-val" id="s-answers">-</div><div class="stat-lbl">Odpowiedzi</div></div>
+    <div class="stat"><div class="stat-val" id="s-bonuses">-</div><div class="stat-lbl">Bonusów</div></div>
+    <div class="stat"><div class="stat-val" id="s-correct">-</div><div class="stat-lbl">Poprawnych</div></div>
+    <div class="stat"><div class="stat-val" id="s-wrong">-</div><div class="stat-lbl">Błędnych</div></div>
+    <div class="stat"><div class="stat-val" id="s-avg">-</div><div class="stat-lbl">Śr. punktów</div></div>
   </div>
 
   <div class="hero">
@@ -2485,12 +2485,12 @@
       </div>
       <div class="insight-card">
         <div class="insight-label">Najczęściej otwierane</div>
-        <div class="insight-value" id="live-hot-question">—</div>
+        <div class="insight-value" id="live-hot-question">-</div>
         <div class="insight-sub" id="live-hot-sub">Czekam na pierwsze wejścia w pytania.</div>
       </div>
       <div class="insight-card">
         <div class="insight-label">Gdzie robi się korek</div>
-        <div class="insight-value" id="live-bottleneck-question">—</div>
+        <div class="insight-value" id="live-bottleneck-question">-</div>
         <div class="insight-sub" id="live-bottleneck-sub">Na razie nie widać zatorów.</div>
       </div>
     </div>
@@ -2635,17 +2635,17 @@
     <div class="insight-grid">
       <div class="insight-card">
         <div class="insight-label">Najtrudniejsze pytanie</div>
-        <div class="insight-value" id="hardest-question">—</div>
+        <div class="insight-value" id="hardest-question">-</div>
         <div class="insight-sub" id="hardest-question-sub">Brak danych do analizy.</div>
       </div>
       <div class="insight-card">
         <div class="insight-label">Najczęściej odwiedzane</div>
-        <div class="insight-value" id="most-visited-question">—</div>
+        <div class="insight-value" id="most-visited-question">-</div>
         <div class="insight-sub" id="most-visited-question-sub">Brak danych do analizy.</div>
       </div>
       <div class="insight-card">
         <div class="insight-label">Średnia skuteczność</div>
-        <div class="insight-value" id="avg-question-success">—</div>
+        <div class="insight-value" id="avg-question-success">-</div>
         <div class="insight-sub" id="avg-question-success-sub">Brak danych do analizy.</div>
       </div>
     </div>
@@ -3350,7 +3350,7 @@ function renderPlayerPreview() {
         </div>
         <div class="player-preview-timer">
           <span class="player-preview-timer-label">Do końca gry zostało</span>
-          <div class="player-preview-timer-value">${gamePhase === 'active' ? gameRemaining : '—'}</div>
+          <div class="player-preview-timer-value">${gamePhase === 'active' ? gameRemaining : '-'}</div>
         </div>
       </div>
     `;
@@ -4087,7 +4087,7 @@ function buildStartSimulation(participantCount = 35) {
         status: cityAggregationMatches ? 'ok' : 'error',
         badge: cityAggregationMatches ? 'OK' : 'Błąd',
         message: cityAggregationMatches
-          ? `Punkty placówek sumują się poprawnie. Liderem jest ${cityStats[0]?.city || '—'}.`
+          ? `Punkty placówek sumują się poprawnie. Liderem jest ${cityStats[0]?.city || '-'}.`
           : 'Suma punktów placówek nie zgadza się z łącznym wynikiem uczestników.'
       },
       {
@@ -4440,7 +4440,7 @@ function updateStats() {
 
   const avg = allParticipants.length
     ? (allParticipants.reduce((sum, p) => sum + (p.score || 0), 0) / allParticipants.length).toFixed(1)
-    : '—';
+    : '-';
 
   document.getElementById('s-avg').textContent = avg;
 }
@@ -4515,7 +4515,7 @@ function renderLiveActivity() {
     : 'Brak uczestników na pytaniach w tej chwili.';
 
   const hottest = hottestQuestions[0];
-  hotQuestionEl.textContent = hottest ? `Pyt. ${hottest.questionId}` : '—';
+  hotQuestionEl.textContent = hottest ? `Pyt. ${hottest.questionId}` : '-';
   hotSubEl.textContent = hottest
     ? `${hottest.opensLast20m} otwarć w ostatnich 20 minutach.`
     : 'Czekam na pierwsze wejścia w pytania.';
@@ -4526,7 +4526,7 @@ function renderLiveActivity() {
       b.longestOpenSeconds - a.longestOpenSeconds ||
       b.opensLast20m - a.opensLast20m
     )[0];
-  bottleneckQuestionEl.textContent = bottleneck && bottleneck.activeCount > 0 ? `Pyt. ${bottleneck.questionId}` : '—';
+  bottleneckQuestionEl.textContent = bottleneck && bottleneck.activeCount > 0 ? `Pyt. ${bottleneck.questionId}` : '-';
   bottleneckSubEl.textContent = bottleneck && bottleneck.activeCount > 0
     ? `${bottleneck.activeCount} osób jest tam teraz, a najdłuższe otwarcie trwa ${formatSecondsToLabel(bottleneck.longestOpenSeconds)}.`
     : 'Na razie nie widać zatorów.';
@@ -4666,8 +4666,8 @@ function renderLeaderboard() {
     const rankClass = index === 0 ? 'rank-1' : index === 1 ? 'rank-2' : index === 2 ? 'rank-3' : '';
     const lastActivity = participant.lastActivity
       ? new Date(participant.lastActivity).toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' })
-      : '—';
-    const city = participant.city || '—';
+      : '-';
+    const city = participant.city || '-';
 
     return `
       <tr class="clickable-row" onclick="openParticipantModal(${participant.id})">
@@ -4699,13 +4699,13 @@ function renderAnswerRows() {
   body.innerHTML = list.map(answer => {
     const createdAt = answer.createdAt
       ? new Date(answer.createdAt).toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
-      : '—';
-    const city = answer.participantCity || '—';
+      : '-';
+    const city = answer.participantCity || '-';
     const questionLabel = answer.questionText || `Pytanie ${answer.questionId}`;
 
     return `
       <tr>
-        <td>${escHtml(answer.participantName || '—')}</td>
+        <td>${escHtml(answer.participantName || '-')}</td>
         <td class="muted detail-col">${escHtml(city)}</td>
         <td style="max-width:260px;word-break:break-word">${escHtml(questionLabel)}</td>
         <td style="max-width:220px;word-break:break-word">${escHtml(answer.answer || '')}</td>
@@ -4731,7 +4731,7 @@ function renderBonusRows() {
   body.innerHTML = list.map((bonus) => {
     const createdAt = bonus.createdAt
       ? new Date(bonus.createdAt).toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
-      : '—';
+      : '-';
 
     return `
       <tr>
@@ -4813,11 +4813,11 @@ function renderQuestionStats() {
 
 function renderQuestionInsights() {
   if (!questionStats.length) {
-    document.getElementById('hardest-question').textContent = '—';
+    document.getElementById('hardest-question').textContent = '-';
     document.getElementById('hardest-question-sub').textContent = 'Brak danych do analizy.';
-    document.getElementById('most-visited-question').textContent = '—';
+    document.getElementById('most-visited-question').textContent = '-';
     document.getElementById('most-visited-question-sub').textContent = 'Brak danych do analizy.';
-    document.getElementById('avg-question-success').textContent = '—';
+    document.getElementById('avg-question-success').textContent = '-';
     document.getElementById('avg-question-success-sub').textContent = 'Brak danych do analizy.';
     return;
   }

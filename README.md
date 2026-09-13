@@ -1,4 +1,4 @@
-# Gra terenowa QR — wersja po naprawach, 11.09.2026
+# Gra terenowa QR - wersja po naprawach, 11.09.2026
 
 Projekt zachowuje pytania, bonusy, panel administratora, ekran wyników, generator QR, dyplomy i symulację. Naprawiono ochronę panelu, punktację i obsługę rund oraz błędy formularzy i widoków.
 
@@ -77,7 +77,7 @@ Wersje przygotowania bazy są zapisane w `qr_schema_migrations`. Nowa instancja 
 
 Weryfikacja urządzenia i odświeżenie aktywności korzystają z jednego zapytania; odczyt postępu wymaga dwóch połączeń HTTP z bazą zamiast pięciu. Blokady, autoryzacja i unikalność zapisów odpowiedzi oraz bonusów nadal są sprawdzane po stronie serwera. Nie dodano współdzielonej pamięci podręcznej danych uczestników.
 
-Ekran główny, pytania i bonusy odświeżają dane w tle co 15–18 sekund po zakończeniu poprzedniego odczytu. Odczyt samego postępu jest dodatkowo ograniczony do jednego na 30 sekund, z wymuszeniem aktualnych danych po zapisie lub powrocie do karty. Pierwsze odświeżenie ma losowe opóźnienie; ukryta karta nie wysyła odczytów. Jednoczesne wymuszenia odświeżenia współdzielą bieżące żądanie. Odliczanie nadal działa lokalnie co sekundę, a potwierdzenia odpowiedzi i bonusów pokazują się od razu po zapisie.
+Ekran główny, pytania i bonusy odświeżają dane w tle co 15-18 sekund po zakończeniu poprzedniego odczytu. Odczyt samego postępu jest dodatkowo ograniczony do jednego na 30 sekund, z wymuszeniem aktualnych danych po zapisie lub powrocie do karty. Pierwsze odświeżenie ma losowe opóźnienie; ukryta karta nie wysyła odczytów. Jednoczesne wymuszenia odświeżenia współdzielą bieżące żądanie. Odliczanie nadal działa lokalnie co sekundę, a potwierdzenia odpowiedzi i bonusów pokazują się od razu po zapisie.
 
 Logowanie ma maksymalnie trzy próby z rosnącym, losowo rozłożonym opóźnieniem dla problemów sieciowych oraz odpowiedzi 429/500/502/503/504. Każda próba zachowuje identyfikator urządzenia i te same dane, więc utrata odpowiedzi po zapisaniu konta nie tworzy drugiego uczestnika. Błędy danych nie są ponawiane. Chwilowy błąd pobrania stanu rundy nie usuwa lokalnej sesji.
 
@@ -85,9 +85,9 @@ Przed wydarzeniem otwórz panel administratora i wykonaj „Szybki test” kilka
 
 ## Wolontariusze i zgłoszenia
 
-Panel wolontariusza znajduje się pod `/wolontariusz/`, a obsługa organizatora w menu **Wolontariusze** (`/admin/wolontariusze/`). Najpierw administrator rozwija „Przypisanie wolontariuszy do bonusów”, wpisuje imię przy identyfikatorze bonusu i zapisuje przypisanie. Jeden bonus ma jednego wolontariusza. Login to identyfikator (np. B01), hasło to przypisane imię; wielkość liter i skrajne spacje nie mają znaczenia. To odrębne dane dostępu do panelu — zapis nie zmienia hasła bonusu w samej grze. Nowe konta nie są wypełniane przykładowymi osobami.
+Panel wolontariusza znajduje się pod `/wolontariusz/`, a obsługa organizatora w menu **Wolontariusze** (`/admin/wolontariusze/`). Najpierw administrator rozwija „Przypisanie wolontariuszy do bonusów”, wpisuje imię przy identyfikatorze bonusu i zapisuje przypisanie. Jeden bonus ma jednego wolontariusza. Login to identyfikator (np. B01), hasło to przypisane imię; wielkość liter i skrajne spacje nie mają znaczenia. To odrębne dane dostępu do panelu - zapis nie zmienia hasła bonusu w samej grze. Nowe konta nie są wypełniane przykładowymi osobami.
 
-Wolontariusz widzi zgłoszenia swojego punktu, tworzy pytania i usterki ogólne lub przypisane do dowolnego pytania/bonusu oraz dopisuje odpowiedzi w rozmowie. Administrator widzi wszystkie zgłoszenia, odpowiada pod wpisem, filtruje listę i ustawia status: Nowe, W trakcie lub Rozwiązane. Odpowiedzi odświeżają się co około 20–23 sekundy w aktywnej karcie. Listy i rozmowy mają stronicowanie; ponowienie zapisu z tym samym identyfikatorem nie tworzy duplikatu.
+Wolontariusz widzi zgłoszenia swojego punktu, tworzy pytania i usterki ogólne lub przypisane do dowolnego pytania/bonusu oraz dopisuje odpowiedzi w rozmowie. Administrator widzi wszystkie zgłoszenia, odpowiada pod wpisem, filtruje listę i ustawia status: Nowe, W trakcie lub Rozwiązane. Odpowiedzi odświeżają się co około 20-23 sekundy w aktywnej karcie. Listy i rozmowy mają stronicowanie; ponowienie zapisu z tym samym identyfikatorem nie tworzy duplikatu.
 
 Sesja wolontariusza używa oddzielnego losowego tokenu w HttpOnly/SameSite cookie (12 godzin), a hasło ma solony skrót scrypt. Serwer sprawdza przypisanie przy każdym żądaniu. Zmiana imienia lub przełącznika dostępu unieważnia poprzednie sesje. Limit logowania działa w bazie: 30 prób na adres IP w 10 minut. Blokada techniczna bonusu nie blokuje dostępu wolontariusza. Zgłoszenia i konta są wspólne dla rzeczywistego wydarzenia, niezależne od symulacji TEST i zachowywane po resetowaniu gry. Nie zmieniają punktacji ani stanu kodów.
 
@@ -97,9 +97,9 @@ Tabele `volunteer_accounts`, `volunteer_sessions`, `volunteer_login_attempts`, `
 
 Wspólny arkusz `public/mobile-canvas.css` przypisuje tło do całego dokumentu, który rośnie wraz z treścią. Usuwa ograniczenie wysokości głównego elementu przez `-webkit-fill-available`, ustawia minimalną wysokość widoku przez `dvh` z zapasem dla starszych przeglądarek i zachowuje kolory poszczególnych paneli. Widoki korzystają z `viewport-fit=cover` oraz odstępów `safe-area-inset-*`. Reguły wspólnego tła dotyczą wyłącznie ekranu, nie wydruków QR.
 
-Sprawdzono dziewięć widoków w WebKit z emulacją iPhone’a przy szerokościach 320–844 px, zmianę wysokości przy aktywnym polu pytania i bonusu oraz wydłużanie i skracanie treści panelu. Weryfikacja obejmuje brak poziomego przepełnienia i tło na całej wysokości dokumentu. Są to testy silnika przeglądarki i emulacji, nie fizycznego iPhone’a.
+Sprawdzono dziewięć widoków w WebKit z emulacją iPhone’a przy szerokościach 320-844 px, zmianę wysokości przy aktywnym polu pytania i bonusu oraz wydłużanie i skracanie treści panelu. Weryfikacja obejmuje brak poziomego przepełnienia i tło na całej wysokości dokumentu. Są to testy silnika przeglądarki i emulacji, nie fizycznego iPhone’a.
 
-## Historia, finał i pobieranie danych — 13.09.2026
+## Historia, finał i pobieranie danych - 13.09.2026
 
 - **Historia i archiwum** w menu admina prowadzi do /admin/historia/. Archiwum obejmuje uczestników, ich punkty i korekty, odpowiedzi, bonusy, otwarcia pytań, placówki, katalog pytań/bonusów i dostępny stan rundy. Tokeny urządzeń są pomijane. Zapis następuje przed resetem, startem nowej rundy, zatrzymaniem i zmianą katalogu; również przed czyszczeniem TEST. Zakończona runda jest dodatkowo zapisywana raz przy odczycie stanu przez zalogowanego administratora. Przycisk „Zapisz rundę teraz” tworzy ręczny zapis. Błąd archiwum przerywa transakcję resetu, więc dane robocze nie są usuwane.
 - Archiwa są niezależne od roboczych tabel i pozostają po resetach; aplikacja nie udostępnia ich kasowania. Podgląd pobiera rekordy porcjami, a „Pobierz pełną kopię rundy” składa kompletny JSON na komputerze. Taki plik umożliwia późniejszą rekonstrukcję danych; nie ma automatycznego przywracania do trwającej rundy. Archiwum w tej samej bazie zabezpiecza przed resetem w aplikacji, nie przed utratą całej bazy. Kopię warto pobrać na osobne urządzenie.

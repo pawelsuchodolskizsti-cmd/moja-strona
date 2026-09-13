@@ -6,7 +6,7 @@ window.OneDayPosts = [
   {id:'hebe',caption:'Staż w Hebe',image:'hebe.jpg',url:'https://www.instagram.com/reel/DaPjJUyNDBW/'},
   {id:'glowa',caption:'Głowa do góry',image:'glowa.jpg',url:'https://www.instagram.com/reel/Dbsgd_qt_L3/'},
   {id:'arteterapia',caption:'Arte Terapia',image:'arteterapia.jpg',url:'https://www.instagram.com/p/DUlbqiEjfyb/'},
-  {id:'psycholog',caption:'Nasz psycholog — Twoje wsparcie',image:'psycholog.jpg',url:'https://www.instagram.com/reel/DWTdi6JDbWM/'},
+  {id:'psycholog',caption:'Nasz psycholog - Twoje wsparcie',image:'psycholog.jpg',url:'https://www.instagram.com/reel/DWTdi6JDbWM/'},
   {id:'terapia',caption:'Terapia',image:'terapia.jpg',url:'https://www.instagram.com/reel/DVjK26EiLWA/'},
   {id:'rtv',caption:'Staż w RTV Euro AGD',image:'rtv.jpg',url:'https://www.instagram.com/p/DQwTsOijQM_/'}
 ];

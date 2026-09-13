@@ -103,7 +103,7 @@ window.AdminNavigation = (() => {
     panels.forEach((section,key)=>section.hidden=key!==id);
     sidebar.querySelectorAll('[data-section]').forEach(link=>{if(link.dataset.section===id)link.setAttribute('aria-current','page');else link.removeAttribute('aria-current');});
     document.getElementById('admin-section-title').textContent=titles[id];document.getElementById('admin-section-description').textContent=descriptions[id];
-    document.title=titles[id]+' — Panel One Day';
+    document.title=titles[id]+' - Panel One Day';
     currentTab=id;renderVisibleData();if(id==='content-blocks')window.ContentControls.refresh();if(id==='institution-ranking')renderCityRanking();
     if(options.history!==false&&location.hash!=='#'+id)history.pushState(null,'','#'+id);
     drawer(false,false);

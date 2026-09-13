@@ -7,7 +7,7 @@
   const group=document.createElement('div');group.className='posts-group';group.setAttribute('role','list');
   for(const post of posts){
     const card=document.createElement('article');card.className='post-card';card.dataset.postId=post.id;card.setAttribute('role','listitem');
-    const link=document.createElement('a');link.className='post-link';link.href=post.url;link.target='_blank';link.rel='noopener noreferrer';link.setAttribute('aria-label',post.caption+' — otwórz post na Instagramie (nowa karta)');
+    const link=document.createElement('a');link.className='post-link';link.href=post.url;link.target='_blank';link.rel='noopener noreferrer';link.setAttribute('aria-label',post.caption+' - otwórz post na Instagramie (nowa karta)');
     const frame=document.createElement('div');frame.className='post-image-frame';
     const image=document.createElement('img');image.className='post-image';image.src='/social-posts/'+post.image;image.alt=post.caption;image.width=210;image.height=210;image.decoding='async';image.draggable=false;
     const fallback=document.createElement('span');fallback.className='post-image-fallback';fallback.textContent='Zobacz post na Instagramie';

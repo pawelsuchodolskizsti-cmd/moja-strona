@@ -24,7 +24,7 @@
     for(const p of data.unassigned){
       const row=document.createElement('div');row.className='assignment';const person=document.createElement('div');person.textContent=p.firstName+' '+p.lastName;const original=document.createElement('small');original.textContent='Poprzedni zapis: '+(p.city||'brak');person.append(original);
       const select=document.createElement('select');select.setAttribute('aria-label','Placówka dla '+p.firstName+' '+p.lastName);const placeholder=document.createElement('option');placeholder.value='';placeholder.textContent='Wybierz placówkę';select.append(placeholder);
-      for(const i of data.institutions.filter(i=>i.active)){const option=document.createElement('option');option.value=i.id;option.textContent=i.name+' — '+i.city;select.append(option);}
+      for(const i of data.institutions.filter(i=>i.active)){const option=document.createElement('option');option.value=i.id;option.textContent=i.name+' - '+i.city;select.append(option);}
       const button=document.createElement('button');button.textContent='Przypisz';button.onclick=async()=>{if(!select.value){message(status,'Wybierz placówkę dla uczestnika.',true);return;}button.disabled=true;try{await request({action:'assign',participantId:p.id,institutionId:Number(select.value)});data.unassigned=data.unassigned.filter(item=>item.id!==p.id);renderUnassigned();message(status,'Przypisano uczestnika. Jego punkty należą teraz do wybranej placówki.');}catch(error){message(status,error.message,true);button.disabled=false;}};
       row.append(person,select,button);root.append(row);
     }

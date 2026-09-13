@@ -72,7 +72,7 @@ window.ContentControls = (() => {
     root.innerHTML = `<section class="ops-card content-controls">
       <div class="ops-title">Dostępność pytań i bonusów</div>
       <p class="ops-copy">Blokada dotyczy wskazanego kodu QR. Nie odbiera zdobytych punktów ani nie zużywa próby odpowiedzi. Pozostałe kody i odliczanie działają dalej. Po naprawie kliknij „Odblokuj”.</p>
-      <p class="ops-copy">To ustawienie wspólnego katalogu — obowiązuje w grze LIVE także wtedy, gdy przeglądasz dane TEST. Blokady pozostają włączone do ręcznego odblokowania.</p>
+      <p class="ops-copy">To ustawienie wspólnego katalogu - obowiązuje w grze LIVE także wtedy, gdy przeglądasz dane TEST. Blokady pozostają włączone do ręcznego odblokowania.</p>
       <div class="content-control-toolbar">
         <label>Szukaj kodu<input id="content-block-search" class="auth-input" type="search" placeholder="Numer pytania lub nazwa bonusu"></label>
         <label>Pokaż<select id="content-block-filter" class="auth-input"><option value="all">Wszystkie kody</option><option value="blocked">Tylko zablokowane</option><option value="question">Pytania</option><option value="bonus">Bonusy</option></select></label>

@@ -1,7 +1,7 @@
 /* Shared onboarding and milestones for both QR entry points. No score is stored here. */
 window.PlayerExperience = (() => {
   const steps = [
-    ['QR', 'Skanuj i zbieraj punkty', 'Szukaj kodów QR na trasie. Każdy kod otwiera pytanie. Poprawna odpowiedź to 1 punkt. Masz jedną próbę — przeczytaj pytanie uważnie.'],
+    ['QR', 'Skanuj i zbieraj punkty', 'Szukaj kodów QR na trasie. Każdy kod otwiera pytanie. Poprawna odpowiedź to 1 punkt. Masz jedną próbę - przeczytaj pytanie uważnie.'],
     ['+1', 'Odkrywaj bonusy', 'Wypatruj bonusowych kodów QR i rozmawiaj z wolontariuszami. Zeskanuj kod i wpisz hasło do bonusu. Każdy bonus daje 1 dodatkowy punkt i można odebrać go tylko raz.'],
     ['3 h', 'Graj przez 3 godziny', 'Wspólna runda trwa 3 godziny od startu organizatora. Odliczanie znajdziesz na ekranie głównym, przy każdym pytaniu i bonusie. Dołączając później, korzystasz z pozostałego czasu. Gotowy?']
   ];

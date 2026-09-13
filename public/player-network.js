@@ -27,7 +27,7 @@ window.PlayerNetwork = (() => {
       if (attempt < retries) await sleep(Math.min(8000,Math.max(retryAfter,retryDelayMs*2**attempt)+Math.random()*700));
     }
     throw new Error(lastError?.name === 'AbortError'
-      ? 'Logowanie trwało zbyt długo. Spróbuj ponownie — użyj tych samych danych.'
+      ? 'Logowanie trwało zbyt długo. Spróbuj ponownie - użyj tych samych danych.'
       : 'Nie udało się połączyć. Sprawdź internet i spróbuj ponownie.');
   }
   function startPolling(task, intervalMs = 10000, jitterMs = 2000) {

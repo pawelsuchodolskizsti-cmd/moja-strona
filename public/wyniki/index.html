@@ -598,7 +598,7 @@ function renderSidebar() {
   cachedSidebarKey = sidebarKey;
 
   sidebar.classList.toggle('locked', !revealState.participantsVisible);
-  if (countEl) countEl.textContent = revealState.participantsVisible ? total : '—';
+  if (countEl) countEl.textContent = revealState.participantsVisible ? total : '-';
 
   if (!revealState.participantsVisible) {
     listEl.innerHTML = getRevealLockMarkup('Uczestnicy zasłonięci', 'Lista graczy wróci przy pierwszym odsłonięciu wyników przez administratora.', 'Pierwszy etap odsłonięcia');

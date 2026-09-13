@@ -11,7 +11,7 @@
     return row[b.length]<=1;
   }
   function choose(item) {
-    selected=item;idInput.value=item.id;input.value=`${item.name} — ${item.city}`;
+    selected=item;idInput.value=item.id;input.value=`${item.name} - ${item.city}`;
     status.textContent=`Wybrano: ${input.value}`;close();input.focus();
   }
   function close(){list.hidden=true;input.setAttribute('aria-expanded','false');input.removeAttribute('aria-activedescendant');highlight=-1;}
@@ -25,10 +25,10 @@
     list.replaceChildren();highlight=-1;
     for(const item of matches.slice(0,30)){
       const option=document.createElement('button');option.type='button';option.role='option';option.id=`institution-option-${item.id}`;option.dataset.id=item.id;option.setAttribute('aria-selected','false');
-      option.textContent=`${item.name} — ${item.city}`;option.onmousedown=e=>e.preventDefault();option.onclick=()=>choose(item);list.append(option);
+      option.textContent=`${item.name} - ${item.city}`;option.onmousedown=e=>e.preventDefault();option.onclick=()=>choose(item);list.append(option);
     }
     list.hidden=!matches.length;input.setAttribute('aria-expanded',String(!list.hidden));input.removeAttribute('aria-activedescendant');
-    status.textContent=matches.length ? `Wybierz swoją placówkę z listy${matches.length>30?' — wpisz więcej znaków, aby zawęzić wyniki':''}.` : 'Brak pasujących placówek. Sprawdź nazwę lub zgłoś brak organizatorowi.';
+    status.textContent=matches.length ? `Wybierz swoją placówkę z listy${matches.length>30?' - wpisz więcej znaków, aby zawęzić wyniki':''}.` : 'Brak pasujących placówek. Sprawdź nazwę lub zgłoś brak organizatorowi.';
   }
   input.addEventListener('input',()=>{selected=null;idInput.value='';render()});
   input.addEventListener('focus',()=>{if(!selected)render()});

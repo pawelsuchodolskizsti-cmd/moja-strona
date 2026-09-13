@@ -28,7 +28,7 @@
       if (!response.ok) throw Error(data.error || 'Nie udało się zapisać zmian.');
       return data;
     } catch (error) {
-      if (error.name === 'AbortError' || error instanceof TypeError) throw Error('Nie udało się połączyć. Spróbuj ponownie — treść pozostaje w formularzu.');
+      if (error.name === 'AbortError' || error instanceof TypeError) throw Error('Nie udało się połączyć. Spróbuj ponownie - treść pozostaje w formularzu.');
       throw error;
     } finally { clearTimeout(timer); }
   }
@@ -54,7 +54,7 @@
     if (type === 'general') return;
     select.append(new Option(type === 'question' ? 'Wybierz pytanie' : 'Wybierz bonus',''));
     for (const item of catalog[type === 'question' ? 'questions' : 'bonuses']) {
-      const option = new Option(item.label + (item.technicalBlocked ? ' — blokada techniczna' : !item.active ? ' — nieaktywny' : ''),item.id);
+      const option = new Option(item.label + (item.technicalBlocked ? ' - blokada techniczna' : !item.active ? ' - nieaktywny' : ''),item.id);
       select.append(option);
     }
   }
@@ -72,7 +72,7 @@
     for (const bonus of catalog.bonuses) {
       let account = catalog.accounts.find(a => a.bonusId === bonus.id) || {bonusId:bonus.id,name:'',enabled:true,revision:0};
       const form = node('form',undefined,'volunteer-account'); form.dataset.bonusId = bonus.id;
-      const label = node('label','Imię — hasło wolontariusza'), input = node('input'); input.value = account.name; input.maxLength = 80; input.required = true; input.autocomplete = 'off'; label.append(input);
+      const label = node('label','Imię - hasło wolontariusza'), input = node('input'); input.value = account.name; input.maxLength = 80; input.required = true; input.autocomplete = 'off'; label.append(input);
       const enabledLabel = node('label',undefined,'account-enabled'), enabled = node('input'); enabled.type = 'checkbox'; enabled.checked = account.enabled; enabledLabel.append(enabled,node('span','Dostęp aktywny'));
       const button = node('button',account.revision ? 'Zapisz' : 'Przypisz'); button.type = 'submit';
       const message = node('p'); message.setAttribute('role','status');
