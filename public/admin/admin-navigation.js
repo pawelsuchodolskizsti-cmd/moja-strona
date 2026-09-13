@@ -2,7 +2,7 @@ window.AdminNavigation = (() => {
   const groups = [
     ['Gra', [['home','Pulpit'],['live','Na żywo'],['announcements','Komunikaty'],['content-blocks','Blokady techniczne'],['preview','Podgląd gracza']]],
     ['Uczestnicy', [['leaderboard','Ranking'],['institution-ranking','Ranking placówek'],['institutions','Placówki','/admin/placowki/'],['answers','Odpowiedzi'],['bonuses','Bonusy'],['question-stats','Statystyki pytań']]],
-    ['Organizacja', [['volunteers','Wolontariusze','/admin/wolontariusze/'],['finale','Finał i wyniki'],['qr','Kody QR i pytania','/admin/qr/'],['documents','Dyplomy i pliki'],['diagnostics','Testy i ustawienia']]]
+    ['Organizacja', [['history','Historia i archiwum','/admin/historia/'],['volunteers','Wolontariusze','/admin/wolontariusze/'],['finale','Finał i wyniki'],['qr','Kody QR i pytania','/admin/qr/'],['documents','Dyplomy i pliki'],['diagnostics','Testy i ustawienia']]]
   ];
   const descriptions = {
     'content-blocks':'Czasowo wyłącz pojedynczy kod QR i przywróć go po naprawie.',
@@ -79,8 +79,8 @@ window.AdminNavigation = (() => {
     const utilities=document.createElement('div');utilities.className='utility-grid admin-test-actions';
     for(const id of ['btn-quick-test','btn-integrity-scan','btn-start-simulator'])move(utilities,'#'+id);
     diagnostics.append(utilities);move(diagnostics,'#system-bar');move(diagnostics,'.notes-panel');move(diagnostics,'.simulator-card');
-    const resetCard=document.createElement('section');resetCard.className='ops-card admin-reset-card';resetCard.innerHTML='<div class="ops-title">Zarządzanie danymi</div><p class="ops-copy">Operacja dotyczy aktualnie wybranego trybu danych. Przed usunięciem sprawdź, czy pracujesz na grze LIVE, czy na symulacji.</p>';
-    const reset=move(resetCard,'#btn-reset');reset.querySelector('small').textContent='Usuwa dane wybranego trybu';diagnostics.append(resetCard);
+    const resetCard=document.createElement('section');resetCard.className='ops-card admin-reset-card';resetCard.innerHTML='<div class="ops-title">Zarządzanie danymi</div><p class="ops-copy">Operacja dotyczy aktualnie wybranego trybu danych. Przed resetem powstaje pełne archiwum rund. Sprawdź, czy pracujesz na grze LIVE, czy na symulacji.</p>';
+    const reset=move(resetCard,'#btn-reset');reset.querySelector('small').textContent='Zapisuje archiwum i czyści wybrany tryb';diagnostics.append(resetCard);
     const feedback=document.getElementById('admin-feedback');feedback.setAttribute('role','status');main.insertBefore(feedback,main.querySelector('.hero'));
     const scope=document.createElement('div');scope.id='admin-scope-label';scope.className='admin-scope-label';scope.textContent='Dane gry LIVE';header.querySelector('.header-main').append(scope);
     for(const id of ['live','leaderboard','answers','bonuses','question-stats']){const tab=move(panels.get(id),'#tab-'+id);tab.style.display='block';}

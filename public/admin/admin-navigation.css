@@ -22,3 +22,5 @@ body.event-mode .admin-section .notes-panel,body.event-mode .admin-section .ops-
 #content-block-list{max-height:65vh;overflow:auto;padding-right:8px;scrollbar-width:thin}.content-control-toolbar label{font-size:13px;color:var(--muted)}
 
 #content-block-summary{margin-bottom:8px}#content-block-feedback{margin:8px 0 16px;line-height:1.5}
+
+.record-pagination{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:14px;padding:18px;color:#aebbd0}

@@ -2123,6 +2123,7 @@
 <script src="/view-loading.js"></script>
 <meta name="theme-color" content="#090b10">
 <link rel="stylesheet" href="/mobile-canvas.css">
+<script src="/game-clock.js"></script>
 </head>
 <body>
 <div id="view-loading" role="status" aria-live="polite"><div class="view-loading-card"><div class="event-brand">Gwiazdka One Day 2026</div><span class="view-loading-spinner" aria-hidden="true"></span><p id="view-loading-message">Otwieramy panel…</p><button id="view-loading-retry" type="button" hidden onclick="location.reload()">Odśwież stronę</button></div></div>
@@ -2337,6 +2338,7 @@
         <button class="btn reveal-gold" id="btn-reveal-cities" type="button" onclick="confirmAction('reveal-cities')">Odsłoń placówki</button>
         <button class="btn outline" id="btn-lock-results" type="button" onclick="confirmAction('lock-results')">Zablokuj ponownie</button>
       </div>
+      <div class="reveal-actions"><button class="btn primary" id="btn-show-thanks" onclick="setFinaleThanks(true)">Pokaż podziękowanie</button><button class="btn outline" id="btn-hide-thanks" onclick="setFinaleThanks(false)">Wróć do finału</button></div>
       <div class="reveal-meta" id="reveal-results-meta">Start lub reset gry automatycznie zamknie wyniki od nowa.</div>
     </section>
     <section class="ops-card">
@@ -2766,6 +2768,7 @@
 <script>
 let allParticipants = [];
 let allAnswers = [];
+let adminTotals={answers:0,bonuses:0,correct:0,wrong:0}, adminRound=null, participantDetails={answers:[],bonuses:[]};
 let allBonuses = [];
 let questionCatalog = [];
 let bonusCatalog = [];
@@ -2863,6 +2866,7 @@ function setAuthFeedback(message, type = '') {
 }
 
 function closeParticipantModal() {
+  currentParticipantId=null;window.AdminData?.cancelParticipant();
   const modal = document.getElementById('participant-modal');
   if (modal) {
     modal.classList.remove('show');
@@ -3116,12 +3120,12 @@ function formatAnnouncementTime(value) {
 
 function getSummaryRemainingMs() {
   if (!summaryAt) return 0;
-  return summaryAt - Date.now();
+  return summaryAt - GameClock.now();
 }
 
 function getGameRemainingMs() {
   if (!gameStartedAt) return 0;
-  return gameDurationMs - (Date.now() - gameStartedAt);
+  return gameDurationMs - (GameClock.now() - gameStartedAt);
 }
 
 function renderOpsState() {
@@ -3171,6 +3175,10 @@ function renderVisibleData() {
   if (currentTab === 'institution-ranking') renderCityRanking();
 }
 
+async function setFinaleThanks(show) {
+  try { const r=await AdminSession.fetch('/api/game-state',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:show?'show-thanks':'hide-thanks',scope:activeDataScope})});const d=await r.json();if(!r.ok)throw Error(d.error);await loadGameState();setAdminFeedback(show?'Podziękowanie zostało wyświetlone.':'Przywrócono ekran finału.'); }
+  catch(e){setAdminFeedback(e.message,'error');}
+}
 function clearAnnouncementField() {
   document.getElementById('admin-message').value = '';
   setAdminFeedback('Pole komunikatu zostało wyczyszczone. Nic nie zostało jeszcze wysłane.');
@@ -3193,7 +3201,7 @@ function renderQuickTestResults(items) {
 function getCurrentPreviewMode() {
   if (gamePhase === 'active') return 'start';
   if (gamePhase === 'ended') {
-    return getSummaryRemainingMs() > 0 ? 'final' : 'thanks';
+    return summaryAt ? 'thanks' : 'final';
   }
   return 'start';
 }
@@ -3227,8 +3235,8 @@ function renderRevealControls() {
   playersLabel.textContent = playersOpen ? `Odsłonięto ${formatAnnouncementTime(resultsParticipantsRevealedAt)}.` : 'Czeka na odsłonięcie.';
   citiesLabel.textContent = citiesOpen ? `Odsłonięto ${formatAnnouncementTime(resultsCitiesRevealedAt)}.` : 'Czeka na odsłonięcie.';
 
-  if (playersBtn) playersBtn.disabled = playersOpen;
-  if (citiesBtn) citiesBtn.disabled = citiesOpen || !playersOpen;
+  if (playersBtn) playersBtn.disabled = playersOpen || gamePhase!=='ended';
+  if (citiesBtn) citiesBtn.disabled = citiesOpen || !playersOpen || gamePhase!=='ended';
   if (lockBtn) lockBtn.disabled = !playersOpen && !citiesOpen;
 
   if (meta) {
@@ -3276,7 +3284,7 @@ function renderPlayerPreview() {
       </div>
     `;
   } else if (mode === 'final') {
-    phaseText = 'Podgląd finału po zatrzymaniu gry, z zaproszeniem do Teatru i drugim licznikiem.';
+    phaseText = 'Podgląd finału po zatrzymaniu gry, z zaproszeniem do Teatru. Odsłanianiem steruje organizator.';
     html = `
       <div class="player-preview-card">
         ${previewPartners}
@@ -3290,8 +3298,8 @@ function renderPlayerPreview() {
           <p>To ekran końcowy widoczny po zatrzymaniu gry albo po upływie czasu aktywnej tury.</p>
         </div>
         <div class="player-preview-timer">
-          <span class="player-preview-timer-label">Do podsumowania zostało</span>
-          <div class="player-preview-timer-value">${summaryRemaining}</div>
+          <span class="player-preview-timer-label">Wyniki ogłasza organizator</span>
+          <div class="player-preview-timer-value">Czekamy na finał</div>
         </div>
       </div>
     `;
@@ -3364,19 +3372,20 @@ async function loadGameState() {
     const res = await AdminSession.fetch('/api/game-state?scope=active');
     const data = await res.json();
     if(!res.ok)throw Error(data.error||'Błąd odczytu stanu gry.');
+    GameClock.sync(data.serverNow);
     const pauseButton=document.getElementById('btn-technical-pause');
     pauseButton.dataset.paused=String(!!data.technical_pause_active);pauseButton.textContent=data.technical_pause_active?'Wznów po pauzie':'Pauza techniczna';
-    pauseButton.disabled=!data.started_at || Date.now()>=new Date(data.started_at).getTime()+Number(data.duration_minutes||180)*60000;
+    pauseButton.disabled=!data.started_at || GameClock.now()>=new Date(data.started_at).getTime()+Number(data.duration_minutes||180)*60000;
     announcementText = (data.announcement_text || '').trim();
     announcementUpdatedAt = data.announcement_updated_at || null;
     resultsParticipantsRevealedAt = data.results_participants_revealed_at || null;
     resultsCitiesRevealedAt = data.results_cities_revealed_at || null;
 
     if (data.started_at) {
-      summaryAt = null;
+      summaryAt = data.summary_at ? Date.parse(data.summary_at) : null;
       gameStartedAt = new Date(data.started_at).getTime();
       gameDurationMs = (data.duration_minutes || 180) * 60 * 1000;
-      const remaining = gameDurationMs - (Date.now() - gameStartedAt);
+      const remaining = gameDurationMs - (GameClock.now() - gameStartedAt);
 
       if (remaining > 0) {
         gamePhase = 'active';
@@ -3386,7 +3395,7 @@ async function loadGameState() {
         if (!timerInterval) timerInterval = setInterval(updateLiveTimer, 1000);
       } else {
         gameStartedAt = null;
-        summaryAt = new Date(data.summary_at || (Date.now() + 5 * 60000)).getTime();
+        summaryAt = data.summary_at ? Date.parse(data.summary_at) : null;
         clearTimer();
         gamePhase = 'ended';
         setStatus('ended', 'Gra zakończona', testModeEnabled ? 'Tryb testowy zakończył odliczanie. Możesz wrócić do danych żywych albo wygenerować nowy test.' : 'Czas gry minął. Możesz uruchomić nową turę lub wyczyścić dane.');
@@ -3395,10 +3404,10 @@ async function loadGameState() {
       }
     } else if (data.ended_at || data.summary_at) {
       gameStartedAt = null;
-      summaryAt = new Date(data.summary_at || (new Date(data.ended_at).getTime() + 5 * 60000)).getTime();
+      summaryAt = data.summary_at ? Date.parse(data.summary_at) : null;
       clearTimer();
       gamePhase = 'ended';
-      setStatus('ended', 'Gra zakończona', testModeEnabled ? 'Widoki pokazują testowe podsumowanie i licznik do finału.' : 'Uczestnicy widzą zaproszenie do Teatru i licznik do podsumowania.');
+      setStatus('ended', 'Gra zakończona', testModeEnabled ? 'Widoki pokazują testowe podsumowanie i licznik do finału.' : 'Uczestnicy widzą zaproszenie do Teatru. Finałem sterujesz ręcznie.');
       syncActionButtons('ended');
       updateLiveTimer();
     } else {
@@ -3407,7 +3416,7 @@ async function loadGameState() {
       clearTimer();
   gameDurationMs = (data.duration_minutes || 180) * 60 * 1000;
       gamePhase = 'idle';
-      setStatus('idle', testModeEnabled ? 'Tryb testowy gotowy' : 'Gra zatrzymana', testModeEnabled ? 'Panel pracuje na danych testowych. Możesz uruchomić testową turę albo wrócić do danych żywych.' : 'Możesz rozpocząć nową turę. Reset usuwa dane aktualnego zakresu.');
+      setStatus('idle', testModeEnabled ? 'Tryb testowy gotowy' : 'Gra zatrzymana', testModeEnabled ? 'Panel pracuje na danych testowych. Możesz uruchomić testową turę albo wrócić do danych żywych.' : 'Możesz rozpocząć nową turę. Reset najpierw zapisuje dane aktualnego zakresu w archiwum.');
       syncActionButtons('idle');
       document.getElementById('live-timer').textContent = '--:--';
       document.getElementById('live-timer').classList.remove('warning');
@@ -3422,6 +3431,8 @@ async function loadGameState() {
 
     renderOpsState();
     renderRevealControls();
+    document.getElementById('btn-show-thanks').disabled=gamePhase!=='ended'||!!summaryAt;
+    document.getElementById('btn-hide-thanks').disabled=gamePhase!=='ended'||!summaryAt;
     renderPlayerPreview();
   } catch (e) {
     console.error(e);
@@ -3484,7 +3495,7 @@ function clearTimer() {
 function updateLiveTimer() {
   const timerEl = document.getElementById('live-timer');
   if (!gameStartedAt && !summaryAt) {
-    timerEl.textContent = '--:--';
+    timerEl.textContent = gamePhase==='ended' ? 'FINAŁ' : '--:--';
     timerEl.classList.remove('warning');
     return;
   }
@@ -3496,10 +3507,10 @@ function updateLiveTimer() {
     return;
   }
 
-  const remaining = gameDurationMs - (Date.now() - gameStartedAt);
+  const remaining = gameDurationMs - (GameClock.now() - gameStartedAt);
   if (remaining <= 0) {
     gameStartedAt = null;
-    summaryAt = Date.now() + 5 * 60000;
+    summaryAt = null;
     timerEl.textContent = 'TEATR';
     timerEl.classList.add('warning');
     clearTimer();
@@ -3991,7 +4002,7 @@ function buildStartSimulation(participantCount = 35) {
     const bonusCount = Math.min(bonusesTotal, index % 4);
     const score = correctCount + bonusCount;
     const participantId = index + 1;
-    const lastActivity = new Date(Date.now() - index * 47000).toISOString();
+    const lastActivity = new Date(GameClock.now() - index * 47000).toISOString();
 
     participants.push({
       id: participantId,
@@ -4023,32 +4034,10 @@ function buildStartSimulation(participantCount = 35) {
   }
 
   const rankedParticipants = [...participants]
-    .sort((a, b) =>
-      (b.score || 0) - (a.score || 0) ||
-      (b.answeredCount || 0) - (a.answeredCount || 0) ||
-      (a.lastName || '').localeCompare(b.lastName || '', 'pl') ||
-      (a.firstName || '').localeCompare(b.firstName || '', 'pl')
-    )
+    .sort(GameRanking.compareParticipants)
     .map((participant, index) => ({ ...participant, rank: index + 1 }));
 
-  const cityStats = [...rankedParticipants.reduce((map, participant) => {
-    const current = map.get(participant.city) || {
-      city: participant.city,
-      score: 0,
-      participants: 0,
-      answers: 0
-    };
-    current.score += Number(participant.score || 0);
-    current.participants += 1;
-    current.answers += Number(participant.answeredCount || 0);
-    map.set(participant.city, current);
-    return map;
-  }, new Map()).values()]
-    .sort((a, b) =>
-      b.score - a.score ||
-      b.participants - a.participants ||
-      a.city.localeCompare(b.city, 'pl')
-    );
+  const cityStats=GameRanking.institutionStats(rankedParticipants);
 
   const totalAnswers = answers.length;
   const totalBonuses = bonuses.length;
@@ -4058,9 +4047,7 @@ function buildStartSimulation(participantCount = 35) {
   const answersMatch = totalAnswers === rankedParticipants.reduce((sum, participant) => sum + Number(participant.answeredCount || 0), 0);
   const cityAggregationMatches = totalScore === cityScoreTotal;
   const rankingStable = rankedParticipants.every((participant, index, list) =>
-    index === 0 ||
-    (list[index - 1].score > participant.score) ||
-    (list[index - 1].score === participant.score && (list[index - 1].answeredCount || 0) >= (participant.answeredCount || 0))
+    index === 0 || GameRanking.compareParticipants(list[index-1],participant)<=0
   );
   const ok = scoreMatches && answersMatch && cityAggregationMatches && rankingStable;
 
@@ -4154,9 +4141,9 @@ function buildPersistedSimulationReport() {
   });
 
   const cityStats = [...cityMap.values()].sort((a, b) => b.score - a.score || a.city.localeCompare(b.city, 'pl'));
-  const topParticipant = [...allParticipants].sort((a, b) => (b.score || 0) - (a.score || 0) || (b.answeredCount || 0) - (a.answeredCount || 0))[0] || null;
+  const topParticipant = [...allParticipants].sort(GameRanking.compareParticipants)[0] || null;
   const topCity = cityStats[0] || null;
-  const answersOk = allAnswers.length > 0 || allBonuses.length > 0;
+  const answersOk = adminTotals.answers > 0 || adminTotals.bonuses > 0;
   const cityOk = cityStats.length >= 2;
   const rankOk = allParticipants.every((participant, index, list) => {
     if (index === 0) return true;
@@ -4165,8 +4152,8 @@ function buildPersistedSimulationReport() {
 
   return {
     participantCount: allParticipants.length,
-    totalAnswers: allAnswers.length,
-    totalBonuses: allBonuses.length,
+    totalAnswers: adminTotals.answers,
+    totalBonuses: adminTotals.bonuses,
     cityCount: cityStats.length,
     topParticipant,
     topCity,
@@ -4192,7 +4179,7 @@ function buildPersistedSimulationReport() {
         label: 'Live odpowiedzi i bonusy',
         status: answersOk ? 'ok' : 'warning',
         badge: answersOk ? 'OK' : 'Uwaga',
-        message: `Baza zwróciła ${allAnswers.length} odpowiedzi oraz ${allBonuses.length} bonusów. Te liczby rosną stopniowo przy odświeżaniu panelu i tablicy.`
+        message: `Baza zwróciła ${adminTotals.answers} odpowiedzi oraz ${adminTotals.bonuses} bonusów. Te liczby rosną stopniowo przy odświeżaniu panelu i tablicy.`
       },
       {
         label: 'Punkty placówek',
@@ -4404,10 +4391,11 @@ async function loadData() {
       setTimeout(() => { document.body.style.boxShadow = 'none'; }, 300);
     }
 
-    prevAnswersCount = (data.answers || []).length;
+    prevAnswersCount = data.totals?.answers||0;
+    adminTotals=data.totals||{answers:0,bonuses:0,correct:0,wrong:0};
+    adminRound=data.roundStartedAt;
     allParticipants = data.participants || [];
-    allAnswers = data.answers || [];
-    allBonuses = data.bonuses || [];
+
     activeDataScope = data.dataScope || 'live';
     testModeEnabled = Boolean(data.testModeEnabled);
     testModeParticipantCount = Number(data.testParticipantCount || 0);
@@ -4415,7 +4403,7 @@ async function loadData() {
     questionCatalog = data.questionCatalog || [];
     bonusCatalog = data.bonusCatalog || [];
     liveActivity = data.liveActivity || { liveParticipants: [], hottestQuestions: [], recentActivity: [] };
-    questionStats = computeQuestionStats(allAnswers);
+    questionStats = data.questionStats || [];
     await gameStatePromise;
 
     updateSystemHealth({
@@ -4445,10 +4433,10 @@ async function loadData() {
 
 function updateStats() {
   document.getElementById('s-participants').textContent = allParticipants.length;
-  document.getElementById('s-answers').textContent = allAnswers.length;
-  document.getElementById('s-bonuses').textContent = allBonuses.length;
-  document.getElementById('s-correct').textContent = allAnswers.filter(a => a.correct).length;
-  document.getElementById('s-wrong').textContent = allAnswers.filter(a => !a.correct).length;
+  document.getElementById('s-answers').textContent = adminTotals.answers;
+  document.getElementById('s-bonuses').textContent = adminTotals.bonuses;
+  document.getElementById('s-correct').textContent = adminTotals.correct;
+  document.getElementById('s-wrong').textContent = adminTotals.wrong;
 
   const avg = allParticipants.length
     ? (allParticipants.reduce((sum, p) => sum + (p.score || 0), 0) / allParticipants.length).toFixed(1)
@@ -4463,21 +4451,8 @@ function populateAnswerFilters() {
   const prevQuestion = questionSelect.value;
   const prevCity = citySelect.value;
 
-  const questions = [...new Map(
-    allAnswers.map(answer => [
-      String(answer.questionId),
-      {
-        id: answer.questionId,
-        label: answer.questionText || `Pytanie ${answer.questionId}`
-      }
-    ])
-  ).values()].sort((a, b) => Number(a.id) - Number(b.id));
-
-  const cities = [...new Set(
-    allAnswers
-      .map(answer => (answer.participantCity || '').trim())
-      .filter(Boolean)
-  )].sort((a, b) => a.localeCompare(b, 'pl'));
+  const questions=questionCatalog.map(q=>({id:q.id,label:q.text}));
+  const cities=[...new Set(allParticipants.map(p=>p.city||'').filter(Boolean))].sort((a,b)=>a.localeCompare(b,'pl'));
 
   questionSelect.innerHTML = '<option value="all">Wszystkie pytania</option>' +
     questions.map(question => `<option value="${question.id}">${escHtml(question.label)}</option>`).join('');
@@ -4495,14 +4470,7 @@ function populateBonusFilters() {
   const prevBonus = bonusSelect.value;
   const prevCity = citySelect.value;
 
-  const cities = [...new Set(
-    allBonuses
-      .map((bonus) => {
-        const participant = allParticipants.find((item) => Number(item.id) === Number(bonus.participantId));
-        return (participant?.city || '').trim();
-      })
-      .filter(Boolean)
-  )].sort((a, b) => a.localeCompare(b, 'pl'));
+  const cities=[...new Set(allParticipants.map(p=>p.city||'').filter(Boolean))].sort((a,b)=>a.localeCompare(b,'pl'));
 
   bonusSelect.innerHTML = '<option value="all">Wszystkie bonusy</option>' +
     bonusCatalog.map((bonus) => `<option value="${escapeAttr(bonus.id)}">${escHtml(bonus.label)}</option>`).join('');
@@ -4719,37 +4687,9 @@ function renderLeaderboard() {
   renderCityRanking();
 }
 
-function renderAnswers() {
-  const query = document.getElementById('search-ans').value.toLowerCase();
-  const correctFilter = document.getElementById('filter-correct').value;
-  const questionFilter = document.getElementById('filter-question').value;
-  const cityFilter = document.getElementById('filter-city').value;
+function renderAnswerRows() {
   const body = document.getElementById('ans-body');
-
-  const list = [...allAnswers]
-    .filter(answer => {
-      const participantName = (answer.participantName || '').toLowerCase();
-      const questionText = (answer.questionText || `Pytanie ${answer.questionId}`).toLowerCase();
-      const answerText = (answer.answer || '').toLowerCase();
-      const participantCity = (answer.participantCity || '').toLowerCase();
-
-      const matchesQuery = !query ||
-        participantName.includes(query) ||
-        questionText.includes(query) ||
-        answerText.includes(query) ||
-        participantCity.includes(query);
-
-      const matchesCorrect =
-        correctFilter === 'all' ||
-        (correctFilter === 'correct' && !!answer.correct) ||
-        (correctFilter === 'wrong' && !answer.correct);
-
-      const matchesQuestion = questionFilter === 'all' || String(answer.questionId) === questionFilter;
-      const matchesCity = cityFilter === 'all' || (answer.participantCity || '') === cityFilter;
-
-      return matchesQuery && matchesCorrect && matchesQuestion && matchesCity;
-    })
-    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  const list = allAnswers;
 
   if (!list.length) {
     body.innerHTML = '<tr><td colspan="6" class="empty">Brak odpowiedzi dla wybranych filtrów.</td></tr>';
@@ -4776,30 +4716,10 @@ function renderAnswers() {
   }).join('');
 }
 
-function renderBonuses() {
-  const query = document.getElementById('search-bonuses').value.toLowerCase();
-  const bonusFilter = document.getElementById('filter-bonus-id').value;
-  const cityFilter = document.getElementById('filter-bonus-city').value;
+function renderBonusRows() {
   const body = document.getElementById('bonus-body');
   const meta = document.getElementById('bonus-meta');
-
-  const list = [...allBonuses]
-    .map((bonus) => {
-      const participant = allParticipants.find((item) => Number(item.id) === Number(bonus.participantId)) || {};
-      return {
-        ...bonus,
-        participantName: `${participant.firstName || ''} ${participant.lastName || ''}`.trim() || '—',
-        participantCity: participant.city || '—'
-      };
-    })
-    .filter((bonus) => {
-      const searchable = `${bonus.participantName} ${bonus.participantCity} ${bonus.bonusLabel || bonus.bonusId}`.toLowerCase();
-      const matchesQuery = !query || searchable.includes(query);
-      const matchesBonus = bonusFilter === 'all' || bonus.bonusId === bonusFilter;
-      const matchesCity = cityFilter === 'all' || bonus.participantCity === cityFilter;
-      return matchesQuery && matchesBonus && matchesCity;
-    })
-    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  const list = allBonuses;
 
   meta.textContent = `Pokazano ${list.length} z ${allBonuses.length} odebranych bonusów. Każdy bonus daje 1 punkt do wyniku.`;
 
@@ -4968,17 +4888,17 @@ function formatDateTime(value) {
   });
 }
 
-function openParticipantModal(participantId) {
+function renderParticipantModal(participantId) {
   const participant = allParticipants.find(item => Number(item.id) === Number(participantId));
   if (!participant) return;
   currentParticipantId = Number(participantId);
 
-  const participantAnswers = allAnswers
+  const participantAnswers = participantDetails.answers
     .filter(answer => Number(answer.participantId) === Number(participantId))
     .sort((a, b) => a.questionId - b.questionId || new Date(a.createdAt) - new Date(b.createdAt));
   const participantPassedAnswers = participantAnswers.filter(answer => Boolean(answer.correct));
 
-  const participantBonuses = allBonuses
+  const participantBonuses = participantDetails.bonuses
     .filter(bonus => Number(bonus.participantId) === Number(participantId))
     .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
@@ -5067,7 +4987,7 @@ async function adjustParticipant(action) {
       body: JSON.stringify({
         participantId: currentParticipantId,
         action,
-        bonusId: bonusId || null
+        ...(bonusId ? {bonusId} : {})
       })
     });
 
@@ -5077,7 +4997,7 @@ async function adjustParticipant(action) {
     }
 
     await loadData();
-    openParticipantModal(currentParticipantId);
+    await openParticipantModal(currentParticipantId);
     setParticipantAdjustFeedback(data.message || 'Korekta została zapisana.', 'success');
   } catch (error) {
     console.error(error);
@@ -5985,5 +5905,6 @@ window.addEventListener('orientationchange', updateViewportHeight);
 window.addEventListener('pageshow', updateViewportHeight);
 initializeAdminAccess();
 </script>
+<script src="/admin/admin-data.js"></script>
 </body>
 </html>

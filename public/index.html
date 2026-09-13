@@ -1816,6 +1816,7 @@ textarea {
 <script src="/view-loading.js"></script>
 <meta name="theme-color" content="#e81e63">
 <link rel="stylesheet" href="/mobile-canvas.css">
+<script src="/game-clock.js"></script>
 </head>
 <body>
 <div id="view-loading" role="status" aria-live="polite"><div class="view-loading-card"><div class="event-brand">Gwiazdka One Day 2026</div><span class="view-loading-spinner" aria-hidden="true"></span><p id="view-loading-message">Wczytujemy grę…</p><button id="view-loading-retry" type="button" hidden onclick="location.reload()">Odśwież stronę</button></div></div>
@@ -2060,8 +2061,8 @@ textarea {
     <p>Gra dobieg&#322;a ko&#324;ca. Za chwil&#281; zaczynamy specjalny pokaz i rozdanie upomink&oacute;w dla uczestnik&oacute;w.</p>
     <div class="status-finale-place">Miejsce: Teatr</div>
     <div class="status-finale-countdown">
-      <span class="status-finale-label">Do podsumowania zosta&#322;o</span>
-      <div class="status-finale-time" data-summary-remaining>05:00</div>
+      <span class="status-finale-label">Wyniki ogłasza organizator</span>
+      <div class="status-finale-time" data-summary-remaining style="font-size:clamp(18px,5vw,26px)">Czekamy na finał</div>
     </div>
     <div class="badge-board" style="margin-top:14px;">
       <div class="badge-board-title">Zdobyte odznaki</div>
@@ -2130,7 +2131,7 @@ textarea {
 <script src="/player-network.js"></script>
 <script>
 let serverClockOffset = 0;
-function gameNow() { return Date.now() + serverClockOffset; }
+function gameNow() { return GameClock.now(); }
 let participantId = null;
 let participantSessionUnavailable = false;
 let currentQuestion = null;
@@ -2947,15 +2948,7 @@ function renderGameRemaining() {
 }
 
 function getSummaryCountdownTarget() {
-  if (activeGameState.summaryAt) return new Date(activeGameState.summaryAt).getTime();
-  if (activeGameState.endedAt) return new Date(activeGameState.endedAt).getTime() + (5 * 60000);
-  if (activeGameState.startedAt) {
-    const endTime = new Date(activeGameState.startedAt).getTime() + (Number(activeGameState.durationMinutes || 180) * 60000);
-    if (gameNow() >= endTime) {
-      return endTime + (5 * 60000);
-    }
-  }
-  return null;
+  return activeGameState.summaryAt ? Date.parse(activeGameState.summaryAt) : null;
 }
 
 function renderSummaryCountdown() {
@@ -2966,8 +2959,8 @@ function renderSummaryCountdown() {
 
   if (!summaryTarget) {
     targets.forEach((el) => {
-      if (el.innerText !== '00:00') {
-        el.innerText = '00:00';
+      if (el.innerText !== 'Czekamy na finał') {
+        el.innerText = 'Czekamy na finał';
       }
     });
     return;
@@ -3365,7 +3358,7 @@ async function loadGameState(options = {}) {
         const savedTime = /^\d+$/.test(savedRound) ? Number(savedRound) : Date.parse(savedRound);
         if (savedRound && savedTime !== Date.parse(data.started_at)) resetLocalParticipantSession();
       }
-      serverClockOffset = data.serverNow ? Date.parse(data.serverNow) - Date.now() : 0;
+      GameClock.sync(data.serverNow);
       activeGameState = {
         startedAt: data.started_at || null,
         endedAt: data.ended_at || null,

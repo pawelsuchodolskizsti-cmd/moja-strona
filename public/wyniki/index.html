@@ -9,6 +9,8 @@
 <link rel="stylesheet" href="/event-brand.css">
 <meta name="theme-color" content="#e81e63">
 <link rel="stylesheet" href="/mobile-canvas.css">
+<script src="/game-ranking.js"></script>
+<script src="/game-clock.js"></script>
 </head>
 <body class="spectator-page">
   <div class="screen">
@@ -191,26 +193,8 @@ function formatTimer(ms) {
 }
 
 function getRemainingMs() {
-  if (['active','paused'].includes(scoreboardState.phase) && scoreboardState.startedAt) {
-    const endTime = new Date(scoreboardState.startedAt).getTime() + Number(scoreboardState.durationMinutes || 180) * 60000;
-    return endTime - Date.now();
-  }
-
-  if (scoreboardState.startedAt) {
-    const endTime = new Date(scoreboardState.startedAt).getTime() + Number(scoreboardState.durationMinutes || 180) * 60000;
-    if (Date.now() >= endTime) {
-      return endTime + (5 * 60000) - Date.now();
-    }
-  }
-
-  if (scoreboardState.summaryAt) {
-    return new Date(scoreboardState.summaryAt).getTime() - Date.now();
-  }
-
-  if (scoreboardState.endedAt) {
-    return new Date(scoreboardState.endedAt).getTime() + (5 * 60000) - Date.now();
-  }
-
+  if (['active','paused'].includes(scoreboardState.phase) && scoreboardState.startedAt)
+    return Date.parse(scoreboardState.startedAt)+Number(scoreboardState.durationMinutes||180)*60000-GameClock.now();
   return null;
 }
 
@@ -233,8 +217,8 @@ function getResultsRevealState() {
   const lockedByFinale = isSuspenseMode() || scoreboardState.phase === 'ended' || scoreboardState.phase === 'thanks';
   return {
     lockedByFinale,
-    participantsVisible: !lockedByFinale || raw.participants,
-    citiesVisible: !lockedByFinale || raw.cities
+    participantsVisible: !isSuspenseMode() && (!lockedByFinale || raw.participants),
+    citiesVisible: !isSuspenseMode() && (!lockedByFinale || raw.cities)
   };
 }
 
@@ -283,7 +267,7 @@ function getMovementPill(movement) {
 }
 
 function getActiveRankMovement(id) {
-  if (!rankMovementsExpiresAt || Date.now() > rankMovementsExpiresAt) return null;
+  if (!rankMovementsExpiresAt || GameClock.now() > rankMovementsExpiresAt) return null;
   return rankMovements.get(id) || null;
 }
 
@@ -330,11 +314,7 @@ function getCityStats() {
       ...item,
       averageScore: item.participants ? Number(item.score || 0) / item.participants : 0
     }))
-    .sort((a, b) =>
-      b.score - a.score ||
-      b.participants - a.participants ||
-      a.city.localeCompare(b.city, 'pl')
-    );
+    .sort(GameRanking.compareCities);
   cachedCityStatsKey = cacheKey;
   return cachedCityStats;
 }
@@ -382,8 +362,7 @@ function getCityLeaders() {
       .sort((a, b) =>
         b.averageScore - a.averageScore ||
         b.score - a.score ||
-        b.participants - a.participants ||
-        a.city.localeCompare(b.city, 'pl')
+        GameRanking.compareCities(a,b)
       )
       .slice(0, 3);
     cachedCityLeadersKey = cacheKey;
@@ -426,8 +405,8 @@ function renderHeader() {
     timerLabel.textContent = 'Do końca gry';
   } else if (scoreboardState.phase === 'ended') {
     headline.textContent = 'Finał i podsumowanie';
-    subline.textContent = 'Gra została zatrzymana. Ekran odlicza teraz czas do podsumowania i przejścia do Teatru.';
-    timerLabel.textContent = 'Do podsumowania';
+    subline.textContent = 'Gra dobiegła końca. Wyniki odsłania organizator podczas finału w Teatrze.';
+    timerLabel.textContent = 'Wyniki ogłasza organizator';
   } else if (scoreboardState.phase === 'thanks') {
     headline.textContent = 'Dziękujemy za udział';
     subline.textContent = 'Gra i podsumowanie zostały zakończone. Ekran pozostaje w trybie końcowym.';
@@ -441,7 +420,7 @@ function renderHeader() {
   const remaining = getRemainingMs();
   timerValue.textContent = scoreboardState.phase === 'idle'
     ? '-'
-    : (remaining !== null && remaining > 0 ? formatTimer(remaining) : '00:00');
+    : scoreboardState.phase==='ended' ? 'FINAŁ' : scoreboardState.phase==='thanks' ? 'DZIĘKUJEMY' : (remaining !== null && remaining > 0 ? formatTimer(remaining) : '00:00');
   if (timerNote) timerNote.textContent = '';
 }
 
@@ -483,7 +462,7 @@ function renderAnnouncement() {
 function renderStats() {
   const liveAgo = document.getElementById('live-ago');
   if (liveAgo && scoreboardFetchedAt) {
-    const secs = Math.round((Date.now() - scoreboardFetchedAt) / 1000);
+    const secs = Math.round((GameClock.now() - scoreboardFetchedAt) / 1000);
     const stale = secs > 10;
     liveAgo.textContent = secs < 60 ? `${secs}s temu` : `${Math.floor(secs/60)}m temu`;
     liveAgo.classList.toggle('stale', stale);
@@ -697,7 +676,7 @@ function renderAll() {
 
 async function loadScoreboard(force = false) {
   if (!force && scoreboardLoadPromise) return scoreboardLoadPromise;
-  if (!force && scoreboardFetchedAt && (Date.now() - scoreboardFetchedAt) < SCOREBOARD_CACHE_MS) {
+  if (!force && scoreboardFetchedAt && (GameClock.now() - scoreboardFetchedAt) < SCOREBOARD_CACHE_MS) {
     return scoreboardState;
   }
 
@@ -705,6 +684,7 @@ async function loadScoreboard(force = false) {
     scoreboardLoadPromise = (async () => {
       const res = await fetch('/api/public-scoreboard');
       const data = await res.json();
+      GameClock.sync(data.serverNow);
       if (!res.ok || data.error) {
         throw new Error(data.error || 'Nie udało się pobrać danych ekranu wyników.');
       }
@@ -732,12 +712,12 @@ async function loadScoreboard(force = false) {
       });
 
       rankMovements = nextRankMovements;
-      rankMovementsExpiresAt = nextRankMovements.size ? Date.now() + 2600 : 0;
+      rankMovementsExpiresAt = nextRankMovements.size ? GameClock.now() + 2600 : 0;
 
       const leaderboardSignature = JSON.stringify(incomingLeaderboard.map((p,index) =>
         [getParticipantKey(p),p.rank||index+1,p.name,p.city,p.institutionId,p.score,p.answeredCount]));
       const citySignature = JSON.stringify(incomingCityStats.map(c =>
-        [c.city,c.institutionId,c.score,c.participants,c.answers,c.averageScore]));
+        [c.city,c.institutionId,c.score,c.participants,c.answers,c.averageScore,c.scoreAt]));
       const nextVersion = [
         data.updatedAt || 'none',
         data.phase || 'idle',data.technicalPauseText||'',
@@ -761,7 +741,7 @@ async function loadScoreboard(force = false) {
         cityStats: incomingCityStats,
         resultsReveal: data.resultsReveal || { participantsAt: null, citiesAt: null }
       };
-      scoreboardFetchedAt = Date.now();
+      scoreboardFetchedAt = GameClock.now();
       const recoveredConnection = scoreboardConnectionFailed;
       scoreboardConnectionFailed = false;
       document.body.classList.remove("connection-lost");
@@ -798,7 +778,7 @@ async function loadScoreboard(force = false) {
 
 function scheduleScoreboardRefresh(force = false) {
   if (document.hidden) return;
-  const now = Date.now();
+  const now = GameClock.now();
   if (!force && (now - lastScoreboardSyncAt) < SCOREBOARD_SYNC_COOLDOWN_MS) {
     return;
   }
