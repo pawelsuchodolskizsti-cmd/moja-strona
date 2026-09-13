@@ -58,7 +58,7 @@
         <div class="section-head">
           <div>
             <div class="section-title">Najlepsi uczestnicy</div>
-            <div class="section-copy">Pokazujemy tylko najmocniejsza czolowke, zeby ekran pozostawal czytelny nawet z daleka.</div>
+            <div class="section-copy">Dziesięciu najlepszych uczestników w aktualnym zestawieniu.</div>
           </div>
           <div class="board-tools">
             <select class="sort-select" id="leaderboard-sort" onchange="setScoreboardSort(this.value)">
@@ -68,7 +68,7 @@
             </select>
           </div>
         </div>
-        <div class="list" id="leaderboard-list"></div>
+        <div class="list" id="leaderboard-list" tabindex="0" aria-label="Dziesięciu najlepszych uczestników"></div>
       </section>
     </div>
 
@@ -545,8 +545,7 @@ function renderCityPodium() {
 function renderLeaderboardList() {
   const container = document.getElementById('leaderboard-list');
   const revealState = getResultsRevealState();
-  const projectionMode = document.body.classList.contains('projection-mode');
-  const sorted = getSortedLeaderboard().slice(0, projectionMode ? 3 : 5);
+  const sorted = getSortedLeaderboard().slice(0, 10);
 
   if (!revealState.participantsVisible) {
     container.innerHTML = getRevealLockMarkup('Wyniki uczestników są zasłonięte', 'Tablica trzyma napięcie do momentu, gdy admin uruchomi pierwsze odsłonięcie.', 'Pierwszy etap odsłonięcia');

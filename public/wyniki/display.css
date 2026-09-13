@@ -85,3 +85,9 @@ button,select{font:inherit}button,select{cursor:pointer}button:focus-visible,sel
 .city-grid{grid-auto-rows:minmax(min-content,1fr)}
 @media(max-width:700px){.podium-item{grid-template-columns:46px minmax(0,1fr) auto;column-gap:12px}.podium-number{font-size:26px}}
 @media(max-width:1099px),(max-height:649px){.city-grid{max-height:380px;overflow-y:auto;grid-auto-rows:auto}}
+
+/* Keep the podium still; scrolling elsewhere remains available without visible tracks. */
+html,body,.screen *{scrollbar-width:none;-ms-overflow-style:none}
+html::-webkit-scrollbar,body::-webkit-scrollbar,.screen *::-webkit-scrollbar{display:none;width:0;height:0}
+#podium{overflow:visible}
+@media(max-width:1099px),(max-height:649px){#leaderboard-list{max-height:460px;overflow-y:auto}}

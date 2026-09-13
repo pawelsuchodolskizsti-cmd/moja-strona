@@ -1,7 +1,7 @@
 // Slowly expose overflow on an unattended display. Manual interaction pauses it.
 (() => {
   const states = new WeakMap();
-  const selectors = '.sidebar-list,.city-grid,.podium-grid,.list,.announcement-content,.hero-main';
+  const selectors = '.sidebar-list,.city-grid,.list,.announcement-content,.hero-main';
   const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)');
   let previous = performance.now();
   document.addEventListener('wheel', pause, {passive:true});
