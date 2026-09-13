@@ -92,3 +92,9 @@ Wolontariusz widzi zgłoszenia swojego punktu, tworzy pytania i usterki ogólne 
 Sesja wolontariusza używa oddzielnego losowego tokenu w HttpOnly/SameSite cookie (12 godzin), a hasło ma solony skrót scrypt. Serwer sprawdza przypisanie przy każdym żądaniu. Zmiana imienia lub przełącznika dostępu unieważnia poprzednie sesje. Limit logowania działa w bazie: 30 prób na adres IP w 10 minut. Blokada techniczna bonusu nie blokuje dostępu wolontariusza. Zgłoszenia i konta są wspólne dla rzeczywistego wydarzenia, niezależne od symulacji TEST i zachowywane po resetowaniu gry. Nie zmieniają punktacji ani stanu kodów.
 
 Tabele `volunteer_accounts`, `volunteer_sessions`, `volunteer_login_attempts`, `volunteer_tickets` i `volunteer_messages` tworzy wersjonowana migracja `volunteer-desk` v1. Nowe API: `volunteer-session`, `volunteer-tickets`, `admin-volunteers`. Wolontariusz nie otrzymuje listy haseł, poprawnych odpowiedzi ani zgłoszeń innych punktów.
+
+## Widoki mobilne i tło
+
+Wspólny arkusz `public/mobile-canvas.css` przypisuje tło do całego dokumentu, który rośnie wraz z treścią. Usuwa ograniczenie wysokości głównego elementu przez `-webkit-fill-available`, ustawia minimalną wysokość widoku przez `dvh` z zapasem dla starszych przeglądarek i zachowuje kolory poszczególnych paneli. Widoki korzystają z `viewport-fit=cover` oraz odstępów `safe-area-inset-*`. Reguły wspólnego tła dotyczą wyłącznie ekranu, nie wydruków QR.
+
+Sprawdzono dziewięć widoków w WebKit z emulacją iPhone’a przy szerokościach 320–844 px, zmianę wysokości przy aktywnym polu pytania i bonusu oraz wydłużanie i skracanie treści panelu. Weryfikacja obejmuje brak poziomego przepełnienia i tło na całej wysokości dokumentu. Są to testy silnika przeglądarki i emulacji, nie fizycznego iPhone’a.

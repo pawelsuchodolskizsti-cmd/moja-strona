@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="pl" class="view-pending">
+<html data-page-surface="admin" lang="pl" class="view-pending">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Panel Organizatora - Gwiazdka One Day 2026</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
@@ -2038,7 +2038,7 @@
 
   @media (max-width: 700px) {
     body {
-      padding: 24px 14px 40px;
+      padding: max(24px, env(safe-area-inset-top)) max(14px, env(safe-area-inset-right)) max(40px, env(safe-area-inset-bottom)) max(14px, env(safe-area-inset-left));
     }
 
     h1 {
@@ -2121,6 +2121,8 @@
 <link rel="stylesheet" href="/event-brand.css">
 <link rel="stylesheet" href="/view-loading.css">
 <script src="/view-loading.js"></script>
+<meta name="theme-color" content="#090b10">
+<link rel="stylesheet" href="/mobile-canvas.css">
 </head>
 <body>
 <div id="view-loading" role="status" aria-live="polite"><div class="view-loading-card"><div class="event-brand">Gwiazdka One Day 2026</div><span class="view-loading-spinner" aria-hidden="true"></span><p id="view-loading-message">Otwieramy panel…</p><button id="view-loading-retry" type="button" hidden onclick="location.reload()">Odśwież stronę</button></div></div>

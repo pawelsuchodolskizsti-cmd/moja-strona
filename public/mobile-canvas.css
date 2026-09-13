@@ -1,0 +1,17 @@
+/* The document owns the background, including Safari's exposed canvas at its edges. */
+@media screen {
+  html[data-page-surface] {height:auto;min-height:100%;background-color:var(--canvas-color,#e81e63)}
+  html[data-page-surface="game"] {--canvas-color:#e81e63;background:#e81e63 url('/tlo-gry.png') no-repeat center/cover}
+  html[data-page-surface="admin"] {--canvas-color:#090b10}
+  html[data-page-surface="qr"] {--canvas-color:#09111c}
+  html[data-page-surface="institutions"] {--canvas-color:#efeffd}
+  html[data-page-surface="rules"] {--canvas-color:#f5f2fa}
+  html[data-page-surface] body {height:auto;min-height:var(--app-height,100vh);min-height:100dvh;background-color:var(--canvas-color)}
+  html[data-page-surface="game"] body {background:transparent}
+  html[data-page-surface="qr"] body {padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px)}
+  html[data-page-surface] body.spectator-page {--page-edge:24px;padding:max(var(--page-edge),env(safe-area-inset-top,0px)) max(var(--page-edge),env(safe-area-inset-right,0px)) max(var(--page-edge),env(safe-area-inset-bottom,0px)) max(var(--page-edge),env(safe-area-inset-left,0px))}
+  @media(min-width:1100px) and (min-height:650px) {html[data-page-surface] body.spectator-page {--page-edge:18px}}
+  @media(min-width:1600px) and (min-height:850px) {html[data-page-surface] body.spectator-page {--page-edge:26px}}
+  @media(max-width:1099px),(max-height:649px) {html[data-page-surface] body.spectator-page {--page-edge:18px}}
+  @media(max-width:700px) {html[data-page-surface] body.spectator-page {--page-edge:12px}}
+}
