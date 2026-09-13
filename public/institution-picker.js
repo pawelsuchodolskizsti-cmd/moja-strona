@@ -23,12 +23,13 @@
       return terms.every(term=>words.some(word=>word.includes(term)||near(term,word)));
     });
     list.replaceChildren();highlight=-1;
-    for(const item of matches.slice(0,30)){
+    for(const item of matches){
       const option=document.createElement('button');option.type='button';option.role='option';option.id=`institution-option-${item.id}`;option.dataset.id=item.id;option.setAttribute('aria-selected','false');
       option.textContent=`${item.name} - ${item.city}`;option.onmousedown=e=>e.preventDefault();option.onclick=()=>choose(item);list.append(option);
     }
     list.hidden=!matches.length;input.setAttribute('aria-expanded',String(!list.hidden));input.removeAttribute('aria-activedescendant');
-    status.textContent=matches.length ? `Wybierz swoją placówkę z listy${matches.length>30?' - wpisz więcej znaków, aby zawęzić wyniki':''}.` : 'Brak pasujących placówek. Sprawdź nazwę lub zgłoś brak organizatorowi.';
+    list.scrollTop=0;
+    status.textContent=matches.length ? 'Wybierz swoją placówkę. Listę możesz przewijać lub zawęzić, wpisując nazwę albo miasto.' : 'Brak pasujących placówek. Sprawdź nazwę lub zgłoś brak organizatorowi.';
   }
   input.addEventListener('input',()=>{selected=null;idInput.value='';render()});
   input.addEventListener('focus',()=>{if(!selected)render()});
@@ -37,7 +38,7 @@
     if(event.key==='ArrowDown'||event.key==='ArrowUp'){
       event.preventDefault();if(list.hidden)render();const options=[...list.children];if(!options.length)return;
       highlight=(highlight+(event.key==='ArrowDown'?1:-1)+options.length)%options.length;
-      options.forEach((option,i)=>{option.setAttribute('aria-selected',String(i===highlight));if(i===highlight){input.setAttribute('aria-activedescendant',option.id);option.scrollIntoView({block:'nearest'});}});
+      options.forEach((option,i)=>{option.setAttribute('aria-selected',String(i===highlight));if(i===highlight){input.setAttribute('aria-activedescendant',option.id);const item=option.getBoundingClientRect(),box=list.getBoundingClientRect();if(item.top<box.top+list.clientTop)list.scrollTop+=item.top-box.top-list.clientTop;else if(item.bottom>box.top+list.clientTop+list.clientHeight)list.scrollTop+=item.bottom-box.top-list.clientTop-list.clientHeight;}});
     }
     if(event.key==='Enter'&&!list.hidden){event.preventDefault();if(highlight>=0)list.children[highlight].click();}
   });
