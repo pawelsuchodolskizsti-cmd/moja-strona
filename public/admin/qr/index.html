@@ -619,6 +619,7 @@ h1 {
 }
 </style>
 <script src="/admin/qr/qr-zip.js"></script>
+<link rel="stylesheet" href="/admin/admin-navigation.css">
 </head>
 <body>
   <div class="page">
@@ -742,6 +743,7 @@ h1 {
   </div>
 
   <script src="/admin/admin-session.js"></script>
+<script src="/admin/admin-navigation.js"></script>
 <script src="/admin/qr-catalog.js"></script>
   <script>
   function isSafariBrowser() {
@@ -1219,6 +1221,7 @@ function normalizeOrigin(value) { try { const url=new URL(String(value||window.l
 
   async function loadDetailsCatalog() {
     if(!await AdminSession.check()){AdminSession.redirect();return;}
+    AdminNavigation.mountAux('qr');
     try {
       const origin = normalizeOrigin(document.getElementById('base-origin').value);
       const response = await AdminSession.fetch('/api/admin-results');

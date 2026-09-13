@@ -2117,6 +2117,7 @@
     }
   }
 </style>
+<link rel="stylesheet" href="/admin/admin-navigation.css">
 </head>
 <body>
 <div class="auth-shell" id="admin-login-screen" style="display:none">
@@ -2511,7 +2512,7 @@
 
   <div id="tab-leaderboard">
     <div class="toolbar">
-      <input type="text" id="search-lb" placeholder="Szukaj po imieniu, nazwisku lub mieście..." oninput="renderLeaderboard()">
+      <input type="text" id="search-lb" placeholder="Szukaj po imieniu, nazwisku lub placówce..." oninput="renderLeaderboard()">
       <select id="sort-lb" onchange="renderLeaderboard()">
         <option value="score">Sortuj: punkty</option>
         <option value="city">Sortuj: placówka A-Z</option>
@@ -2595,7 +2596,7 @@
 
   <div id="tab-bonuses" style="display:none">
     <div class="toolbar">
-      <input type="text" id="search-bonuses" placeholder="Szukaj po uczestniku, mieście lub bonusie..." oninput="renderBonuses()">
+      <input type="text" id="search-bonuses" placeholder="Szukaj po uczestniku, placówce lub bonusie..." oninput="renderBonuses()">
       <select id="filter-bonus-id" onchange="renderBonuses()">
         <option value="all">Wszystkie bonusy</option>
       </select>
@@ -2752,6 +2753,7 @@
 </div>
 
 <script src="/admin/admin-session.js"></script>
+<script src="/admin/admin-navigation.js"></script>
 <script src="/game-ranking.js"></script>
 <script src="/admin/qr-catalog.js"></script>
 <script>
@@ -2776,7 +2778,7 @@ let resultsCitiesRevealedAt = null;
 let previewMode = 'current';
 let pendingAction = null;
 let pendingActionScope = null;
-let currentTab = 'leaderboard';
+let currentTab = 'home';
 let isStateLoading = false;
 let pendingStateReload = false;
 let isDataLoading = false;
@@ -2883,6 +2885,7 @@ function toggleEventMode() {
 
 function applyAdminAccessState(isUnlocked) {
   adminUnlocked = isUnlocked;
+  AdminNavigation.access(isUnlocked);
   const loginScreen = document.getElementById('admin-login-screen');
   const adminShell = document.getElementById('admin-shell');
 
@@ -2903,6 +2906,7 @@ function isAdminAuthenticated() { return adminUnlocked; }
 
 function bootAdminPanel() {
   if (!adminUnlocked) return;
+  AdminNavigation.init();
   loadData();
   loadGameState();
 
@@ -3003,7 +3007,7 @@ function renderSystemBar() {
     level = 'error';
     badgeText = 'Problem';
     titleText = 'Jest problem';
-    messageText = 'Szybki test wykrył problem. Sprawdź listę po prawej stronie i popraw błędny moduł.';
+    messageText = 'Szybki test wykrył problem. Sprawdź listę w sekcji Testy i ustawienia i popraw błędny moduł.';
   } else if (systemHealth.integrity === 'error') {
     level = 'error';
     badgeText = 'Problem';
@@ -3114,6 +3118,7 @@ function getGameRemainingMs() {
 }
 
 function renderOpsState() {
+  AdminNavigation.updateScope(activeDataScope);
   const durationChip = document.getElementById('duration-chip');
   const announcementChip = document.getElementById('announcement-chip');
   const announcementMeta = document.getElementById('announcement-meta');
@@ -3155,7 +3160,8 @@ function renderVisibleData() {
     return;
   }
 
-  renderLeaderboard();
+  if (currentTab === 'leaderboard') renderLeaderboard();
+  if (currentTab === 'institution-ranking') renderCityRanking();
 }
 
 function clearAnnouncementField() {
@@ -5081,17 +5087,7 @@ function setPreviewMode(mode, element) {
   renderPlayerPreview();
 }
 
-function showTab(tab, element) {
-  currentTab = tab;
-  document.getElementById('tab-live').style.display = tab === 'live' ? 'block' : 'none';
-  document.getElementById('tab-leaderboard').style.display = tab === 'leaderboard' ? 'block' : 'none';
-  document.getElementById('tab-answers').style.display = tab === 'answers' ? 'block' : 'none';
-  document.getElementById('tab-bonuses').style.display = tab === 'bonuses' ? 'block' : 'none';
-  document.getElementById('tab-question-stats').style.display = tab === 'question-stats' ? 'block' : 'none';
-  document.querySelectorAll('.tab').forEach(tabButton => tabButton.classList.remove('active'));
-  element.classList.add('active');
-  renderVisibleData();
-}
+function showTab(tab) { AdminNavigation.show(tab); }
 
 function getQrCenterUrl(mode = '') {
   const url = new URL('/admin/qr/', window.location.origin);
