@@ -3,7 +3,7 @@
 .instruction-dots { display:flex; justify-content:center; gap:8px; margin-bottom:24px; }
 .instruction-dots span { height:5px; width:40px; border-radius:8px; background:#e8d9ed; }
 .instruction-dots .active { background:#b830a7; }
-.instruction-icon { width:100px; height:100px; margin:0 auto 24px; display:grid; place-items:center; border-radius:30px; background:linear-gradient(140deg,#f8e5f7,#e6f4ff); color:#913c99; font-family:'Syne',sans-serif; font-size:36px; font-weight:800; border:1px solid #fff; }
+.instruction-icon { width:100px; height:100px; margin:0 auto 24px; display:grid; place-items:center; border-radius:30px; background:linear-gradient(140deg,#f8e5f7,#e6f4ff); color:#913c99; font-family:'Syne',sans-serif; font-size:36px; font-weight:800; white-space:nowrap; line-height:1; border:1px solid #fff; }
 #instruction-screen h1 { font-size:28px; line-height:1.15; margin:0 0 16px; outline:none; }
 .instruction-copy { color:#634c6a; font-size:15px; line-height:1.65; margin-bottom:24px; }
 .instruction-back { background:transparent; color:#765179; border:0; padding:14px 24px; font:inherit; cursor:pointer; }
@@ -20,7 +20,7 @@
 .bonus-card .badge-chip-name { font-size:12px; font-weight:800; }
 .bonus-card .badge-chip-text { font-size:11px; line-height:1.5; color:#68596b; }
 .micro-toast-stack { top:auto; bottom:16px; pointer-events:none; padding-bottom:env(safe-area-inset-bottom,0px); }
-@media (max-width:430px) { #instruction-screen h1 {font-size:25px;} .instruction-icon {width:80px;height:80px;margin-bottom:18px;} }
+@media (max-width:430px) { #instruction-screen h1 {font-size:25px;} .instruction-icon {width:80px;height:80px;margin-bottom:18px;font-size:28px;} }
 .institution-picker {text-align:left; margin-bottom:14px;}
 #institution-options {max-height:230px;overflow:auto;border:1px solid #d7c4e5;border-radius:12px;background:#fff;margin-top:6px;}
 #institution-options[hidden] {display:none;}
