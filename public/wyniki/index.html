@@ -2219,7 +2219,7 @@ let scoreboardState = {
   startedAt: null,
   endedAt: null,
   summaryAt: null,
-  durationMinutes: 10,
+  durationMinutes: 180,
   announcementText: '',
   announcementUpdatedAt: null,
   updatedAt: null,
@@ -2289,12 +2289,12 @@ function formatTimer(ms) {
 
 function getRemainingMs() {
   if (['active','paused'].includes(scoreboardState.phase) && scoreboardState.startedAt) {
-    const endTime = new Date(scoreboardState.startedAt).getTime() + Number(scoreboardState.durationMinutes || 10) * 60000;
+    const endTime = new Date(scoreboardState.startedAt).getTime() + Number(scoreboardState.durationMinutes || 180) * 60000;
     return endTime - Date.now();
   }
 
   if (scoreboardState.startedAt) {
-    const endTime = new Date(scoreboardState.startedAt).getTime() + Number(scoreboardState.durationMinutes || 10) * 60000;
+    const endTime = new Date(scoreboardState.startedAt).getTime() + Number(scoreboardState.durationMinutes || 180) * 60000;
     if (Date.now() >= endTime) {
       return endTime + (5 * 60000) - Date.now();
     }

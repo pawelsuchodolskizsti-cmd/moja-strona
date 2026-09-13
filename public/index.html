@@ -1809,9 +1809,10 @@ textarea {
   }
 }
 </style>
+<link rel="stylesheet" href="/player-experience.css">
 </head>
 <body>
-<div class="micro-toast-stack" id="micro-toast-stack"></div>
+<div class="micro-toast-stack" id="micro-toast-stack" role="status" aria-live="polite" aria-atomic="false"></div>
 
 <!-- === LOGIN SCREEN === -->
 <div class="card" id="login-screen">
@@ -1943,7 +1944,7 @@ textarea {
       </div>
     </div>
     <div class="badge-board">
-      <div class="badge-board-title">Twoje odznaki</div>
+      <div class="badge-board-title">Twoje kamienie milowe</div>
       <div class="badge-list" data-badge-list></div>
     </div>
   </div>
@@ -2002,7 +2003,7 @@ textarea {
       </div>
     </div>
     <div class="badge-board">
-      <div class="badge-board-title">Twoje odznaki</div>
+      <div class="badge-board-title">Twoje kamienie milowe</div>
       <div class="badge-list" data-badge-list></div>
     </div>
   </div>
@@ -2087,7 +2088,27 @@ textarea {
   </div>
 </div>
 
+
+<div class="card" id="instruction-screen" style="display:none">
+  <div class="partners-row" aria-label="Partnerzy wydarzenia">
+    <img class="partner-logo" src="/fundacjaoneday.svg" alt="Fundacja One Day">
+    <img class="partner-logo energy" src="/energyliandia.svg" alt="Energylandia">
+  </div>
+  <div class="logo">Gwiazdka One Day 2026</div>
+  <div class="announcement-box" data-announcement><span class="announcement-label">Komunikat organizatora</span><div class="announcement-text"></div></div>
+  <div class="instruction-step" data-instruction-step>Krok 1 z 3</div>
+  <div class="instruction-dots" aria-hidden="true"><span data-instruction-dot></span><span data-instruction-dot></span><span data-instruction-dot></span></div>
+  <div class="instruction-icon" data-instruction-icon aria-hidden="true">QR</div>
+  <h1 data-instruction-title tabindex="-1"></h1>
+  <p class="instruction-copy" data-instruction-copy></p>
+  <div class="game-remaining"><span class="game-remaining-label" data-game-remaining-label>Do końca gry zostało</span><div class="game-remaining-value" data-game-remaining>--:--</div></div>
+  <button class="btn" type="button" data-instruction-next>Dalej</button>
+  <button class="instruction-back" type="button" data-instruction-back hidden>Wstecz</button>
+</div>
+<script src="/player-experience.js"></script>
 <script>
+let serverClockOffset = 0;
+function gameNow() { return Date.now() + serverClockOffset; }
 let participantId = null;
 let currentQuestion = null;
 let hasOpenedLogin = false;
@@ -2097,7 +2118,7 @@ let activeGameState = {
   startedAt: null,
   endedAt: null,
   summaryAt: null,
-  durationMinutes: 10,
+  durationMinutes: 180,
   announcementText: '',
   announcementUpdatedAt: null,
   technicalPauseActive: false,
@@ -2113,7 +2134,6 @@ let summaryRemainingElements = [];
 let announcementElements = [];
 let statsHydrated = false;
 let shownMicroToastKeys = new Set();
-let shownBadgeIds = new Set();
 let gameStateFetchedAt = 0;
 let participantStatsFetchedAt = 0;
 let questionFetchedAt = 0;
@@ -2125,7 +2145,7 @@ const GAME_STATE_CACHE_MS = 2500;
 const PARTICIPANT_STATS_CACHE_MS = 5000;
 const QUESTION_CACHE_MS = 2500;
 const VIEW_SYNC_COOLDOWN_MS = 2500;
-const screenIds = ['login-screen', 'question-screen', 'no-q-screen', 'pause-screen', 'end-screen', 'thanks-screen'];
+const screenIds = ['instruction-screen', 'login-screen', 'question-screen', 'no-q-screen', 'pause-screen', 'end-screen', 'thanks-screen'];
 const screenElements = Object.fromEntries(screenIds.map((id) => [id, document.getElementById(id)]));
 const loginFormEl = document.getElementById('login-form');
 const statusBoxEl = document.getElementById('game-status-box');
@@ -2149,7 +2169,6 @@ const submitBtnEl = document.getElementById('submit-btn');
 const statAnswerValueElements = Array.from(document.querySelectorAll('[data-stat-value="answers"]'));
 const statAnswerSummaryElements = Array.from(document.querySelectorAll('[data-stat-summary="answers"]'));
 const statBonusValueElements = Array.from(document.querySelectorAll('[data-stat-value="bonuses"]'));
-const badgeListElements = Array.from(document.querySelectorAll('[data-badge-list]'));
 gameRemainingLabelElements = Array.from(document.querySelectorAll('[data-game-remaining-label]'));
 
 const EVENT_DATE = new Date('2026-12-13T10:00:00+01:00');
@@ -2263,6 +2282,9 @@ function rememberMicroToast(key) {
 }
 
 function showMicroToast(message, type = 'info', title = 'Aktualizacja', key = '') {
+  PlayerExperience.enqueue(displayMicroToast, message, type, title, key);
+}
+function displayMicroToast(message, type = 'info', title = 'Aktualizacja', key = '') {
   if (!message) return;
   if (key && rememberMicroToast(key)) return;
 
@@ -2743,7 +2765,6 @@ function resetLocalParticipantSession() {
   currentQuestion = null;
   participantStats = { answers: 0, bonuses: 0 };
   statsHydrated = false;
-  shownBadgeIds = new Set();
   participantStatsFetchedAt = 0;
   questionFetchedAt = 0;
   questionRequestKey = '';
@@ -2757,7 +2778,9 @@ function getStoredParticipantIdForCurrentGame() {
   if (!saved) return '';
 
   const currentSessionKey = getCurrentGameSessionKey();
-  const savedSessionKey = storageGet(PARTICIPANT_GAME_STORAGE_KEY, '');
+  const rawSessionKey = storageGet(PARTICIPANT_GAME_STORAGE_KEY, '');
+  const savedSessionKey = rawSessionKey && !/^\d+$/.test(rawSessionKey) ? String(Date.parse(rawSessionKey)) : rawSessionKey;
+  if (savedSessionKey && savedSessionKey !== rawSessionKey) storageSet(PARTICIPANT_GAME_STORAGE_KEY, savedSessionKey);
 
   // Only invalidate if we have a confirmed game key AND it mismatches.
   // If currentSessionKey is empty (game state not yet loaded), preserve session.
@@ -2875,13 +2898,13 @@ function renderGameRemaining() {
   const summaryTarget = getSummaryCountdownTarget();
 
   if (startedAt) {
-    const endTime = new Date(startedAt).getTime() + (Number(durationMinutes || 10) * 60000);
-    const remaining = endTime - Date.now();
+    const endTime = new Date(startedAt).getTime() + (Number(durationMinutes || 180) * 60000);
+    const remaining = endTime - gameNow();
     if (remaining > 0) {
       const label = formatRemainingTime(remaining);
       setGameRemainingLabel('Do końca gry zostało');
 
-      if (remaining <= 15 * 60000) {
+      if (participantId && remaining <= 15 * 60000) {
         showMicroToast(
           'Zostało 15 minut do końca gry. To dobry moment na finałowy sprint.',
           'warning',
@@ -2900,7 +2923,7 @@ function renderGameRemaining() {
   }
 
   if (summaryTarget) {
-    const remaining = summaryTarget - Date.now();
+    const remaining = summaryTarget - gameNow();
     const label = remaining > 0 ? formatRemainingTime(remaining) : '00:00';
     setGameRemainingLabel('Do podsumowania zostało');
     targets.forEach((el) => {
@@ -2923,8 +2946,8 @@ function getSummaryCountdownTarget() {
   if (activeGameState.summaryAt) return new Date(activeGameState.summaryAt).getTime();
   if (activeGameState.endedAt) return new Date(activeGameState.endedAt).getTime() + (5 * 60000);
   if (activeGameState.startedAt) {
-    const endTime = new Date(activeGameState.startedAt).getTime() + (Number(activeGameState.durationMinutes || 10) * 60000);
-    if (Date.now() >= endTime) {
+    const endTime = new Date(activeGameState.startedAt).getTime() + (Number(activeGameState.durationMinutes || 180) * 60000);
+    if (gameNow() >= endTime) {
       return endTime + (5 * 60000);
     }
   }
@@ -2946,7 +2969,7 @@ function renderSummaryCountdown() {
     return;
   }
 
-  const remaining = summaryTarget - Date.now();
+  const remaining = summaryTarget - gameNow();
   const label = remaining > 0 ? formatRemainingTime(remaining) : '00:00';
   targets.forEach((el) => {
     if (el.innerText !== label) {
@@ -2988,20 +3011,20 @@ function renderTechnicalPause() {
 }
 
 function getGamePhase() {
-  if (activeGameState.technicalPauseActive) return 'paused';
+  if (activeGameState.technicalPauseActive && getGameRemainingMs() > 0) return 'paused';
 
   const { startedAt, endedAt, durationMinutes } = activeGameState;
   const summaryTarget = getSummaryCountdownTarget();
 
   if (startedAt) {
-    const endTime = new Date(startedAt).getTime() + (Number(durationMinutes || 10) * 60000);
-    if (Date.now() < endTime) return 'active';
-    if (summaryTarget && Date.now() >= summaryTarget) return 'thanks';
+    const endTime = new Date(startedAt).getTime() + (Number(durationMinutes || 180) * 60000);
+    if (gameNow() < endTime) return 'active';
+    if (summaryTarget && gameNow() >= summaryTarget) return 'thanks';
     return 'ended';
   }
 
   if (endedAt || summaryTarget) {
-    if (summaryTarget && Date.now() >= summaryTarget) return 'thanks';
+    if (summaryTarget && gameNow() >= summaryTarget) return 'thanks';
     return 'ended';
   }
 
@@ -3190,7 +3213,6 @@ function renderParticipantStats(stats) {
     answers: Number(stats?.answers || 0),
     bonuses: Number(stats?.bonuses || 0)
   };
-  const shouldAnnounceBadges = statsHydrated;
 
   if (statsHydrated && nextStats.bonuses > participantStats.bonuses) {
     showMicroToast(
@@ -3214,150 +3236,17 @@ function renderParticipantStats(stats) {
     el.innerText = participantStats.bonuses;
   });
   participantStatsFetchedAt = Date.now();
-  renderParticipantBadges({ announce: shouldAnnounceBadges });
+  renderParticipantBadges();
 }
 
 function getGameRemainingMs() {
   if (!activeGameState.startedAt) return null;
-  const endTime = new Date(activeGameState.startedAt).getTime() + (Number(activeGameState.durationMinutes || 10) * 60000);
-  return endTime - Date.now();
+  const endTime = new Date(activeGameState.startedAt).getTime() + (Number(activeGameState.durationMinutes || 180) * 60000);
+  return endTime - gameNow();
 }
 
-function getParticipantBadgesLegacy() {
-  const badges = [];
-  const remainingMs = getGameRemainingMs();
-
-  if (participantStats.answers >= 5) {
-    badges.push({
-      icon: 'O',
-      name: 'Odkrywca',
-      text: 'Masz już minimum 5 odpowiedzi, więc świetnie idziesz przez trasę.'
-    });
-  }
-
-  if (participantStats.bonuses >= 1) {
-    badges.push({
-      icon: 'B',
-      name: 'Łowca bonusów',
-      text: 'Odkryłeś przynajmniej jeden bonus i wyciskasz z gry coś ekstra.'
-    });
-  }
-
-  if (remainingMs !== null && remainingMs <= 15 * 60000 && participantStats.answers >= 1) {
-    badges.push({
-      icon: 'S',
-      name: 'Sprint finałowy',
-      text: 'Grasz do samego końca i nadal zbierasz odpowiedzi w ostatnich minutach.'
-    });
-  }
-
-  return badges;
-}
-
-function getParticipantBadges() {
-  const badges = [];
-  const remainingMs = getGameRemainingMs();
-
-  if (participantStats.answers >= 1) {
-    badges.push({
-      id: 'first-clue',
-      icon: '1',
-      tone: 'blue',
-      name: 'Pierwszy Trop',
-      text: 'Pierwszy kod za Tobą. Gra właśnie nabrała tempa.'
-    });
-  }
-
-  if (participantStats.bonuses >= 1) {
-    badges.push({
-      id: 'spark-hunter',
-      icon: '+',
-      tone: 'lime',
-      name: 'Łowca Iskier',
-      text: 'Masz bonus. Złapałeś dodatkową okazję na trasie.'
-    });
-  }
-
-  if (participantStats.bonuses >= 2) {
-    badges.push({
-      id: 'volunteer-talker',
-      icon: 'W',
-      tone: 'gold',
-      name: 'Rozmówca Wolontariuszy',
-      text: 'Bonusy mówią jasno: rozmawiasz, szukasz i jesteś w grze.'
-    });
-  }
-
-  if (participantStats.answers >= 8) {
-    badges.push({
-      id: 'quiet-star',
-      icon: '*',
-      tone: 'blue',
-      name: 'Cicha Gwiazda',
-      text: 'Robisz swoje bez hałasu, ale Twój postęp naprawdę widać.'
-    });
-  }
-
-  if (participantStats.answers >= 10) {
-    badges.push({
-      id: 'unstoppable',
-      icon: 'N',
-      tone: 'gold',
-      name: 'Nie do zatrzymania',
-      text: 'Masz dwucyfrowy wynik odpowiedzi. To już konkretna seria.'
-    });
-  }
-
-  if (remainingMs !== null && remainingMs <= 15 * 60000 && participantStats.answers >= 1) {
-    badges.push({
-      id: 'final-sprinter',
-      icon: 'S',
-      tone: 'lime',
-      name: 'Finałowy Sprinter',
-      text: 'Ostatnie minuty, a Ty nadal jesteś w ruchu.'
-    });
-  }
-
-  return badges;
-}
-
-function renderParticipantBadges(options = {}) {
-  const { announce = false } = options;
-  const badges = getParticipantBadges();
-  const freshBadgeIds = [];
-
-  badges.forEach((badge) => {
-    if (!shownBadgeIds.has(badge.id)) {
-      freshBadgeIds.push(badge.id);
-      shownBadgeIds.add(badge.id);
-
-      if (announce) {
-        showMicroToast(
-          badge.text,
-          'badge',
-          `Nowa odznaka: ${badge.name}`,
-          `badge-${badge.id}`
-        );
-      }
-    }
-  });
-
-  badgeListElements.forEach((list) => {
-    if (badges.length === 0) {
-      list.innerHTML = '<div class="badge-empty">Pierwsza odznaka pojawi się po zaliczonym pytaniu albo bonusie.</div>';
-      return;
-    }
-
-    list.innerHTML = badges.map((badge) => `
-      <div class="badge-chip ${escHtml(badge.tone || '')} ${freshBadgeIds.includes(badge.id) ? 'badge-fresh' : ''}">
-        <div class="badge-chip-icon">${escHtml(badge.icon)}</div>
-        <div>
-          <div class="badge-chip-name">${escHtml(badge.name)}</div>
-          <div class="badge-chip-text">${escHtml(badge.text)}</div>
-        </div>
-      </div>
-    `).join('');
-  });
+function renderParticipantBadges() {
+  PlayerExperience.renderProgress(participantStats, statsHydrated, getGameRemainingMs(), getGamePhase() === 'active', showMicroToast);
 }
 
 async function refreshParticipantStats(options = {}) {
@@ -3463,12 +3352,17 @@ async function loadGameState(options = {}) {
       const res  = await fetch('/api/game-state');
       if(!res.ok)throw Error('Nie udało się pobrać stanu gry.');
       const data = await res.json();
-      if(activeGameState.startedAt && data.started_at && activeGameState.startedAt!==data.started_at)resetLocalParticipantSession();
+      if (participantId && data.started_at) {
+        const savedRound = storageGet(PARTICIPANT_GAME_STORAGE_KEY, '');
+        const savedTime = /^\d+$/.test(savedRound) ? Number(savedRound) : Date.parse(savedRound);
+        if (savedRound && savedTime !== Date.parse(data.started_at)) resetLocalParticipantSession();
+      }
+      serverClockOffset = data.serverNow ? Date.parse(data.serverNow) - Date.now() : 0;
       activeGameState = {
         startedAt: data.started_at || null,
         endedAt: data.ended_at || null,
         summaryAt: data.summary_at || null,
-        durationMinutes: Number(data.duration_minutes || 10),
+        durationMinutes: Number(data.duration_minutes || 180),
         announcementText: data.announcement_text || '',
         announcementUpdatedAt: data.announcement_updated_at || null,
         technicalPauseActive:!!data.technical_pause_active,technicalPauseText:data.technical_pause_text||''
@@ -3601,6 +3495,7 @@ async function fetchQuestionData(options = {}) {
 }
 
 async function showQuestionScreen(options = {}) {
+  if (PlayerExperience.instruction(setActiveScreen, () => syncPlayerView({force:true}))) return;
   const { force = false } = options;
   const q = getQuestionParam();
 
@@ -3716,6 +3611,7 @@ async function syncPlayerView(options = {}) {
       return phase;
     }
 
+    if (PlayerExperience.instruction(setActiveScreen, () => syncPlayerView({force:true}))) return phase;
     if (getQuestionParam()) {
       if (currentQuestion && activeScreenId==='question-screen') {
         await refreshQuestionState({ force });

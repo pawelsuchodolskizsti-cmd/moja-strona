@@ -2335,7 +2335,7 @@
       <div class="ops-title">Komunikat i czas gry</div>
       <div class="ops-copy">Wyślij krótką informację do wszystkich graczy. Pojawi się na ich ekranie przy najbliższym odświeżeniu stanu gry.</div>
       <div class="ops-row">
-        <div class="ops-chip" id="duration-chip">Czas gry: 10 min</div>
+        <div class="ops-chip" id="duration-chip">Czas gry: 180 min</div>
         <div class="ops-chip" id="announcement-chip">Brak aktywnego komunikatu</div>
       </div>
       <textarea id="admin-message" placeholder="Np. Za 10 minut startujemy z finałowym sprintem. Kierujcie się do kolejnej strefy."></textarea>
@@ -2763,7 +2763,7 @@ let liveActivity = { liveParticipants: [], hottestQuestions: [], recentActivity:
 let questionStats = [];
 let gameStartedAt = null;
 let summaryAt = null;
-let gameDurationMs = 60 * 60 * 1000;
+let gameDurationMs = 180 * 60 * 1000;
 let timerInterval = null;
 let prevAnswersCount = 0;
 let currentParticipantId = null;
@@ -3352,7 +3352,7 @@ async function loadGameState() {
     if(!res.ok)throw Error(data.error||'Błąd odczytu stanu gry.');
     const pauseButton=document.getElementById('btn-technical-pause');
     pauseButton.dataset.paused=String(!!data.technical_pause_active);pauseButton.textContent=data.technical_pause_active?'Wznów po pauzie':'Pauza techniczna';
-    pauseButton.disabled=!data.started_at || Date.now()>=new Date(data.started_at).getTime()+Number(data.duration_minutes||10)*60000;
+    pauseButton.disabled=!data.started_at || Date.now()>=new Date(data.started_at).getTime()+Number(data.duration_minutes||180)*60000;
     announcementText = (data.announcement_text || '').trim();
     announcementUpdatedAt = data.announcement_updated_at || null;
     resultsParticipantsRevealedAt = data.results_participants_revealed_at || null;
@@ -3361,7 +3361,7 @@ async function loadGameState() {
     if (data.started_at) {
       summaryAt = null;
       gameStartedAt = new Date(data.started_at).getTime();
-      gameDurationMs = (data.duration_minutes || 10) * 60 * 1000;
+      gameDurationMs = (data.duration_minutes || 180) * 60 * 1000;
       const remaining = gameDurationMs - (Date.now() - gameStartedAt);
 
       if (remaining > 0) {
@@ -3391,7 +3391,7 @@ async function loadGameState() {
       gameStartedAt = null;
       summaryAt = null;
       clearTimer();
-  gameDurationMs = (data.duration_minutes || 10) * 60 * 1000;
+  gameDurationMs = (data.duration_minutes || 180) * 60 * 1000;
       gamePhase = 'idle';
       setStatus('idle', testModeEnabled ? 'Tryb testowy gotowy' : 'Gra zatrzymana', testModeEnabled ? 'Panel pracuje na danych testowych. Możesz uruchomić testową turę albo wrócić do danych żywych.' : 'Możesz rozpocząć nową turę. Reset usuwa dane aktualnego zakresu.');
       syncActionButtons('idle');
@@ -3625,7 +3625,7 @@ async function startGame() {
 
     const data = await res.json();
     gameStartedAt = new Date(data.started_at).getTime();
-    gameDurationMs = (data.duration_minutes || 10) * 60 * 1000;
+    gameDurationMs = (data.duration_minutes || 180) * 60 * 1000;
     document.getElementById('live-timer').classList.remove('warning');
     clearTimer();
     timerInterval = setInterval(updateLiveTimer, 1000);
@@ -4287,7 +4287,7 @@ async function runQuickTest() {
       homeRes.text()
     ]);
 
-    const timerMinutes = Number(stateData.duration_minutes || 10);
+    const timerMinutes = Number(stateData.duration_minutes || 180);
     const timerOk = Number.isFinite(timerMinutes) && timerMinutes > 0;
     const startedOk = !stateData.started_at || !Number.isNaN(new Date(stateData.started_at).getTime());
     const summaryOk = !stateData.summary_at || !Number.isNaN(new Date(stateData.summary_at).getTime());

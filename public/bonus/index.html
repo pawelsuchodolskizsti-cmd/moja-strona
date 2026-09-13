@@ -1355,9 +1355,10 @@ input:focus {
 }
 .bonus-announcement{padding:12px;margin-bottom:16px;border-radius:12px;background:#fff3c4;color:#34295e;overflow-wrap:anywhere;font-weight:700}.bonus-announcement[hidden]{display:none}
 </style>
+<link rel="stylesheet" href="/player-experience.css">
 </head>
 <body>
-<div class="micro-toast-stack" id="micro-toast-stack"></div>
+<div class="micro-toast-stack" id="micro-toast-stack" role="status" aria-live="polite" aria-atomic="false"></div>
 
 <div class="card bonus-card" id="name-screen" style="display:none">
   <div class="partners-row" aria-label="Partnerzy wydarzenia">
@@ -1445,6 +1446,7 @@ input:focus {
     <span class="game-remaining-label" data-game-remaining-label>Do ko&#324;ca gry zosta&#322;o</span>
     <div class="game-remaining-value" data-game-remaining>--:--</div>
   </div>
+<div class="badge-board"><div class="badge-board-title">Twoje kamienie milowe</div><div class="badge-list" data-badge-list></div></div>
 </div>
 
 <div class="card bonus-card" id="success-screen" style="display:none">
@@ -1498,6 +1500,7 @@ input:focus {
       <span class="game-remaining-label" data-game-remaining-label>Do ko&#324;ca gry zosta&#322;o</span>
       <div class="game-remaining-value" data-game-remaining>--:--</div>
     </div>
+<div class="badge-board"><div class="badge-board-title">Twoje kamienie milowe</div><div class="badge-list" data-badge-list></div></div>
   </div>
 
   <div class="status-finale" id="bonus-result-finale" style="display:none">
@@ -1545,14 +1548,33 @@ input:focus {
   <button class="btn secondary" type="button" onclick="goToHomeFromBonus()">Wr&oacute;&#263; do ekranu g&#322;&oacute;wnego</button>
 </div>
 
+
+<div class="card" id="instruction-screen" style="display:none">
+  <div class="partners-row" aria-label="Partnerzy wydarzenia">
+    <img class="partner-logo" src="/fundacjaoneday.svg" alt="Fundacja One Day">
+    <img class="partner-logo energy" src="/energyliandia.svg" alt="Energylandia">
+  </div>
+  <div class="logo">Gwiazdka One Day 2026</div>
+  <div class="instruction-step" data-instruction-step>Krok 1 z 3</div>
+  <div class="instruction-dots" aria-hidden="true"><span data-instruction-dot></span><span data-instruction-dot></span><span data-instruction-dot></span></div>
+  <div class="instruction-icon" data-instruction-icon aria-hidden="true">QR</div>
+  <h1 data-instruction-title tabindex="-1"></h1>
+  <p class="instruction-copy" data-instruction-copy></p>
+  <div class="game-remaining"><span class="game-remaining-label" data-game-remaining-label>Do końca gry zostało</span><div class="game-remaining-value" data-game-remaining>--:--</div></div>
+  <button class="btn" type="button" data-instruction-next>Dalej</button>
+  <button class="instruction-back" type="button" data-instruction-back hidden>Wstecz</button>
+</div>
+<script src="/player-experience.js"></script>
 <script>
+let serverClockOffset = 0;
+function gameNow() { return Date.now() + serverClockOffset; }
 let participantId = null;
 let deviceToken = null;
 let activeGameState = {
   startedAt: null,
   endedAt: null,
   summaryAt: null,
-  durationMinutes: 10
+  durationMinutes: 180
 };
 let participantStats = {
   answers: 0,
@@ -1606,8 +1628,7 @@ const bonusId = new URLSearchParams(window.location.search).get('b');
 const bonusLabelElements = Array.from(document.querySelectorAll('[data-bonus-label]'));
 const gameRemainingElements = Array.from(document.querySelectorAll('[data-game-remaining]'));
 const gameRemainingLabelElements = Array.from(document.querySelectorAll('[data-game-remaining-label]'));
-const badgeListElements = Array.from(document.querySelectorAll('[data-badge-list]'));
-const bonusScreenIds = ['name-screen', 'secret-screen', 'success-screen'];
+const bonusScreenIds = ['instruction-screen', 'name-screen', 'secret-screen', 'success-screen'];
 const bonusScreenElements = Object.fromEntries(bonusScreenIds.map((id) => [id, document.getElementById(id)]));
 const nameBtnEl = document.getElementById('name-btn');
 const nameMsgEl = document.getElementById('name-msg');
@@ -1690,7 +1711,7 @@ function getDeviceToken() {
 }
 
 function getCurrentGameSessionKey() {
-  return activeGameState.startedAt ? String(activeGameState.startedAt) : '';
+  return activeGameState.startedAt ? String(new Date(activeGameState.startedAt).getTime()) : '';
 }
 
 function clearStoredParticipantSession() {
@@ -1722,7 +1743,9 @@ function getStoredParticipantIdForCurrentGame() {
   if (!saved) return '';
 
   const currentSessionKey = getCurrentGameSessionKey();
-  const savedSessionKey = storageGet(PARTICIPANT_GAME_STORAGE_KEY, '');
+  const rawSessionKey = storageGet(PARTICIPANT_GAME_STORAGE_KEY, '');
+  const savedSessionKey = rawSessionKey && !/^\d+$/.test(rawSessionKey) ? String(Date.parse(rawSessionKey)) : rawSessionKey;
+  if (savedSessionKey && savedSessionKey !== rawSessionKey) storageSet(PARTICIPANT_GAME_STORAGE_KEY, savedSessionKey);
 
   if (currentSessionKey && savedSessionKey !== currentSessionKey) {
     resetLocalParticipantSession();
@@ -1856,62 +1879,12 @@ function formatPolishCount(value, one, few, many) {
 
 function getGameRemainingMs() {
   if (!activeGameState.startedAt) return null;
-  const endTime = new Date(activeGameState.startedAt).getTime() + (Number(activeGameState.durationMinutes || 10) * 60000);
-  return endTime - Date.now();
-}
-
-function getParticipantBadges() {
-  const badges = [];
-  const remainingMs = getGameRemainingMs();
-
-  if (participantStats.answers >= 5) {
-    badges.push({
-      icon: 'O',
-      name: 'Odkrywca',
-      text: 'Masz ju\u017c minimum 5 odpowiedzi, wi\u0119c \u015bwietnie idziesz przez tras\u0119.'
-    });
-  }
-
-  if (participantStats.bonuses >= 1) {
-    badges.push({
-      icon: 'B',
-      name: '\u0141owca bonus\u00f3w',
-      text: 'Odkry\u0142e\u015b przynajmniej jeden bonus i wyciskasz z gry co\u015b ekstra.'
-    });
-  }
-
-  if (remainingMs !== null && remainingMs <= 15 * 60000 && participantStats.answers >= 1) {
-    badges.push({
-      icon: 'S',
-      name: 'Sprint fina\u0142owy',
-      text: 'Grasz do samego ko\u0144ca i nadal zbierasz odpowiedzi w ostatnich minutach.'
-    });
-  }
-
-  return badges;
+  const endTime = new Date(activeGameState.startedAt).getTime() + (Number(activeGameState.durationMinutes || 180) * 60000);
+  return endTime - gameNow();
 }
 
 function renderParticipantBadges() {
-  const badges = getParticipantBadges();
-
-  badgeListElements.forEach((list) => {
-    if (!list) return;
-
-    if (badges.length === 0) {
-      list.innerHTML = '<div class="badge-empty">Jeszcze chwila i pojawi si\u0119 tutaj pierwsza odznaka.</div>';
-      return;
-    }
-
-    list.innerHTML = badges.map((badge) => `
-      <div class="badge-chip">
-        <div class="badge-chip-icon">${badge.icon}</div>
-        <div>
-          <div class="badge-chip-name">${badge.name}</div>
-          <div class="badge-chip-text">${badge.text}</div>
-        </div>
-      </div>
-    `).join('');
-  });
+  PlayerExperience.renderProgress(participantStats, participantStatsFetchedAt > 0, getGameRemainingMs(), getGamePhase() === 'active', showMicroToast);
 }
 
 async function refreshParticipantStats(options = {}) {
@@ -2206,6 +2179,9 @@ function initBonusQrCameraCapture() {
 }
 
 function showMicroToast(message, type = 'info', title = 'Aktualizacja', key = '') {
+  PlayerExperience.enqueue(displayMicroToast, message, type, title, key);
+}
+function displayMicroToast(message, type = 'info', title = 'Aktualizacja', key = '') {
   if (!message) return;
   if (key && rememberMicroToast(key)) return;
 
@@ -2346,17 +2322,17 @@ function getGamePhase() {
   const startedAt = activeGameState.startedAt ? new Date(activeGameState.startedAt).getTime() : null;
   const endedAt = activeGameState.endedAt ? new Date(activeGameState.endedAt).getTime() : null;
   const summaryAt = activeGameState.summaryAt ? new Date(activeGameState.summaryAt).getTime() : null;
-  const durationMs = Number(activeGameState.durationMinutes || 10) * 60000;
+  const durationMs = Number(activeGameState.durationMinutes || 180) * 60000;
 
   if (startedAt) {
     const endTime = startedAt + durationMs;
-    if (Date.now() < endTime) return activeGameState.technicalPauseActive ? 'paused' : 'active';
-    if (summaryAt && Date.now() >= summaryAt) return 'thanks';
+    if (gameNow() < endTime) return activeGameState.technicalPauseActive ? 'paused' : 'active';
+    if (summaryAt && gameNow() >= summaryAt) return 'thanks';
     return 'ended';
   }
 
   if (endedAt || summaryAt) {
-    if (summaryAt && Date.now() >= summaryAt) return 'thanks';
+    if (summaryAt && gameNow() >= summaryAt) return 'thanks';
     return 'ended';
   }
 
@@ -2512,8 +2488,8 @@ function getSummaryCountdownTarget() {
   if (activeGameState.summaryAt) return new Date(activeGameState.summaryAt).getTime();
   if (activeGameState.endedAt) return new Date(activeGameState.endedAt).getTime() + (5 * 60000);
   if (activeGameState.startedAt) {
-    const endTime = new Date(activeGameState.startedAt).getTime() + Number(activeGameState.durationMinutes || 10) * 60000;
-    if (Date.now() >= endTime) {
+    const endTime = new Date(activeGameState.startedAt).getTime() + Number(activeGameState.durationMinutes || 180) * 60000;
+    if (gameNow() >= endTime) {
       return endTime + (5 * 60000);
     }
   }
@@ -2555,13 +2531,13 @@ function renderGameRemaining() {
   const summaryTarget = getSummaryCountdownTarget();
 
   if (startedAt) {
-    const endTime = new Date(startedAt).getTime() + Number(durationMinutes || 10) * 60000;
-    const remaining = endTime - Date.now();
+    const endTime = new Date(startedAt).getTime() + Number(durationMinutes || 180) * 60000;
+    const remaining = endTime - gameNow();
     if (remaining > 0) {
       const label = formatRemainingTime(remaining);
       setGameRemainingLabel('Do końca gry zostało');
 
-      if (remaining <= 15 * 60000) {
+      if (participantId && remaining <= 15 * 60000) {
         showMicroToast(
           'Zostało 15 minut do końca gry. To dobry moment na finałowy sprint.',
           'warning',
@@ -2580,7 +2556,7 @@ function renderGameRemaining() {
   }
 
   if (summaryTarget) {
-    const remaining = summaryTarget - Date.now();
+    const remaining = summaryTarget - gameNow();
     if (remaining <= 0) {
       setGameRemainingLabel('Do podsumowania zostało');
       gameRemainingElements.forEach((element) => {
@@ -2621,11 +2597,17 @@ async function loadGameState(options = {}) {
     if (!res.ok) return getGamePhase();
 
     const data = await res.json();
+    if (participantId && data.started_at) {
+        const savedRound = storageGet(PARTICIPANT_GAME_STORAGE_KEY, '');
+        const savedTime = /^\d+$/.test(savedRound) ? Number(savedRound) : Date.parse(savedRound);
+        if (savedRound && savedTime !== Date.parse(data.started_at)) resetLocalParticipantSession();
+      }
+    serverClockOffset = data.serverNow ? Date.parse(data.serverNow) - Date.now() : 0;
     activeGameState = {
       startedAt: data.started_at || null,
       endedAt: data.ended_at || null,
       summaryAt: data.summary_at || null,
-      durationMinutes: Number(data.duration_minutes || 10),
+      durationMinutes: Number(data.duration_minutes || 180),
       technicalPauseActive:!!data.technical_pause_active,technicalPauseText:data.technical_pause_text||'',announcementText:data.announcement_text||''
     };
     gameStateFetchedAt = Date.now();
@@ -2724,6 +2706,8 @@ async function validateParticipant(id) {
 }
 
 async function showSecret(existingBonusData = null, options = {}) {
+  if (PlayerExperience.instruction(setActiveBonusScreen, () => syncBonusView({force:true}))) return;
+  await refreshParticipantStats(options);
   const { force = false } = options;
   const bonusData = existingBonusData || await loadBonusLabel({ force });
 
@@ -2804,6 +2788,7 @@ async function syncBonusView(options = {}) {
       return phase;
     }
 
+    if (participantId && PlayerExperience.instruction(setActiveBonusScreen, () => syncBonusView({force:true}))) return phase;
     const bonusData = await loadBonusLabel({ force });
     if (bonusData?.inactive) {
       return phase;
@@ -2933,6 +2918,7 @@ async function doNameLogin() {
     bonusCountFetchedAt = 0;
     bonusLabelCacheKey = '';
     cachedBonusLabelData = null;
+    if (!activeGameState.startedAt && data.gameStartedAt) activeGameState.startedAt = data.gameStartedAt;
     rememberParticipantSession(participantId);
     triggerHaptic([16, 45, 16]);
     playFeedbackTone('ready');
@@ -2980,6 +2966,11 @@ async function submitSecret() {
       const bonusCount = data.stats
         ? Number(data.stats.bonuses || 0)
         : await getParticipantBonusCount({ force: true });
+      if (data.stats) {
+        participantStats = {answers:Number(data.stats.answers || 0), bonuses:bonusCount};
+        participantStatsFetchedAt = Date.now();
+        renderParticipantBadges();
+      } else await refreshParticipantStats({force:true});
       cachedBonusCount = bonusCount;
       bonusCountFetchedAt = Date.now();
       bonusLabelFetchedAt = 0;

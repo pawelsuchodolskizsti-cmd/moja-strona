@@ -1,0 +1,23 @@
+#instruction-screen { display:none; text-align:center; }
+.instruction-step { color:#765179; font-size:12px; font-weight:700; margin:24px 0 12px; text-transform:uppercase; letter-spacing:2px; }
+.instruction-dots { display:flex; justify-content:center; gap:8px; margin-bottom:24px; }
+.instruction-dots span { height:5px; width:40px; border-radius:8px; background:#e8d9ed; }
+.instruction-dots .active { background:#b830a7; }
+.instruction-icon { width:100px; height:100px; margin:0 auto 24px; display:grid; place-items:center; border-radius:30px; background:linear-gradient(140deg,#f8e5f7,#e6f4ff); color:#913c99; font-family:'Syne',sans-serif; font-size:36px; font-weight:800; border:1px solid #fff; }
+#instruction-screen h1 { font-size:28px; line-height:1.15; margin:0 0 16px; outline:none; }
+.instruction-copy { color:#634c6a; font-size:15px; line-height:1.65; margin-bottom:24px; }
+.instruction-back { background:transparent; color:#765179; border:0; padding:14px 24px; font:inherit; cursor:pointer; }
+.instruction-back[hidden] { display:none; }
+.badge-board { display:block !important; }
+.milestone-next { display:grid; gap:8px; color:#66406e; padding:12px; border-radius:14px; background:rgba(255,255,255,.65); font-size:12px; }
+.milestone-next span { font-size:11px; }
+.milestone-next progress { width:100%; height:7px; accent-color:#ad369f; }
+.bonus-card .badge-board { margin-top:16px; padding:14px; border-radius:18px; background:rgba(255,255,255,.45); text-align:left; }
+.bonus-card .badge-board-title { font-size:12px; font-weight:800; margin-bottom:10px; }
+.bonus-card .badge-list { display:grid; gap:8px; }
+.bonus-card .badge-chip { display:flex; align-items:center; gap:10px; padding:10px; border-radius:14px; background:rgba(255,255,255,.72); }
+.bonus-card .badge-chip-icon { display:grid; place-items:center; flex:0 0 32px; height:32px; border-radius:10px; background:#e9e4ff; font-weight:800; }
+.bonus-card .badge-chip-name { font-size:12px; font-weight:800; }
+.bonus-card .badge-chip-text { font-size:11px; line-height:1.5; color:#68596b; }
+.micro-toast-stack { top:auto; bottom:16px; pointer-events:none; padding-bottom:env(safe-area-inset-bottom,0px); }
+@media (max-width:430px) { #instruction-screen h1 {font-size:25px;} .instruction-icon {width:80px;height:80px;margin-bottom:18px;} }

@@ -16,7 +16,7 @@ Projekt zachowuje pytania, bonusy, panel administratora, ekran wyników, generat
 
 ## Zasady zachowane i ujednolicone
 
-- Tura domyślnie trwa 10 minut. Poprawna odpowiedź daje 1 punkt; błędna wykorzystuje jedyną próbę. Każdy bonus daje 1 punkt tylko raz na turę.
+- Tura domyślnie trwa 3 godziny (180 minut). Poprawna odpowiedź daje 1 punkt; błędna wykorzystuje jedyną próbę. Każdy bonus daje 1 punkt tylko raz na turę.
 - Pauza techniczna blokuje odpowiedzi i bonusy, ale zegar nadal biegnie. Administrator może dodać czas przyciskiem „+10 minut”.
 - Korekty administratora nie znikają po odpowiedzi, bonusie ani przeliczeniu katalogu. Zmiana akceptowanych odpowiedzi w katalogu nadal przelicza zapisane odpowiedzi, jak w dotychczasowej wersji.
 - Nowa tura otrzymuje oddzielne wyniki. Reset usuwa historię wybranego zakresu LIVE lub TEST; potwierdzenie wskazuje zakres.
@@ -30,3 +30,7 @@ Projekt zachowuje pytania, bonusy, panel administratora, ekran wyników, generat
 `public/regulamin/index.html` to zatwierdzony do przygotowania **projekt roboczy**, a nie końcowy regulamin. Organizator musi uzupełnić i zatwierdzić wskazane w nim informacje przed udostępnieniem gry uczestnikom.
 
 Sprawdzono logikę na lokalnej bazie PGlite i działanie interfejsu w Edge, w tym skanowanie z symulowanych klatek obrazu, pobrania QR i generowanie PDF dyplomów. Nie wykonywano wdrożenia, połączenia z produkcyjną bazą Neon ani testów rzeczywistych aparatów iPhone/Android. Eksport „Excel” zachowuje dotychczasowy format tabeli HTML z rozszerzeniem `.xls`; nie jest plikiem `.xlsx`.
+
+## Instrukcja i postępy gracza
+
+Po zalogowaniu gracz przechodzi trzy kroki instrukcji: pytania QR, bonusy i wspólny czas rundy. „Start” kończy instrukcję, zachowując zeskanowane pytanie lub bonus. Instrukcja jest zapamiętana na urządzeniu na daną rundę. Kamienie milowe są wspólne dla pytań i bonusów, widoczne również na małych ekranach; komunikaty pojawiają się kolejno. Odliczanie korzysta z czasu serwera. Zmiana długości dotyczy nowych rund; już rozpoczęta runda zachowuje swój czas.
