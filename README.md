@@ -27,7 +27,7 @@ Projekt zachowuje pytania, bonusy, panel administratora, ekran wyników, generat
 
 ## Regulamin i granice testów
 
-`public/regulamin/index.html` to zatwierdzony do przygotowania **projekt roboczy**, a nie końcowy regulamin. Organizator musi uzupełnić i zatwierdzić wskazane w nim informacje przed udostępnieniem gry uczestnikom.
+`public/regulamin/index.html` i `public/rodo/index.html` zawierają **wzory** przygotowane na podstawie dokumentów organizatora, dopasowane do obecnej gry. Formularz zapisu pokazuje krótką informację o danych i linki do obu pełnych dokumentów. Linki są też dostępne na stronie powitalnej przed startem. Wzory zachowują oznaczone pola do uzupełnienia, zgodę przedstawiciela małoletniego i oddzielny wzór zgody CRM. Nie dodają aktywnego zapisu do CRM ani zgody marketingowej. Akceptacja regulaminu pozostaje jedynym wymaganym polem; udostępnienie informacji RODO nie jest dodatkową zgodą na przetwarzanie. Przed użyciem wersji ostatecznej organizator uzupełnia dane, okresy, warunki udziału i nagrody oraz zatwierdza treść. Wzory mają oznaczenie `2026-09-13-wzor-1`; ten identyfikator dokumentu nie jest obecnie zapisywany na koncie uczestnika.
 
 Sprawdzono logikę na lokalnej bazie PGlite i działanie interfejsu w Edge, w tym skanowanie z symulowanych klatek obrazu, pobrania QR i generowanie PDF dyplomów. Nie wykonywano wdrożenia, połączenia z produkcyjną bazą Neon ani testów rzeczywistych aparatów iPhone/Android. Eksport „Excel” zachowuje dotychczasowy format tabeli HTML z rozszerzeniem `.xls`; nie jest plikiem `.xlsx`.
 
