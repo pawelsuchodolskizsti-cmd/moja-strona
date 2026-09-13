@@ -1,6 +1,9 @@
 const { runHandler } = require('../lib/run-handler');
 
 const handlers = {
+  'volunteer-session': require('../lib/handlers/volunteer-session').handler,
+  'volunteer-tickets': require('../lib/handlers/volunteer-tickets').handler,
+  'admin-volunteers': require('../lib/handlers/admin-volunteers').handler,
   'institutions': require('../lib/handlers/institutions').handler,
   'admin-institutions': require('../lib/handlers/admin-institutions').handler,
   'admin-session': require('../lib/handlers/admin-session').handler,

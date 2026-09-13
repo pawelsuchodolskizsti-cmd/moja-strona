@@ -82,3 +82,13 @@ Ekran główny, pytania i bonusy odświeżają dane w tle co 15–18 sekund po z
 Logowanie ma maksymalnie trzy próby z rosnącym, losowo rozłożonym opóźnieniem dla problemów sieciowych oraz odpowiedzi 429/500/502/503/504. Każda próba zachowuje identyfikator urządzenia i te same dane, więc utrata odpowiedzi po zapisaniu konta nie tworzy drugiego uczestnika. Błędy danych nie są ponawiane. Chwilowy błąd pobrania stanu rundy nie usuwa lokalnej sesji.
 
 Przed wydarzeniem otwórz panel administratora i wykonaj „Szybki test” kilka minut przed startem, aby sprawdzić aktualne połączenie i zakończyć przygotowanie bazy po wdrożeniu. Plan i bieżące wykorzystanie Vercel oraz bazy Neon należy sprawdzić w ich panelach. Lokalna próba obciążeniowa nie jest gwarancją wydajności rzeczywistej infrastruktury ani sieci uczestników.
+
+## Wolontariusze i zgłoszenia
+
+Panel wolontariusza znajduje się pod `/wolontariusz/`, a obsługa organizatora w menu **Wolontariusze** (`/admin/wolontariusze/`). Najpierw administrator rozwija „Przypisanie wolontariuszy do bonusów”, wpisuje imię przy identyfikatorze bonusu i zapisuje przypisanie. Jeden bonus ma jednego wolontariusza. Login to identyfikator (np. B01), hasło to przypisane imię; wielkość liter i skrajne spacje nie mają znaczenia. To odrębne dane dostępu do panelu — zapis nie zmienia hasła bonusu w samej grze. Nowe konta nie są wypełniane przykładowymi osobami.
+
+Wolontariusz widzi zgłoszenia swojego punktu, tworzy pytania i usterki ogólne lub przypisane do dowolnego pytania/bonusu oraz dopisuje odpowiedzi w rozmowie. Administrator widzi wszystkie zgłoszenia, odpowiada pod wpisem, filtruje listę i ustawia status: Nowe, W trakcie lub Rozwiązane. Odpowiedzi odświeżają się co około 20–23 sekundy w aktywnej karcie. Listy i rozmowy mają stronicowanie; ponowienie zapisu z tym samym identyfikatorem nie tworzy duplikatu.
+
+Sesja wolontariusza używa oddzielnego losowego tokenu w HttpOnly/SameSite cookie (12 godzin), a hasło ma solony skrót scrypt. Serwer sprawdza przypisanie przy każdym żądaniu. Zmiana imienia lub przełącznika dostępu unieważnia poprzednie sesje. Limit logowania działa w bazie: 30 prób na adres IP w 10 minut. Blokada techniczna bonusu nie blokuje dostępu wolontariusza. Zgłoszenia i konta są wspólne dla rzeczywistego wydarzenia, niezależne od symulacji TEST i zachowywane po resetowaniu gry. Nie zmieniają punktacji ani stanu kodów.
+
+Tabele `volunteer_accounts`, `volunteer_sessions`, `volunteer_login_attempts`, `volunteer_tickets` i `volunteer_messages` tworzy wersjonowana migracja `volunteer-desk` v1. Nowe API: `volunteer-session`, `volunteer-tickets`, `admin-volunteers`. Wolontariusz nie otrzymuje listy haseł, poprawnych odpowiedzi ani zgłoszeń innych punktów.
