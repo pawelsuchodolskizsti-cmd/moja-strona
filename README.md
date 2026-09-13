@@ -44,3 +44,9 @@ Gracz wybiera placówkę z katalogu, wyszukując nazwę lub miasto (również be
 Pulpit zawiera stan i czas rundy, liczniki uczestników, odpowiedzi i bonusów oraz start, stop, pauzę techniczną i przedłużenie gry. Boczne menu prowadzi do osobnych sekcji: aktywności na żywo, komunikatów, podglądu gracza, rankingów, placówek, odpowiedzi, bonusów, statystyk pytań, finału, kodów QR, dyplomów oraz testów i ustawień. Reset danych i symulacja znajdują się w sekcji „Testy i ustawienia”. Oznaczenie LIVE/TEST pozostaje widoczne w głównym panelu.
 
 Na telefonie menu otwiera przycisk „Menu”. Katalog placówek i generator QR korzystają z tej samej nawigacji. Przełączanie sekcji głównego panelu zachowuje filtry i roboczy komunikat, a adres z fragmentem (np. `/admin/#leaderboard`) umożliwia powrót do konkretnego widoku.
+
+## Ekran widowni
+
+Widok `/wyniki/` zachowuje tło i logotypy wydarzenia, wyróżnia odliczanie oraz pokazuje podium placówek, najlepszych graczy, punkty placówek i pełną listę uczestników. Komunikat organizatora ma stały pasek, razem ze stanem aktualizacji i przyciskiem „Tryb projekcyjny”. Układ mieści się na ekranach 1920 × 1080, 1366 × 768 i 1280 × 720; na telefonach i mniejszych oknach sekcje układają się pionowo.
+
+Na dużym ekranie długie listy i komunikaty przewijają się automatycznie. Wskazanie kursorem, użycie klawiatury lub ręczne przewijanie wstrzymuje ruch. Ustawienie systemowe ograniczające animacje wyłącza automatyczne przewijanie. Pełne nazwy i teksty pozostają dostępne. Zasłanianie ostatnich trzech minut i etapowe odsłanianie finału obowiązuje we wszystkich rankingach, również na bocznej liście. Po chwilowej utracie połączenia widok odzyskuje prawidłowy komunikat także wtedy, gdy dane się nie zmieniły.
