@@ -1,7 +1,7 @@
 .social-posts{margin:20px 0 22px;min-width:0;width:100%;text-align:left;color:#34294e}
 .social-posts[hidden]{display:none!important}
-.posts-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 2px 12px}
-.posts-heading h2{font:800 16px/1.2 'Syne',sans-serif;letter-spacing:-.4px;margin:0;color:#392b59}
+.posts-heading{display:flex;align-items:center;justify-content:center;text-align:center;gap:12px;margin:0 2px 12px}
+.posts-heading h2{font:800 16px/1.35 'Syne',sans-serif;letter-spacing:-.4px;margin:0;color:#392b59}
 .post-link:focus-visible{outline:3px solid #7c6af7;outline-offset:2px}
 .posts-viewport{width:100%;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;overscroll-behavior-x:contain;border-radius:20px;touch-action:pan-x pan-y;direction:ltr}
 .posts-viewport::-webkit-scrollbar{display:none}
