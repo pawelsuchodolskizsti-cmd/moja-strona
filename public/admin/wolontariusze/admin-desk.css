@@ -1,0 +1,86 @@
+/* Organizer styling; the volunteer's separate phone panel keeps its game theme. */
+:root {
+  color-scheme: dark;
+  --text: #eef3ff;
+  --muted: #8f9ab3;
+  --border: #273044;
+  --purple: #8b5cf6;
+  --lime: #b7ff48;
+  --danger: #ff6b81;
+  --success: #6dffb3;
+}
+body {
+  color: var(--text);
+  background: radial-gradient(circle at top right, #8b5cf629, transparent 28%),
+    radial-gradient(circle at top left, #b7ff4814, transparent 22%),
+    linear-gradient(180deg, #090b10, #0d1119 45%, #090b10);
+}
+.desk-page { padding: 0; border: 0; border-radius: 0; background: transparent; }
+.desk-header { align-items: flex-start; margin: 8px 0 28px; }
+.desk-header > div { min-width: 0; }
+.desk-header h1 { font-size: clamp(28px, 3vw, 40px); overflow-wrap: anywhere; }
+.desk-header p, .desk-page .desk-card > p { color: var(--muted); }
+.desk-brand { font-size: 11px; letter-spacing: 1.2px; text-transform: uppercase; }
+.desk-logos { width: fit-content; max-width: 100%; padding: 10px 14px; background: #f5f3fa; border-radius: 12px; gap: 18px; }
+.desk-logos img { height: 28px; max-width: min(125px, calc(50% - 9px)); }
+.desk-links { justify-content: flex-end; gap: 8px 16px; }
+.desk-links a { color: #c4b5fd; min-height: 44px; display: inline-flex; align-items: center; }
+.desk-identity { color: #86e5b4; background: #6dffb315; border: 1px solid #6dffb329; font-size: 12px; overflow-wrap: anywhere; }
+#desk-feedback:empty { min-height: 0; margin: 0 0 22px; }
+.desk-card, .desk-feed {
+  border: 1px solid var(--border); border-radius: 20px; padding: 24px;
+  background: linear-gradient(180deg, #121722fa, #0c1018fa);
+  box-shadow: 0 24px 64px #00000030;
+}
+.desk-feed { margin-bottom: 20px; }
+.desk-page button { min-height: 44px; background: linear-gradient(135deg, var(--purple), #6d8cff); font-weight: 700; }
+.desk-page button.secondary { background: transparent; border: 1px solid var(--border); color: #c4cfe1; }
+.desk-page button:hover:not(:disabled) { filter: brightness(1.12); }
+.desk-page button:focus-visible, .desk-page a:focus-visible, .desk-page summary:focus-visible { outline-color: var(--lime); }
+.desk-page input, .desk-page textarea, .desk-page select { background: #0a0e15; color: var(--text); border-color: var(--border); min-height: 46px; }
+.desk-page input::placeholder, .desk-page textarea::placeholder { color: var(--muted); opacity: 1; }
+.desk-page input:focus, .desk-page textarea:focus, .desk-page select:focus { outline-color: var(--purple); }
+.desk-page .error { color: var(--danger); }
+.desk-page .success { color: var(--success); }
+.desk-page summary { min-height: 44px; display: list-item; align-content: center; overflow-wrap: anywhere; }
+body[data-volunteer-mode=admin] .desk-filters { grid-template-columns: minmax(120px, 1fr) minmax(150px, 1.3fr) minmax(180px, 1.6fr) auto; gap: 14px; padding-bottom: 22px; border-bottom: 1px solid var(--border); }
+.ticket-card { border-color: var(--border); background: #151c29; box-shadow: none; border-radius: 16px; }
+.ticket-card:last-child { margin-bottom: 0; }
+.ticket-card h2, .ticket-card h3 { color: var(--text); overflow-wrap: anywhere; }
+.ticket-meta, .ticket-card-footer, .thread-message small { color: #9eacc2; }
+.ticket-target { color: #c4b5fd; }
+.ticket-badge { background: #ff6b811c; color: #ff9daf; }
+.ticket-badge.progress { background: #8b5cf629; color: #c4b5fd; }
+.ticket-badge.resolved { background: #6dffb31a; color: #86e5b4; }
+.desk-empty { background: #0e1420; border-color: #39435d; color: #9eacc2; }
+#ticket-thread-post .ticket-card { background: transparent; }
+.thread-status { background: #0a0e15; border: 1px solid var(--border); }
+.thread-message { background: #151c29; border-color: var(--border); }
+.thread-message.admin { background: #8b5cf614; border-left-color: var(--purple); }
+body[data-volunteer-mode=admin] .volunteer-account { grid-template-columns: minmax(150px, 1.3fr) minmax(180px, 1.5fr) auto auto; border-color: var(--border); align-items: center; }
+.account-title { overflow-wrap: anywhere; color: #c4cfe1; }
+.volunteer-account label.account-enabled { padding: 10px 0; min-height: 44px; }
+.desk-page .account-enabled input { width: 18px; height: 18px; min-height: 18px; flex-shrink: 0; accent-color: var(--lime); }
+.volunteer-account p:empty { display: none; }
+#ticket-more { margin-top: 18px; }
+#ticket-reply-form { padding-top: 22px; border-top: 1px solid var(--border); }
+@media (min-width: 961px) and (max-width: 1250px) {
+  .desk-header { flex-wrap: wrap; }
+  .desk-links { justify-content: flex-start; }
+  body[data-volunteer-mode=admin] .desk-filters,
+  body[data-volunteer-mode=admin] .volunteer-account { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 760px) {
+  .desk-page { padding: 0; }
+  .desk-header { margin-bottom: 20px; }
+  .desk-links { justify-content: flex-start; }
+  .desk-page .desk-card, .desk-feed { padding: 16px; }
+  body[data-volunteer-mode=admin] .desk-filters,
+  body[data-volunteer-mode=admin] .volunteer-account { grid-template-columns: minmax(0, 1fr) !important; }
+  .desk-page .volunteer-account { gap: 12px; padding: 20px 0; }
+  .desk-page form > button { justify-self: stretch; }
+  .account-title { font-size: 16px; }
+  .desk-page .ticket-card { padding: 16px; }
+  .desk-page .feed-heading { align-items: center; }
+  #ticket-back, #ticket-more { width: 100%; }
+}
