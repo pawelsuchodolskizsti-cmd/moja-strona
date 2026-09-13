@@ -66,7 +66,6 @@ window.AdminNavigation = (() => {
     const header=main.querySelector('.header-row');header.querySelector('h1').id='admin-section-title';header.querySelector('h1').tabIndex=-1;
     const subtitle=main.querySelector(':scope > .sub');subtitle.id='admin-section-description';
     const institutionCard=document.getElementById('manage-institutions').closest('.ops-card');institutionCard.remove();
-    header.querySelector('a[href="/wyniki/"]').remove();
     mount(shell,'home');
     const sections=document.createElement('div');sections.className='admin-sections';
     for(const [id] of Object.entries(descriptions))sections.append(panel(id));
