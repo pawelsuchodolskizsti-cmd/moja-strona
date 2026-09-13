@@ -1574,6 +1574,7 @@ input:focus {
 </div>
 <script src="/institution-picker.js"></script>
 <script src="/player-experience.js"></script>
+<script src="/player-network.js"></script>
 <script>
 let serverClockOffset = 0;
 function gameNow() { return Date.now() + serverClockOffset; }
@@ -1654,7 +1655,7 @@ const bonusQrScannerStatusEl = document.getElementById('bonus-qr-scanner-status'
 const GAME_STATE_CACHE_MS = 5000;
 const BONUS_LABEL_CACHE_MS = 10000;
 const BONUS_COUNT_CACHE_MS = 10000;
-const PARTICIPANT_STATS_CACHE_MS = 10000;
+const PARTICIPANT_STATS_CACHE_MS = 30000;
 const BONUS_SYNC_COOLDOWN_MS = 3000;
 const JS_QR_SCRIPT_URL = 'https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js';
 const PARTICIPANT_GAME_STORAGE_KEY = 'participantGameStartedAt';
@@ -1787,59 +1788,10 @@ async function readJsonResponse(response) {
 }
 
 async function postJsonWithRetry(url, payload, options = {}) {
-  const { retries = 1, retryDelayMs = 700 } = options;
-  let lastError = null;
-
-  for (let attempt = 0; attempt <= retries; attempt += 1) {
-    try {
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-      const data = await readJsonResponse(response);
-      return { response, data };
-    } catch (error) {
-      lastError = error;
-      if (attempt >= retries) break;
-      await new Promise((resolve) => setTimeout(resolve, retryDelayMs));
-    }
-  }
-
-  throw lastError || new Error('Błąd połączenia');
+  return PlayerNetwork.postJsonWithRetry(url, payload, options);
 }
 
-async function readJsonResponse(response) {
-  const raw = await response.text();
-  try {
-    return raw ? JSON.parse(raw) : {};
-  } catch (error) {
-    return { error: raw || 'Nie udało się odczytać odpowiedzi serwera.' };
-  }
-}
 
-async function postJsonWithRetry(url, payload, options = {}) {
-  const { retries = 1, retryDelayMs = 700 } = options;
-  let lastError = null;
-
-  for (let attempt = 0; attempt <= retries; attempt += 1) {
-    try {
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-      const data = await readJsonResponse(response);
-      return { response, data };
-    } catch (error) {
-      lastError = error;
-      if (attempt >= retries) break;
-      await new Promise((resolve) => setTimeout(resolve, retryDelayMs));
-    }
-  }
-
-  throw lastError || new Error('Błąd połączenia');
-}
 
 function escHtml(value) {
   return String(value || '')
@@ -1904,7 +1856,7 @@ async function refreshParticipantStats(options = {}) {
     return participantStats;
   }
 
-  if (!force && participantStatsLoadPromise) return participantStatsLoadPromise;
+  if (participantStatsLoadPromise) return participantStatsLoadPromise;
   if (!force && participantStatsFetchedAt && (Date.now() - participantStatsFetchedAt) < PARTICIPANT_STATS_CACHE_MS) {
     renderParticipantBadges();
     return participantStats;
@@ -2599,7 +2551,7 @@ function renderGameRemaining() {
 }
 async function loadGameState(options = {}) {
   const { force = false } = options;
-  if (!force && gameStateLoadPromise) return gameStateLoadPromise;
+  if (gameStateLoadPromise) return gameStateLoadPromise;
   if (!force && gameStateFetchedAt && (Date.now() - gameStateFetchedAt) < GAME_STATE_CACHE_MS) {
     return getGamePhase();
   }
@@ -2676,7 +2628,7 @@ function showBonusUnavailable(data = {}) {
 async function loadBonusLabel(options = {}) {
   const { force = false } = options;
   const cacheKey = `${bonusId}:${participantId || 'guest'}`;
-  if (!force && bonusLabelLoadPromise && bonusLabelCacheKey === cacheKey) {
+  if (bonusLabelLoadPromise && bonusLabelCacheKey === cacheKey) {
     return bonusLabelLoadPromise;
   }
   if (!force && bonusLabelFetchedAt && bonusLabelCacheKey === cacheKey && (Date.now() - bonusLabelFetchedAt) < BONUS_LABEL_CACHE_MS) {
@@ -2811,7 +2763,7 @@ function showBonusPhaseState(phase) {
 async function syncBonusView(options = {}) {
   const { force = false } = options;
   const now = Date.now();
-  if (!force && bonusSyncPromise) {
+  if (bonusSyncPromise) {
     return bonusSyncPromise;
   }
   if (!force && (now - lastBonusSyncAt) < BONUS_SYNC_COOLDOWN_MS) {
@@ -2882,13 +2834,9 @@ window.onload = async () => {
     await restoreParticipantSession();
   }
 
-  await syncBonusView({ force: true });
+  await syncBonusView();
 
-  setInterval(() => {
-    if (!document.hidden) {
-      syncBonusView();
-    }
-  }, 15000);
+  PlayerNetwork.startPolling(() => syncBonusView(), 15000, 3000);
   window.addEventListener('focus', () => {
     scheduleBonusSync({ force: true });
   });

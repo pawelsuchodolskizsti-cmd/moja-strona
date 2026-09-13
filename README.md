@@ -66,3 +66,15 @@ Panel → Gra → „Blokady techniczne” (`/admin/#content-blocks`) pozwala os
 Serwer sprawdza dostępność przy pobieraniu pytania/bonusu oraz przy wysyłaniu odpowiedzi/hasła. Zapis ma dodatkowy warunek w transakcji zsynchronizowanej z blokadą administratora: formularz otwarty wcześniej nie pozwala ominąć blokady. Odpowiedź API `423` z `contentBlocked: true` jest oddzielona od pauzy całej gry. Próba odrzucona z powodu blokady nie zapisuje odpowiedzi ani odbioru bonusu. Edycja treści katalogu nie znosi blokady i zachowuje jej dotychczasową punktację.
 
 Gracz widzi komunikat, możliwość ponowienia i powrotu do gry. Odświeżenie w tle wykrywa zmianę dostępności; sam zapis jest zabezpieczony natychmiast po zatwierdzeniu blokady. Po awarii pobierania pytania lub bonusu można ponowić żądanie. Ekran niedostępnego bonusu nie wyświetla potwierdzenia zdobycia punktu. Nie zastępuje to naprawy samej awarii serwera lub połączenia.
+
+## Wejście wielu uczestników po starcie
+
+Wersje przygotowania bazy są zapisane w `qr_schema_migrations`. Nowa instancja funkcji odczytuje je raz; nie powtarza wykonanych zmian tabel, indeksów i danych. Nowe migracje są wykonywane transakcyjnie, ze wspólną blokadą zapisu i znacznikiem wersji zapisanym dopiero po powodzeniu. Migracje muszą pozostawać idempotentne: przy równoczesnym pierwszym uruchomieniu kilku instancji mogą zostać wykonane kolejno, zanim instancje odczytają nową wersję. **Przy każdej zmianie struktury, indeksów lub danych startowych zwiększ wersję odpowiedniej migracji w `db-schema.js` albo `institutions.js`.**
+
+Weryfikacja urządzenia i odświeżenie aktywności korzystają z jednego zapytania; odczyt postępu wymaga dwóch połączeń HTTP z bazą zamiast pięciu. Blokady, autoryzacja i unikalność zapisów odpowiedzi oraz bonusów nadal są sprawdzane po stronie serwera. Nie dodano współdzielonej pamięci podręcznej danych uczestników.
+
+Ekran główny, pytania i bonusy odświeżają dane w tle co 15–18 sekund po zakończeniu poprzedniego odczytu. Odczyt samego postępu jest dodatkowo ograniczony do jednego na 30 sekund, z wymuszeniem aktualnych danych po zapisie lub powrocie do karty. Pierwsze odświeżenie ma losowe opóźnienie; ukryta karta nie wysyła odczytów. Jednoczesne wymuszenia odświeżenia współdzielą bieżące żądanie. Odliczanie nadal działa lokalnie co sekundę, a potwierdzenia odpowiedzi i bonusów pokazują się od razu po zapisie.
+
+Logowanie ma maksymalnie trzy próby z rosnącym, losowo rozłożonym opóźnieniem dla problemów sieciowych oraz odpowiedzi 429/500/502/503/504. Każda próba zachowuje identyfikator urządzenia i te same dane, więc utrata odpowiedzi po zapisaniu konta nie tworzy drugiego uczestnika. Błędy danych nie są ponawiane. Chwilowy błąd pobrania stanu rundy nie usuwa lokalnej sesji.
+
+Przed wydarzeniem otwórz panel administratora i wykonaj „Szybki test” kilka minut przed startem, aby sprawdzić aktualne połączenie i zakończyć przygotowanie bazy po wdrożeniu. Plan i bieżące wykorzystanie Vercel oraz bazy Neon należy sprawdzić w ich panelach. Lokalna próba obciążeniowa nie jest gwarancją wydajności rzeczywistej infrastruktury ani sieci uczestników.

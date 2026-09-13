@@ -2121,6 +2121,7 @@ textarea {
 </div>
 <script src="/institution-picker.js"></script>
 <script src="/player-experience.js"></script>
+<script src="/player-network.js"></script>
 <script>
 let serverClockOffset = 0;
 function gameNow() { return Date.now() + serverClockOffset; }
@@ -2157,7 +2158,7 @@ let lastSyncPlayerViewAt = 0;
 let activeScreenId = '';
 
 const GAME_STATE_CACHE_MS = 2500;
-const PARTICIPANT_STATS_CACHE_MS = 5000;
+const PARTICIPANT_STATS_CACHE_MS = 30000;
 const QUESTION_CACHE_MS = 2500;
 const VIEW_SYNC_COOLDOWN_MS = 2500;
 const screenIds = ['instruction-screen', 'login-screen', 'question-screen', 'no-q-screen', 'pause-screen', 'end-screen', 'thanks-screen'];
@@ -2830,26 +2831,7 @@ async function readJsonResponse(response) {
 }
 
 async function postJsonWithRetry(url, payload, options = {}) {
-  const { retries = 1, retryDelayMs = 700 } = options;
-  let lastError = null;
-
-  for (let attempt = 0; attempt <= retries; attempt += 1) {
-    try {
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-      const data = await readJsonResponse(response);
-      return { response, data };
-    } catch (error) {
-      lastError = error;
-      if (attempt >= retries) break;
-      await new Promise((resolve) => setTimeout(resolve, retryDelayMs));
-    }
-  }
-
-  throw lastError || new Error('B\u0142\u0105d po\u0142\u0105czenia');
+  return PlayerNetwork.postJsonWithRetry(url, payload, options);
 }
 
 function bindUppercaseLoginFields() {
@@ -3267,7 +3249,7 @@ function renderParticipantBadges() {
 async function refreshParticipantStats(options = {}) {
   const { force = false } = options;
   if (!participantId) return;
-  if (!force && participantStatsLoadPromise) return participantStatsLoadPromise;
+  if (participantStatsLoadPromise) return participantStatsLoadPromise;
   if (!force && participantStatsFetchedAt && (Date.now() - participantStatsFetchedAt) < PARTICIPANT_STATS_CACHE_MS) {
     return participantStats;
   }
@@ -3357,7 +3339,7 @@ function applyGamePhaseScreen(phase, manageScreens) {
 
 async function loadGameState(options = {}) {
   const { manageScreens = true, force = false } = options;
-  if (!force && gameStateLoadPromise) return gameStateLoadPromise;
+  if (gameStateLoadPromise) return gameStateLoadPromise.then(phase => applyGamePhaseScreen(phase, manageScreens));
   if (!force && gameStateFetchedAt && (Date.now() - gameStateFetchedAt) < GAME_STATE_CACHE_MS) {
     return applyGamePhaseScreen(getGamePhase(), manageScreens);
   }
@@ -3390,7 +3372,7 @@ async function loadGameState(options = {}) {
 
       return applyGamePhaseScreen(getGamePhase(), manageScreens);
     } catch(e) {
-      return 'idle';
+      return gameStateFetchedAt ? getGamePhase() : 'offline';
     } finally {
       gameStateLoadPromise = null;
     }
@@ -3479,7 +3461,7 @@ async function fetchQuestionData(options = {}) {
 
   const questionId = parseInt(q, 10);
   const requestKey = `${questionId}:${participantId}:${trackOpen ? 'open' : 'refresh'}`;
-  if (!force && questionLoadPromise && questionRequestKey === requestKey) {
+  if (questionLoadPromise && questionRequestKey === requestKey) {
     return questionLoadPromise;
   }
 
@@ -3622,7 +3604,7 @@ async function refreshQuestionState(options = {}) {
 async function syncPlayerView(options = {}) {
   const { silent = false, force = false } = options;
   const now = Date.now();
-  if (!force && syncPlayerViewPromise) {
+  if (syncPlayerViewPromise) {
     return syncPlayerViewPromise;
   }
   if (!force && (now - lastSyncPlayerViewAt) < VIEW_SYNC_COOLDOWN_MS) {
@@ -3636,6 +3618,9 @@ async function syncPlayerView(options = {}) {
       return phase;
     }
 
+    if (!participantId && getStoredParticipantIdForCurrentGame()) {
+      await restoreParticipantSession({clearWhenMissing:true});
+    }
     if (!participantId) {
       if (!silent) {
         showLoginScreen({ showForm: true });
@@ -3811,23 +3796,19 @@ window.onload = async () => {
 
   if (phase === 'active' || phase === 'paused') {
     await restoreParticipantSession({ clearWhenMissing: true });
-  } else {
+  } else if (phase !== 'offline') {
     resetLocalParticipantSession();
   }
 
   if (participantId && phase === 'active') {
     await showQuestionScreen({ force: true });
   } else {
-    await loadGameState({ manageScreens: true, force: true });
+    await loadGameState({ manageScreens: true });
   }
 
   renderSummaryCountdown();
   setInterval(renderSummaryCountdown, 1000);
-  setInterval(() => {
-    if (!document.hidden) {
-      syncPlayerView();
-    }
-  }, 5000);
+  PlayerNetwork.startPolling(() => syncPlayerView(), 15000, 3000);
   window.addEventListener('focus', () => {
     schedulePlayerSync({ force: true });
   });
