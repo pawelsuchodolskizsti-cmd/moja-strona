@@ -2,7 +2,7 @@ window.AdminNavigation = (() => {
   const groups = [
     ['Gra', [['home','Pulpit'],['live','Na żywo'],['announcements','Komunikaty'],['content-blocks','Blokady techniczne'],['preview','Podgląd gracza']]],
     ['Uczestnicy', [['leaderboard','Ranking'],['institution-ranking','Ranking placówek'],['institutions','Placówki','/admin/placowki/'],['answers','Odpowiedzi'],['bonuses','Bonusy'],['question-stats','Statystyki pytań']]],
-    ['Organizacja', [['history','Historia i archiwum','/admin/historia/'],['volunteers','Wolontariusze','/admin/wolontariusze/'],['finale','Finał i wyniki'],['qr','Kody QR i pytania','/admin/qr/'],['documents','Dyplomy i pliki'],['diagnostics','Testy i ustawienia']]]
+    ['Organizacja', [['communications','Kontakt Fundacji','/admin/komunikacja/'],['history','Historia i archiwum','/admin/historia/'],['volunteers','Wolontariusze','/admin/wolontariusze/'],['finale','Finał i wyniki'],['qr','Kody QR i pytania','/admin/qr/'],['documents','Dyplomy i pliki'],['diagnostics','Testy i ustawienia']]]
   ];
   const descriptions = {
     'content-blocks':'Czasowo wyłącz pojedynczy kod QR i przywróć go po naprawie.',

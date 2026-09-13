@@ -778,6 +778,15 @@ label {
 .login-privacy p {margin:8px 0;overflow-wrap:anywhere}
 .login-privacy a {color:#6844b0;font-weight:700;text-underline-offset:3px}
 .login-privacy .privacy-draft {font-size:12px;color:#795317}
+.communication-choice{margin:12px 0 16px;text-align:left;color:#514565;font-size:13px;line-height:1.55}
+#login-form .communication-choice .terms-check{margin-bottom:8px;background:#f4effc}
+.communication-choice strong,.communication-choice [data-communication-text]{display:block}
+.communication-choice strong{color:#6844b0;margin-bottom:7px;font-size:14px}
+.communication-choice a{color:#6844b0;text-underline-offset:3px}
+.communication-choice p{margin:8px 0}.communication-choice small{font-size:12px}
+#login-form .communication-choice label{letter-spacing:0;text-transform:none}
+#login-form .communication-choice select{width:100%;min-width:0;min-height:46px;background:#f7f7fb;border:1px solid #d9cde7;border-radius:10px;padding:10px;color:#392b59;font:16px system-ui}
+#communication-age-field[hidden]{display:none!important}
 
 #login-screen.login-form-open {
   min-height: auto;
@@ -1822,6 +1831,7 @@ textarea {
 <meta name="theme-color" content="#e81e63">
 <link rel="stylesheet" href="/mobile-canvas.css">
 <script src="/game-clock.js"></script>
+<script src="/communication-policy.js"></script><script src="/communication-consent.js" defer></script>
 </head>
 <body>
 <div id="view-loading" role="status" aria-live="polite"><div class="view-loading-card"><div class="event-brand">Gwiazdka One Day 2026</div><span class="view-loading-spinner" aria-hidden="true"></span><p id="view-loading-message">Wczytujemy grę…</p><button id="view-loading-retry" type="button" hidden onclick="location.reload()">Odśwież stronę</button></div></div>
@@ -1921,13 +1931,19 @@ textarea {
       <h2 id="login-privacy-title">Twoje dane w grze</h2>
       <p>Fundacja One Day wykorzystuje podane dane do obsługi udziału i wyników. Publiczny ranking pokazuje imię, nazwisko, placówkę i punkty. E-mail oraz dane sesji nie są w nim publikowane.</p>
       <p><a href="/rodo/" target="_blank" rel="noopener">Informacja RODO - wzór</a> opisuje zakres danych, ich przechowywanie i Twoje prawa.</p>
-      <p>Akceptacja regulaminu nie jest zgodą na CRM, przyszły kontakt ani zdjęcia. Ten formularz nie zapisuje Cię do CRM.</p>
+      <p>Akceptacja regulaminu nie jest zgodą na kontakt ani zdjęcia. Dobrowolny zapis na wiadomości od Fundacji znajdziesz osobno poniżej.</p>
       <p class="privacy-draft">Regulamin i informacja RODO są wzorami do uzupełnienia i zatwierdzenia przez organizatora.</p>
     </section>
     <label class="terms-check" for="accept-rules">
       <input type="checkbox" id="accept-rules">
       <span class="terms-check-text">Akceptuję <a href="/regulamin/" target="_blank" rel="noopener">regulamin gry - wzór</a>.</span>
     </label>
+    <div class="communication-choice">
+      <label class="terms-check" for="accept-communication"><input type="checkbox" id="accept-communication"><span class="terms-check-text"><strong data-communication-title>Chcę poznawać nowe możliwości z One Day</strong><span data-communication-text></span><span>Zapoznałem się z <a href="/komunikacja/" target="_blank" rel="noopener">zasadami kontaktu</a>.</span></span></label>
+      <p><small>Dobrowolne. Możesz grać bez zaznaczania tego pola. To wzór zgody - zapis testowy nie uruchamia wysyłki wiadomości.</small></p>
+      <div id="communication-age-field" hidden><label for="communication-age">Potwierdzenie zgody</label><select id="communication-age"><option value="">Wybierz odpowiedź</option><option value="adult">Mam ukończone 18 lat</option><option value="guardian_required">Nie mam 18 lat - potrzebne potwierdzenie opiekuna</option></select><p><small>Za osobę niepełnoletnią zgodę potwierdza osoba uprawniona do jej reprezentowania. Sam zapis uczestnika tego nie zastępuje.</small></p></div>
+      <p><a href="/komunikacja/#rezygnacja" target="_blank" rel="noopener">Zarządzaj zgodą na kontakt</a></p>
+    </div>
 
     <button class="btn" id="login-btn" onclick="doLogin()">Dołącz do gry</button>
     <div class="msg error" id="login-msg"></div>
@@ -3406,6 +3422,14 @@ async function doLogin() {
   const email = normalizeEmailValue(emailInputEl.value);
   const acceptedRules = !!acceptRulesEl?.checked;
   const msg  = loginMsgEl;
+  let communication;
+  try{
+    communication={communicationConsent:false};
+    if(document.getElementById('accept-communication')?.checked){
+      if(!window.CommunicationConsent||!window.CommunicationPolicy)throw Error('Nie udało się wczytać zasad kontaktu. Odśwież stronę lub dołącz bez dodatkowej zgody.');
+      communication=CommunicationConsent.payload();
+    }
+  }catch(error){msg.innerText=error.message;return;}
 
   if (!fn || !ln || !institutionId || !email) {
     msg.innerText = 'Uzupełnij dane i wybierz swoją placówkę z listy.';
@@ -3434,7 +3458,8 @@ async function doLogin() {
       institutionId,
       email,
       deviceToken,
-      acceptedRules
+      acceptedRules,
+      ...communication
     });
 
     if (!data.id) {

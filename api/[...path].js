@@ -1,6 +1,8 @@
 const { runHandler } = require('../lib/run-handler');
 
 const handlers = {
+  'communication-consent':require('../lib/handlers/communication-consent').handler,
+  'admin-communications':require('../lib/handlers/admin-communications').handler,
   'admin-history':require('../lib/handlers/admin-history').handler,
   'admin-records':require('../lib/handlers/admin-records').handler,
   'volunteer-session': require('../lib/handlers/volunteer-session').handler,
