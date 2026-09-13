@@ -21,3 +21,11 @@
 .bonus-card .badge-chip-text { font-size:11px; line-height:1.5; color:#68596b; }
 .micro-toast-stack { top:auto; bottom:16px; pointer-events:none; padding-bottom:env(safe-area-inset-bottom,0px); }
 @media (max-width:430px) { #instruction-screen h1 {font-size:25px;} .instruction-icon {width:80px;height:80px;margin-bottom:18px;} }
+.institution-picker {text-align:left; margin-bottom:14px;}
+#institution-options {max-height:230px;overflow:auto;border:1px solid #d7c4e5;border-radius:12px;background:#fff;margin-top:6px;}
+#institution-options[hidden] {display:none;}
+#institution-options button {display:block;width:100%;text-align:left;border:0;border-bottom:1px solid #eee5f4;background:white;color:#493154;padding:12px;font:13px/1.5 system-ui;cursor:pointer;}
+#institution-options button:hover,#institution-options button[aria-selected="true"] {background:#f2e6f8;}
+#institution-status {font:12px/1.5 system-ui;color:#705377;margin:8px 0;}
+#institution-retry {padding:4px 0;font-size:11px;text-decoration:underline;}
+#institution-retry[hidden] {display:none;}

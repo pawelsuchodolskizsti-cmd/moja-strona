@@ -1375,7 +1375,7 @@ input:focus {
     </div>
   </div>
   <h1>Odbierz dodatkowy punkt</h1>
-  <p class="subtitle">Podaj imi&#281;, nazwisko, miasto i adres e-mail, aby przej&#347;&#263; do has&#322;a bonusowego przypisanego do tego kodu QR.</p>
+  <p class="subtitle">Podaj imię, nazwisko i adres e-mail oraz wybierz swoją placówkę, aby przejść do has&#322;a bonusowego przypisanego do tego kodu QR.</p>
   <div class="bonus-note">To specjalna okazja. Bonus daje Ci dodatkowy punkt poza zwyk&#322;ymi pytaniami.</div>
 
   <div class="bonus-highlight">
@@ -1389,8 +1389,14 @@ input:focus {
   <label for="lname">Nazwisko</label>
   <input type="text" id="lname" data-uppercase-login placeholder="Wpisz nazwisko">
 
-  <label for="city">Miasto</label>
-  <input type="text" id="city" data-uppercase-login placeholder="Wpisz miasto">
+  <div class="institution-picker">
+      <label for="institution-search">Twoja placówka</label>
+      <input id="institution-search" type="search" placeholder="Wpisz miasto lub nazwę placówki" autocomplete="off" role="combobox" aria-autocomplete="list" aria-controls="institution-options" aria-expanded="false">
+      <input id="institution-id" type="hidden">
+      <div id="institution-options" role="listbox" aria-label="Placówki" hidden></div>
+      <p id="institution-status" role="status">Ładowanie placówek…</p>
+      <button type="button" class="instruction-back" id="institution-retry" hidden>Odśwież listę placówek</button>
+    </div>
 
   <label for="email">E-mail</label>
   <input type="email" id="email" data-email-login inputmode="email" autocapitalize="off" autocomplete="email" spellcheck="false" placeholder="np. anna@example.com">
@@ -1564,6 +1570,7 @@ input:focus {
   <button class="btn" type="button" data-instruction-next>Dalej</button>
   <button class="instruction-back" type="button" data-instruction-back hidden>Wstecz</button>
 </div>
+<script src="/institution-picker.js"></script>
 <script src="/player-experience.js"></script>
 <script>
 let serverClockOffset = 0;
@@ -2869,15 +2876,15 @@ async function doNameLogin() {
   primeFeedbackAudio();
   const fn = normalizeLoginValue(document.getElementById('fname').value);
   const ln = normalizeLoginValue(document.getElementById('lname').value);
-  const city = normalizeLoginValue(document.getElementById('city').value);
+  const institutionId = Number(document.getElementById('institution-id').value);
   const email = normalizeEmailValue(document.getElementById('email').value);
   const acceptedRules = !!acceptRulesBonusEl?.checked;
   const msg = nameMsgEl;
   const btn = nameBtnEl;
 
-  if (!fn || !ln || !city || !email) {
+  if (!fn || !ln || !institutionId || !email) {
     msg.className = 'msg error';
-    msg.innerText = 'Uzupe\u0142nij imi\u0119, nazwisko, miasto i e-mail.';
+    msg.innerText = 'Uzupełnij dane i wybierz swoją placówkę z listy.';
     return;
   }
 
@@ -2903,7 +2910,7 @@ async function doNameLogin() {
     const { response: res, data } = await postJsonWithRetry('/api/login', {
       firstName: fn,
       lastName: ln,
-      city,
+      institutionId,
       email,
       deviceToken,
       acceptedRules

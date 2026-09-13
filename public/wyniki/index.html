@@ -2110,6 +2110,11 @@ body.projection-mode .city-item-meta{font-size:9px;white-space:nowrap;overflow:h
  .podium-score{grid-column:2;grid-row:auto;border-left:0;padding-left:0;text-align:left;min-width:0}
  .podium-meta{grid-column:2;overflow-wrap:anywhere}
 }
+.city-item-name{white-space:normal;overflow:visible;text-overflow:clip;overflow-wrap:anywhere;line-height:1.2}
+body.projection-mode .city-grid{overflow-y:auto;grid-template-rows:repeat(2,minmax(min-content,1fr))}
+.podium-name{white-space:normal;overflow-wrap:anywhere}
+body.projection-mode .podium-name,body.projection-mode .city-item-name{display:block;-webkit-line-clamp:unset;overflow:visible;white-space:normal;overflow-wrap:anywhere;font-family:'DM Sans',sans-serif;font-size:15px;line-height:1.2}
+body.projection-mode .podium-grid{overflow-y:auto;grid-template-rows:repeat(3,minmax(min-content,1fr))}
 </style>
 </head>
 <body>
@@ -2151,8 +2156,8 @@ body.projection-mode .city-item-meta{font-size:9px;white-space:nowrap;overflow:h
       <section class="card board-card">
         <div class="section-head">
           <div>
-            <div class="section-title">Top 3 miast</div>
-            <div class="section-copy" id="podium-copy">Podium liczone według sumy punktów zdobytych przez całe miasto.</div>
+            <div class="section-title">Top 3 placówek</div>
+            <div class="section-copy" id="podium-copy">Podium liczone według sumy punktów zdobytych przez całe placówki.</div>
           </div>
           <div class="board-tools">
             <select class="sort-select" id="city-podium-mode" onchange="setCityPodiumMode(this.value)">
@@ -2173,8 +2178,8 @@ body.projection-mode .city-item-meta{font-size:9px;white-space:nowrap;overflow:h
           <div class="board-tools">
             <select class="sort-select" id="leaderboard-sort" onchange="setScoreboardSort(this.value)">
               <option value="score">Sortowanie: punkty</option>
-              <option value="city">Sortowanie: miasto A-Z</option>
-              <option value="city-score">Sortowanie: wynik miasta</option>
+              <option value="city">Sortowanie: placówka A-Z</option>
+              <option value="city-score">Sortowanie: wynik placówki</option>
             </select>
           </div>
         </div>
@@ -2191,8 +2196,8 @@ body.projection-mode .city-item-meta{font-size:9px;white-space:nowrap;overflow:h
     <section class="card city-card">
       <div class="section-head">
         <div>
-          <div class="section-title">Punkty miast</div>
-          <div class="section-copy">Kompaktowy przeglad wszystkich miast, bez przeladowania ekranu dodatkowymi tabelami.</div>
+          <div class="section-title">Punkty placówek</div>
+          <div class="section-copy">Kompaktowy przeglad wszystkich placówek, bez przeladowania ekranu dodatkowymi tabelami.</div>
         </div>
       </div>
       <div class="city-grid" id="city-ranking"></div>
@@ -2393,7 +2398,7 @@ function triggerRevealMoment(type) {
   overlay.innerHTML = `
     <div class="reveal-flash-card">
       <div class="reveal-flash-kicker">${isCities ? 'Etap drugi' : 'Etap pierwszy'}</div>
-      <div class="reveal-flash-title">${isCities ? 'Ranking miast' : 'Wyniki uczestników'}</div>
+      <div class="reveal-flash-title">${isCities ? 'Ranking placówek' : 'Wyniki uczestników'}</div>
     </div>
   `;
   document.body.appendChild(overlay);
@@ -2408,7 +2413,7 @@ function getCityStats() {
   const baseStats = Array.isArray(scoreboardState.cityStats) && scoreboardState.cityStats.length
     ? scoreboardState.cityStats
     : [...scoreboardState.leaderboard.reduce((map, participant) => {
-        const cityName = String(participant.city || 'Bez miasta').trim() || 'Bez miasta';
+        const cityName = String(participant.city || 'Bez placówki').trim() || 'Bez placówki';
         const current = map.get(cityName) || {
           city: cityName,
           score: 0,
@@ -2444,8 +2449,8 @@ function getSortedLeaderboard() {
 
   const cityScores = new Map(getCityStats().map((item) => [item.city, item.score]));
   cachedSortedLeaderboard = [...scoreboardState.leaderboard].sort((a, b) => {
-    const cityA = String(a.city || 'Bez miasta').trim() || 'Bez miasta';
-    const cityB = String(b.city || 'Bez miasta').trim() || 'Bez miasta';
+    const cityA = String(a.city || 'Bez placówki').trim() || 'Bez placówki';
+    const cityB = String(b.city || 'Bez placówki').trim() || 'Bez placówki';
 
     if (scoreboardSort === 'city') {
       return cityA.localeCompare(cityB, 'pl') ||
@@ -2518,8 +2523,8 @@ function renderHeader() {
   } else if (scoreboardState.phase === 'active') {
     headline.textContent = suspenseMode ? 'Finałowa końcówka' : 'Ranking na żywo';
     subline.textContent = suspenseMode
-      ? 'Ostatnie 3 minuty. Top 3 miast i najlepsi uczestnicy zostały właśnie ukryte, a pełny wynik wróci dopiero po zakończeniu gry.'
-      : 'Gra trwa. Widownia widzi liderów miast, najmocniejszych uczestników i wyraźny licznik czasu.';
+      ? 'Ostatnie 3 minuty. Top 3 placówek i najlepsi uczestnicy zostały właśnie ukryte, a pełny wynik wróci dopiero po zakończeniu gry.'
+      : 'Gra trwa. Widownia widzi liderów placówek, najmocniejszych uczestników i wyraźny licznik czasu.';
     timerLabel.textContent = 'Do końca gry';
   } else if (scoreboardState.phase === 'ended') {
     headline.textContent = 'Finał i podsumowanie';
@@ -2561,7 +2566,7 @@ function renderAnnouncement() {
 
   if (scoreboardState.phase === 'active' && suspenseMode) {
     copy.textContent = 'Finałowa końcówka trwa. Wyniki sa juz zamkniete, a pelne podium odslonimy dopiero po ostatnich sekundach gry.';
-    meta.textContent = 'To jest moment na największe emocje. Tablica celowo ukrywa topkę miast i uczestników.';
+    meta.textContent = 'To jest moment na największe emocje. Tablica celowo ukrywa topkę placówek i uczestników.';
   } else if (scoreboardState.phase === 'active') {
     copy.textContent = 'Gra trwa. Gdy organizator wyśle ważną informację, pojawi się ona właśnie tutaj.';
     meta.textContent = 'Na razie brak aktywnego komunikatu.';
@@ -2591,12 +2596,12 @@ function renderCityStats() {
   const projectionMode = document.body.classList.contains('projection-mode');
 
   if (!revealState.citiesVisible) {
-    container.innerHTML = getRevealLockMarkup('Punkty miast są zasłonięte', 'Miasta odsłonimy w drugim kroku, kiedy organizator uruchomi finałowe pokazanie rankingu.', 'Miasta czekają na odsłonięcie');
+    container.innerHTML = getRevealLockMarkup('Punkty placówek są zasłonięte', 'Placówki odsłonimy w drugim kroku, kiedy organizator uruchomi finałowe pokazanie rankingu.', 'Placówki czekają na odsłonięcie');
     return;
   }
 
   if (!cityStats.length) {
-    container.innerHTML = '<div class="empty-state" style="grid-column:1 / -1;">Po starcie gry tutaj pojawi się ranking miast z sumą punktów i średnią na osobę.</div>';
+    container.innerHTML = '<div class="empty-state" style="grid-column:1 / -1;">Po starcie gry tutaj pojawi się ranking placówek z sumą punktów i średnią na osobę.</div>';
     return;
   }
 
@@ -2613,7 +2618,7 @@ function renderCityStats() {
   `).join('') + (extraCities > 0 ? `
     <div class="city-item more">
       <div class="city-item-name">+${extraCities}</div>
-      <div class="city-item-meta">kolejnych miast w rankingu</div>
+      <div class="city-item-meta">kolejnych placówek w rankingu</div>
     </div>
   ` : '');
 }
@@ -2626,17 +2631,17 @@ function renderCityPodium() {
   const variants = ['gold', 'silver', 'bronze'];
 
   if (!revealState.citiesVisible) {
-    podiumCopy.textContent = 'Ranking miast jest zasłonięty na finał. Najpierw odsłaniamy uczestników, potem miasta.';
-    podium.innerHTML = getRevealLockMarkup('Top 3 miast za chwilę', 'Podium miast pozostaje ukryte, żeby finał miał mocniejsze napięcie na sali.', 'Drugi etap odsłonięcia');
+    podiumCopy.textContent = 'Ranking placówek jest zasłonięty na finał. Najpierw odsłaniamy uczestników, potem placówki.';
+    podium.innerHTML = getRevealLockMarkup('Top 3 placówek za chwilę', 'Podium placówek pozostaje ukryte, żeby finał miał mocniejsze napięcie na sali.', 'Drugi etap odsłonięcia');
     return;
   }
 
   podiumCopy.textContent = cityPodiumMode === 'average'
-    ? 'Podium liczone według średniej punktów na jednego uczestnika z danego miasta.'
-    : 'Podium liczone według sumy punktów zdobytych przez całe miasto.';
+    ? 'Podium liczone według średniej punktów na jednego uczestnika z danej placówki.'
+    : 'Podium liczone według sumy punktów zdobytych przez całe placówki.';
 
   if (!top.length) {
-    podium.innerHTML = '<div class="empty-state">Po starcie gry tutaj pojawi się podium miast.</div>';
+    podium.innerHTML = '<div class="empty-state">Po starcie gry tutaj pojawi się podium placówek.</div>';
     return;
   }
 
@@ -2686,7 +2691,7 @@ function renderLeaderboardList() {
       <div class="list-rank">${participant.rank}</div>
       <div class="list-main">
         <div class="list-name">${escHtml(participant.name)}${getMovementPill(movement)}</div>
-        <div class="list-city">${escHtml(participant.city || 'Bez miasta')}</div>
+        <div class="list-city">${escHtml(participant.city || 'Bez placówki')}</div>
       </div>
       <div class="list-score">
         <strong class="${scoreChanged ? 'score-changed' : ''}">${participant.score} pkt</strong>

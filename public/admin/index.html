@@ -2143,6 +2143,7 @@
 </div>
 
 <div class="shell" id="admin-shell" style="display:none">
+  <section class="ops-card"><div class="ops-title">Placówki uczestników</div><p class="ops-copy">Dodawaj i edytuj placówki dostępne przy zapisie do gry. Wyniki łączą się według placówki.</p><a class="btn" id="manage-institutions" href="/admin/placowki/">Zarządzaj placówkami</a></section>
   <div class="system-mini-bar warning" id="system-mini-bar">
     <div class="system-mini-main">
       <div class="system-mini-dot" id="system-mini-dot"></div>
@@ -2285,16 +2286,16 @@
 
   <div class="ops-grid">
     <section class="ops-card city-dashboard-card">
-      <div class="ops-title">Punkty miast</div>
-      <div class="ops-copy">Szybki podgląd sumy punktów, liczby uczestników i odpowiedzi dla każdego miasta bez przechodzenia do zakładki rankingu.</div>
+      <div class="ops-title">Punkty placówek</div>
+      <div class="ops-copy">Szybki podgląd sumy punktów, liczby uczestników i odpowiedzi dla każdej placówki bez przechodzenia do zakładki rankingu.</div>
       <div class="table-wrap city-summary tight">
         <div class="city-summary-head">
-          <div class="city-summary-copy" data-city-meta>Ładowanie rankingu miast...</div>
+          <div class="city-summary-copy" data-city-meta>Ładowanie rankingu placówek...</div>
         </div>
         <table>
           <thead>
             <tr>
-              <th>Miasto</th>
+              <th>Placówka</th>
               <th>Punkty</th>
               <th>Uczestnicy</th>
               <th>Odpowiedzi</th>
@@ -2309,7 +2310,7 @@
 
     <section class="ops-card reveal-control-card">
       <div class="ops-title">Odsłanianie wyników</div>
-      <div class="ops-copy">To steruje blokadą z końcówki gry na publicznej tablicy. Najpierw odsłoń uczestników, potem miasta, żeby finał miał mocniejszy efekt.</div>
+      <div class="ops-copy">To steruje blokadą z końcówki gry na publicznej tablicy. Najpierw odsłoń uczestników, potem placówki, żeby finał miał mocniejszy efekt.</div>
       <div class="reveal-status-row">
         <div class="reveal-step" id="reveal-step-lock">
           <strong>Blokada finałowa</strong>
@@ -2320,13 +2321,13 @@
           <span id="reveal-players-label">Czeka na odsłonięcie.</span>
         </div>
         <div class="reveal-step" id="reveal-step-cities">
-          <strong>Etap 2: miasta</strong>
+          <strong>Etap 2: placówki</strong>
           <span id="reveal-cities-label">Czeka na odsłonięcie.</span>
         </div>
       </div>
       <div class="reveal-actions">
         <button class="btn reveal-primary" id="btn-reveal-participants" type="button" onclick="confirmAction('reveal-participants')">Odsłoń osoby</button>
-        <button class="btn reveal-gold" id="btn-reveal-cities" type="button" onclick="confirmAction('reveal-cities')">Odsłoń miasta</button>
+        <button class="btn reveal-gold" id="btn-reveal-cities" type="button" onclick="confirmAction('reveal-cities')">Odsłoń placówki</button>
         <button class="btn outline" id="btn-lock-results" type="button" onclick="confirmAction('lock-results')">Zablokuj ponownie</button>
       </div>
       <div class="reveal-meta" id="reveal-results-meta">Start lub reset gry automatycznie zamknie wyniki od nowa.</div>
@@ -2355,14 +2356,14 @@
         <button class="btn outline" type="button" onclick="confirmClearSimulation()">Usuń symulację</button>
         <button class="btn primary simulator-mega-btn" type="button" onclick="runStartSimulator()">
           Uruchom test 300 uczestników
-          <small>Ranking, miasta, odpowiedzi i bonusy będą aktualizować się live</small>
+          <small>Ranking, placówki, odpowiedzi i bonusy będą aktualizować się live</small>
         </button>
       </div>
       <div class="qr-admin-summary">
         <div class="qr-admin-pill" id="sim-total-participants">0 uczestników</div>
         <div class="qr-admin-pill" id="sim-total-answers">0 odpowiedzi</div>
         <div class="qr-admin-pill" id="sim-total-bonuses">0 bonusów</div>
-        <div class="qr-admin-pill" id="sim-total-cities">0 miast</div>
+        <div class="qr-admin-pill" id="sim-total-cities">0 placówek</div>
       </div>
       <div class="checklist" id="simulator-results">
         <div class="check-item pending">
@@ -2427,7 +2428,7 @@
 
     <section class="ops-card diploma-admin-card">
       <div class="ops-title">Dyplomy i umowy</div>
-      <div class="ops-copy">Gotowy pakiet dokumentów do druku i zapisu w PDF. System pobiera dane automatycznie z aktualnego rankingu uczestników oraz klasyfikacji miast.</div>
+      <div class="ops-copy">Gotowy pakiet dokumentów do druku i zapisu w PDF. System pobiera dane automatycznie z aktualnego rankingu uczestników oraz klasyfikacji placówek.</div>
       <div class="qr-admin-summary">
         <div class="qr-admin-pill" id="diploma-admin-total">0 pakietów</div>
         <div class="qr-admin-pill" id="diploma-admin-pages">0 stron</div>
@@ -2439,7 +2440,7 @@
           <strong id="diploma-admin-participants">3 podium + reszta</strong>
         </div>
         <div class="qr-admin-route">
-          <span>Top miast</span>
+          <span>Top placówek</span>
           <strong id="diploma-admin-cities">3 podium + reszta</strong>
         </div>
         <div class="qr-admin-route">
@@ -2513,8 +2514,8 @@
       <input type="text" id="search-lb" placeholder="Szukaj po imieniu, nazwisku lub mieście..." oninput="renderLeaderboard()">
       <select id="sort-lb" onchange="renderLeaderboard()">
         <option value="score">Sortuj: punkty</option>
-        <option value="city">Sortuj: miasto A-Z</option>
-        <option value="city-score">Sortuj: punkty miasta</option>
+        <option value="city">Sortuj: placówka A-Z</option>
+        <option value="city-score">Sortuj: punkty placówki</option>
       </select>
       <button class="btn primary" onclick="loadData()">Odśwież</button>
       <button class="btn outline" onclick="exportExcel()">Eksportuj Excel</button>
@@ -2527,7 +2528,7 @@
           <tr>
             <th>#</th>
             <th>Imię i nazwisko</th>
-            <th class="detail-col">Miasto</th>
+            <th class="detail-col">Placówka</th>
             <th>Punkty łącznie</th>
             <th>Odpowiedzi</th>
             <th class="detail-col">Ostatnia aktywność</th>
@@ -2540,12 +2541,12 @@
     </div>
     <div class="table-wrap city-summary">
       <div class="city-summary-head">
-        <div class="city-summary-copy" data-city-meta>Ładowanie rankingu miast...</div>
+        <div class="city-summary-copy" data-city-meta>Ładowanie rankingu placówek...</div>
       </div>
       <table>
         <thead>
           <tr>
-            <th>Miasto</th>
+            <th>Placówka</th>
             <th>Punkty</th>
             <th>Uczestnicy</th>
             <th>Odpowiedzi</th>
@@ -2565,7 +2566,7 @@
         <option value="all">Wszystkie pytania</option>
       </select>
       <select id="filter-city" onchange="renderAnswers()">
-        <option value="all">Wszystkie miasta</option>
+        <option value="all">Wszystkie placówki</option>
       </select>
       <select id="filter-correct" onchange="renderAnswers()">
         <option value="all">Wszystkie wyniki</option>
@@ -2578,7 +2579,7 @@
         <thead>
           <tr>
             <th>Uczestnik</th>
-            <th class="detail-col">Miasto</th>
+            <th class="detail-col">Placówka</th>
             <th>Pytanie</th>
             <th>Odpowiedź</th>
             <th>Wynik</th>
@@ -2599,7 +2600,7 @@
         <option value="all">Wszystkie bonusy</option>
       </select>
       <select id="filter-bonus-city" onchange="renderBonuses()">
-        <option value="all">Wszystkie miasta</option>
+        <option value="all">Wszystkie placówki</option>
       </select>
       <div class="toolbar-meta" id="bonus-meta">Pokazano 0 bonusów</div>
     </div>
@@ -2608,7 +2609,7 @@
         <thead>
           <tr>
             <th>Uczestnik</th>
-            <th class="detail-col">Miasto</th>
+            <th class="detail-col">Placówka</th>
             <th>Bonus</th>
             <th>Punkt</th>
             <th>Czas</th>
@@ -3221,8 +3222,8 @@ function renderRevealControls() {
     meta.textContent = citiesOpen
       ? 'Pełny ranking jest odsłonięty na tablicy wyników.'
       : playersOpen
-        ? 'Uczestnicy są odsłonięci. Kolejny krok to spektakularne pokazanie rankingu miast.'
-        : 'Wyniki pozostają zasłonięte w finale. Odsłanianie działa etapami: najpierw osoby, potem miasta.';
+        ? 'Uczestnicy są odsłonięci. Kolejny krok to spektakularne pokazanie rankingu placówek.'
+        : 'Wyniki pozostają zasłonięte w finale. Odsłanianie działa etapami: najpierw osoby, potem placówki.';
   }
 }
 function renderPlayerPreview() {
@@ -3545,9 +3546,9 @@ function confirmAction(action) {
       button: 'Tak, odsłoń osoby'
     },
     'reveal-cities': {
-      title: 'Odsłonić ranking miast?',
-      copy: 'To drugi etap finału: po osobach tablica pokaże Top 3 miast i punkty miast.',
-      button: 'Tak, odsłoń miasta'
+      title: 'Odsłonić ranking placówek?',
+      copy: 'To drugi etap finału: po osobach tablica pokaże Top 3 placówek i punkty placówek.',
+      button: 'Tak, odsłoń placówki'
     },
     'lock-results': {
       title: 'Zablokować wyniki ponownie?',
@@ -3752,7 +3753,7 @@ async function sendAnnouncement() {
 async function setResultsReveal(action) {
   const labels = {
     'reveal-participants': 'Odsłaniam wyniki uczestników...',
-    'reveal-cities': 'Odsłaniam ranking miast...',
+    'reveal-cities': 'Odsłaniam ranking placówek...',
     'lock-results': 'Zasłaniam wyniki ponownie...'
   };
   setAdminFeedback(labels[action] || 'Aktualizuję blokadę wyników...');
@@ -3774,7 +3775,7 @@ async function setResultsReveal(action) {
       action === 'lock-results'
         ? 'Wyniki zostały ponownie zasłonięte na tablicy.'
         : action === 'reveal-cities'
-          ? 'Ranking miast został odsłonięty na tablicy wyników.'
+          ? 'Ranking placówek został odsłonięty na tablicy wyników.'
           : 'Wyniki uczestników zostały odsłonięte na tablicy wyników.',
       'success'
     );
@@ -4082,12 +4083,12 @@ function buildStartSimulation(participantCount = 35) {
           : 'Suma odpowiedzi nie zgadza się z liczbą odpowiedzi przypisaną uczestnikom.'
       },
       {
-        label: 'Ranking miast',
+        label: 'Ranking placówek',
         status: cityAggregationMatches ? 'ok' : 'error',
         badge: cityAggregationMatches ? 'OK' : 'Błąd',
         message: cityAggregationMatches
-          ? `Punkty miast sumują się poprawnie. Liderem jest ${cityStats[0]?.city || '—'}.`
-          : 'Suma punktów miast nie zgadza się z łącznym wynikiem uczestników.'
+          ? `Punkty placówek sumują się poprawnie. Liderem jest ${cityStats[0]?.city || '—'}.`
+          : 'Suma punktów placówek nie zgadza się z łącznym wynikiem uczestników.'
       },
       {
         label: 'Topka i remisy',
@@ -4112,7 +4113,7 @@ function renderStartSimulation(report) {
   participantsEl.textContent = `${report.participantCount} uczestników`;
   answersEl.textContent = `${report.totalAnswers} odpowiedzi`;
   bonusesEl.textContent = `${report.totalBonuses} bonusów`;
-  citiesEl.textContent = `${report.cityCount} miast`;
+  citiesEl.textContent = `${report.cityCount} placówek`;
 
   list.innerHTML = report.checks.map((item) => `
     <div class="check-item ${item.status}">
@@ -4125,14 +4126,14 @@ function renderStartSimulation(report) {
   `).join('');
 
   meta.textContent = report.topParticipant && report.topCity
-    ? `Lider testu: ${report.topParticipant.firstName} ${report.topParticipant.lastName} (${report.topParticipant.score} pkt) | Lider miast: ${report.topCity.city} (${report.topCity.score} pkt).`
+    ? `Lider testu: ${report.topParticipant.firstName} ${report.topParticipant.lastName} (${report.topParticipant.score} pkt) | Lider placówek: ${report.topCity.city} (${report.topCity.score} pkt).`
     : 'Wielki test korzysta z tych samych tabel i zasad liczenia co panel, ale działa w oddzielnym trybie danych.';
 }
 
 function buildPersistedSimulationReport() {
   const cityMap = new Map();
   allParticipants.forEach((participant) => {
-    const cityName = (participant.city || '').trim() || 'BEZ MIASTA';
+    const cityName = (participant.city || '').trim() || 'BEZ PLACÓWKI';
     const current = cityMap.get(cityName) || { city: cityName, score: 0, participants: 0 };
     current.score += Number(participant.score || 0);
     current.participants += 1;
@@ -4181,12 +4182,12 @@ function buildPersistedSimulationReport() {
         message: `Baza zwróciła ${allAnswers.length} odpowiedzi oraz ${allBonuses.length} bonusów. Te liczby rosną stopniowo przy odświeżaniu panelu i tablicy.`
       },
       {
-        label: 'Punkty miast',
+        label: 'Punkty placówek',
         status: cityOk ? 'ok' : 'warning',
         badge: cityOk ? 'OK' : 'Uwaga',
         message: cityStats.length
-          ? `W rankingu miast widać ${cityStats.length} miast, a liderem jest ${topCity?.city || '---'}.`
-          : 'Brak wystarczających danych miast w trybie testowym.'
+          ? `W rankingu placówek widać ${cityStats.length} placówek, a liderem jest ${topCity?.city || '---'}.`
+          : 'Brak wystarczających danych placówek w trybie testowym.'
       }
     ]
   };
@@ -4468,7 +4469,7 @@ function populateAnswerFilters() {
   questionSelect.innerHTML = '<option value="all">Wszystkie pytania</option>' +
     questions.map(question => `<option value="${question.id}">${escHtml(question.label)}</option>`).join('');
 
-  citySelect.innerHTML = '<option value="all">Wszystkie miasta</option>' +
+  citySelect.innerHTML = '<option value="all">Wszystkie placówki</option>' +
     cities.map(city => `<option value="${escapeAttr(city)}">${escHtml(city)}</option>`).join('');
 
   questionSelect.value = [...questionSelect.options].some(option => option.value === prevQuestion) ? prevQuestion : 'all';
@@ -4493,7 +4494,7 @@ function populateBonusFilters() {
   bonusSelect.innerHTML = '<option value="all">Wszystkie bonusy</option>' +
     bonusCatalog.map((bonus) => `<option value="${escapeAttr(bonus.id)}">${escHtml(bonus.label)}</option>`).join('');
 
-  citySelect.innerHTML = '<option value="all">Wszystkie miasta</option>' +
+  citySelect.innerHTML = '<option value="all">Wszystkie placówki</option>' +
     cities.map((city) => `<option value="${escapeAttr(city)}">${escHtml(city)}</option>`).join('');
 
   bonusSelect.value = [...bonusSelect.options].some((option) => option.value === prevBonus) ? prevBonus : 'all';
@@ -4559,7 +4560,7 @@ function renderLiveActivity() {
           <div class="live-item-badge">${formatSecondsToLabel(participant.secondsOpen)}</div>
         </div>
         <div class="live-item-sub">Pytanie ${participant.currentQuestionId}: ${escHtml(participant.currentQuestionText || 'Brak treści pytania')}</div>
-        <div class="live-item-sub">${escHtml(participant.city || 'Bez miasta')} | Odpowiedzi: ${participant.answeredCount || 0}</div>
+        <div class="live-item-sub">${escHtml(participant.city || 'Bez placówki')} | Odpowiedzi: ${participant.answeredCount || 0}</div>
       </div>
     `).join('');
   }
@@ -4589,34 +4590,13 @@ function renderLiveActivity() {
           <div class="live-item-badge">${formatDateTime(activity.createdAt)}</div>
         </div>
         <div class="live-item-sub">Otworzył pytanie ${activity.questionId}: ${escHtml(activity.questionText || 'Brak treści pytania')}</div>
-        <div class="live-item-sub">${escHtml(activity.city || 'Bez miasta')}</div>
+        <div class="live-item-sub">${escHtml(activity.city || 'Bez placówki')}</div>
       </div>
     `).join('');
   }
 }
 
-function getCityStats() {
-  return [...allParticipants.reduce((map, participant) => {
-    const cityName = String(participant.city || 'Bez miasta').trim() || 'Bez miasta';
-    const current = map.get(cityName) || {
-      city: cityName,
-      score: 0,
-      participants: 0,
-      answers: 0
-    };
-
-    current.score += Number(participant.score || 0);
-    current.participants += 1;
-    current.answers += Number(participant.answeredCount || 0);
-    map.set(cityName, current);
-    return map;
-  }, new Map()).values()]
-    .sort((a, b) =>
-      b.score - a.score ||
-      b.participants - a.participants ||
-      a.city.localeCompare(b.city, 'pl')
-    );
-}
+function getCityStats() { return GameRanking.institutionStats(allParticipants); }
 
 function renderCityRanking() {
   const bodies = Array.from(document.querySelectorAll('[data-city-body]'));
@@ -4625,15 +4605,15 @@ function renderCityRanking() {
 
   metas.forEach((meta) => {
     meta.textContent = cityStats.length
-      ? `Łącznie punktują ${cityStats.length} miasta.`
-      : 'Brak miast w aktualnych danych.';
+      ? `Liczba punktujących placówek: ${cityStats.length}.`
+      : 'Brak placówek w aktualnych danych.';
   });
 
   if (!bodies.length) return;
 
   if (!cityStats.length) {
     bodies.forEach((body) => {
-      body.innerHTML = '<tr><td colspan="4" class="empty">Brak danych o miastach.</td></tr>';
+      body.innerHTML = '<tr><td colspan="4" class="empty">Brak danych o placówkach.</td></tr>';
     });
     return;
   }
@@ -4671,8 +4651,8 @@ function renderLeaderboard() {
         return queryTokens.every(token => searchable.includes(token));
       })
     .sort((a, b) => {
-      const cityA = String(a.city || 'Bez miasta').trim() || 'Bez miasta';
-      const cityB = String(b.city || 'Bez miasta').trim() || 'Bez miasta';
+      const cityA = String(a.city || 'Bez placówki').trim() || 'Bez placówki';
+      const cityB = String(b.city || 'Bez placówki').trim() || 'Bez placówki';
 
       if (sortMode === 'city') {
         return cityA.localeCompare(cityB, 'pl') ||
@@ -4992,7 +4972,7 @@ function openParticipantModal(participantId) {
   document.getElementById('participant-modal-name').textContent =
     `${participant.firstName || ''} ${participant.lastName || ''}`.trim() || 'Uczestnik';
   document.getElementById('participant-modal-sub').textContent =
-    `Miasto: ${participant.city || 'Brak miasta'} | Ostatnia aktywność: ${formatDateTime(participant.lastActivity)}`;
+    `Placówka: ${participant.city || 'Brak placówki'} | Ostatnia aktywność: ${formatDateTime(participant.lastActivity)}`;
 
   document.getElementById('participant-modal-passed-count').textContent = participantPassedAnswers.length;
   document.getElementById('participant-modal-answers-count').textContent = participantAnswers.length;
@@ -5168,7 +5148,7 @@ function refreshDiplomaAdminSummary() {
   if (citiesEl) {
     citiesEl.textContent = cityCount
       ? `${Math.min(3, cityCount)} podium + ${Math.max(cityCount - 3, 0)} podziękowań`
-      : 'Brak danych miast';
+      : 'Brak danych placówek';
   }
 
   if (totalEl) totalEl.textContent = `${packetCount} pakietów`;
@@ -5197,7 +5177,7 @@ function downloadQrJpgPack() {
 }
 
 function exportCSV() {
-  let csv = 'Miejsce,Imię,Nazwisko,Miasto,E-mail,Punkty,Odpowiedzi\n';
+  let csv = 'Miejsce,Imię,Nazwisko,Placówka,E-mail,Punkty,Odpowiedzi\n';
 
   [...allParticipants]
     .sort(GameRanking.compareParticipants)
@@ -5245,7 +5225,7 @@ function exportExcel() {
       <tr>
         <th>Imię</th>
         <th>Nazwisko</th>
-        <th>Miasto</th>
+        <th>Placówka</th>
         <th>E-mail</th>
       </tr>
     </thead>
@@ -5304,7 +5284,7 @@ function getCityDiplomaRanking() { return [...getCityStats()].sort(GameRanking.c
 
 function buildParticipantPacket(participant, place, isAppreciation) {
   const fullName = `${participant.firstName || ''} ${participant.lastName || ''}`.trim() || 'Uczestnik';
-  const cityName = participant.city || 'Bez miasta';
+  const cityName = participant.city || 'Bez placówki';
   const placeLabel = formatPlaceLabel(place);
 
   return {
@@ -5318,7 +5298,7 @@ function buildParticipantPacket(participant, place, isAppreciation) {
       ? `Miejsce w rankingu końcowym: ${place}.`
       : 'Wyróżnienie przyznane na podstawie końcowego rankingu uczestników.',
     stats: [
-      { label: 'Miasto', value: cityName },
+      { label: 'Placówka', value: cityName },
       { label: 'Punkty', value: `${participant.score || 0} pkt` },
       { label: 'Odpowiedzi', value: `${participant.answeredCount || 0}` },
       { label: 'E-mail', value: participant.email || 'Brak adresu e-mail' }
@@ -5339,29 +5319,29 @@ function buildCityPacket(city, place, isAppreciation) {
 
   return {
     type: 'city',
-    title: isAppreciation ? 'Dyplom podziękowania dla miasta' : 'Dyplom dla miasta',
-    eyebrow: isAppreciation ? 'Klasyfikacja miast' : `${placeLabel} miejsce`,
+    title: isAppreciation ? 'Dyplom podziękowania dla placówki' : 'Dyplom dla placówki',
+    eyebrow: isAppreciation ? 'Klasyfikacja placówek' : `${placeLabel} miejsce`,
     recipientLabel: 'Dyplom dla',
-    recipientName: city.city || 'Miasto',
+    recipientName: city.city || 'Placówka',
     highlight: isAppreciation
-      ? 'Za zaangażowanie i udział miasta w grze terenowej Gwiazdka One Day 2026.'
-      : `Za zajęcie ${placeLabel} miejsca w klasyfikacji miast w grze terenowej Gwiazdka One Day 2026.`,
+      ? 'Za zaangażowanie i udział placówki w grze terenowej Gwiazdka One Day 2026.'
+      : `Za zajęcie ${placeLabel} miejsca w klasyfikacji placówek w grze terenowej Gwiazdka One Day 2026.`,
     note: isAppreciation
-      ? `Pozycja miasta w rankingu końcowym: ${place}.`
-      : 'Wyróżnienie przyznane na podstawie sumy punktów wszystkich uczestników z danego miasta.',
+      ? `Pozycja placówki w rankingu końcowym: ${place}.`
+      : 'Wyróżnienie przyznane na podstawie sumy punktów wszystkich uczestników z danej placówki.',
     stats: [
-      { label: 'Punkty miasta', value: `${city.score || 0} pkt` },
+      { label: 'Punkty placówki', value: `${city.score || 0} pkt` },
       { label: 'Uczestnicy', value: `${city.participants || 0}` },
       { label: 'Odpowiedzi', value: `${city.answers || 0}` },
       { label: 'Średnio na osobę', value: formatCityAverage(city) }
     ],
     agreementTitle: 'Umowa przekazania darowizny w postaci nagrody',
     agreementRecipientLabel: 'Odbiorca',
-    agreementRecipientValue: `Reprezentant miasta ${city.city || 'Miasto'}`,
+    agreementRecipientValue: `Reprezentant placówki ${city.city || 'Placówka'}`,
     agreementBody: [
-      'Organizator przekazuje nagrodę lub upominek przyznany w ramach klasyfikacji miast wydarzenia Gwiazdka One Day 2026.',
+      'Organizator przekazuje nagrodę lub upominek przyznany w ramach klasyfikacji placówek wydarzenia Gwiazdka One Day 2026.',
       'To jest wersja robocza dokumentu, przygotowana jako placeholder do czasu otrzymania właściwego wzoru umowy.',
-      `Nagroda dotyczy miasta wskazanego na dyplomie ${isAppreciation ? 'za udział w grze' : `za zajęcie ${placeLabel} miejsca w klasyfikacji`}.`
+      `Nagroda dotyczy placówki wskazanej na dyplomie ${isAppreciation ? 'za udział w grze' : `za zajęcie ${placeLabel} miejsca w klasyfikacji`}.`
     ]
   };
 }
@@ -5936,7 +5916,7 @@ function buildAgreementSheet(packet, sheetNumber) {
         </div>
         <div class="agreement-footer">
           <div class="signature">Podpis organizatora</div>
-          <div class="signature">${packet.type === 'city' ? 'Podpis odbiorcy / reprezentanta miasta' : 'Podpis obdarowanego'}</div>
+          <div class="signature">${packet.type === 'city' ? 'Podpis odbiorcy / reprezentanta placówki' : 'Podpis obdarowanego'}</div>
         </div>
       </div>
     </section>

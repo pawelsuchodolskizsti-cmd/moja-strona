@@ -1,0 +1,10 @@
+<!doctype html>
+<html lang="pl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Placówki — panel administratora</title>
+<link rel="stylesheet" href="/admin/placowki/institutions.css"></head>
+<body><main><header><div><span class="eyebrow">Gwiazdka One Day 2026 · administracja</span><h1>Placówki uczestników</h1><p>Jedna nazwa, wspólny wynik. Zarządzaj listą dostępną podczas zapisu do gry.</p></div><a href="/admin/">← Wróć do panelu</a></header>
+<p id="status" role="status">Sprawdzam dostęp…</p>
+<div id="institution-admin" hidden>
+<section><h2>Dodaj placówkę</h2><form id="add-institution"><label>Nazwa placówki<input id="new-name" maxlength="160" required placeholder="Pełna nazwa placówki"></label><label>Miasto / miejscowość<input id="new-city" maxlength="100" required placeholder="np. Elbląg"></label><button type="submit">Dodaj placówkę</button></form></section>
+<section><div class="section-head"><div><h2>Katalog placówek</h2><p>Wyłączenie ukrywa placówkę przy nowych zapisach. Jej uczestnicy i punkty pozostają w rankingu.</p></div><button type="button" class="secondary" id="refresh">Odśwież listę</button></div><label>Wyszukaj w katalogu<input id="catalog-search" type="search" placeholder="Nazwa lub miejscowość"></label><div id="catalog"></div></section>
+<section><h2>Uczestnicy bez przypisanej placówki</h2><p>Starsze zgłoszenia zachowują dotychczasowe wyniki. Wybierz właściwą placówkę dla uczestnika z bieżącej rundy, aby połączyć jego punkty z jej rankingiem.</p><div id="unassigned"></div></section>
+</div></main><script src="/admin/admin-session.js"></script><script src="/admin/placowki/institutions.js"></script></body></html>

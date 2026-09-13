@@ -1885,8 +1885,14 @@ textarea {
     <label>Nazwisko</label>
     <input type="text" id="lname" data-uppercase-login placeholder="np. Kowalska">
 
-    <label>Miasto</label>
-    <input type="text" id="city" data-uppercase-login placeholder="np. Warszawa">
+    <div class="institution-picker">
+      <label for="institution-search">Twoja placówka</label>
+      <input id="institution-search" type="search" placeholder="Wpisz miasto lub nazwę placówki" autocomplete="off" role="combobox" aria-autocomplete="list" aria-controls="institution-options" aria-expanded="false">
+      <input id="institution-id" type="hidden">
+      <div id="institution-options" role="listbox" aria-label="Placówki" hidden></div>
+      <p id="institution-status" role="status">Ładowanie placówek…</p>
+      <button type="button" class="instruction-back" id="institution-retry" hidden>Odśwież listę placówek</button>
+    </div>
 
     <label>E-mail</label>
     <input type="email" id="email" data-email-login inputmode="email" autocapitalize="off" autocomplete="email" spellcheck="false" placeholder="np. anna@example.com">
@@ -2105,6 +2111,7 @@ textarea {
   <button class="btn" type="button" data-instruction-next>Dalej</button>
   <button class="instruction-back" type="button" data-instruction-back hidden>Wstecz</button>
 </div>
+<script src="/institution-picker.js"></script>
 <script src="/player-experience.js"></script>
 <script>
 let serverClockOffset = 0;
@@ -3389,13 +3396,13 @@ async function doLogin() {
   primeFeedbackAudio();
   const fn   = normalizeLoginValue(fnameInputEl.value);
   const ln   = normalizeLoginValue(document.getElementById('lname').value);
-  const city = normalizeLoginValue(document.getElementById('city').value);
+  const institutionId = Number(document.getElementById('institution-id').value);
   const email = normalizeEmailValue(emailInputEl.value);
   const acceptedRules = !!acceptRulesEl?.checked;
   const msg  = loginMsgEl;
 
-  if (!fn || !ln || !city || !email) {
-    msg.innerText = 'Uzupełnij wszystkie pola';
+  if (!fn || !ln || !institutionId || !email) {
+    msg.innerText = 'Uzupełnij dane i wybierz swoją placówkę z listy.';
     return;
   }
 
@@ -3418,7 +3425,7 @@ async function doLogin() {
     const { response: res, data } = await postJsonWithRetry('/api/login', {
       firstName: fn,
       lastName: ln,
-      city,
+      institutionId,
       email,
       deviceToken,
       acceptedRules

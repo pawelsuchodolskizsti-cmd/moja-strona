@@ -34,3 +34,7 @@ Sprawdzono logikę na lokalnej bazie PGlite i działanie interfejsu w Edge, w ty
 ## Instrukcja i postępy gracza
 
 Po zalogowaniu gracz przechodzi trzy kroki instrukcji: pytania QR, bonusy i wspólny czas rundy. „Start” kończy instrukcję, zachowując zeskanowane pytanie lub bonus. Instrukcja jest zapamiętana na urządzeniu na daną rundę. Kamienie milowe są wspólne dla pytań i bonusów, widoczne również na małych ekranach; komunikaty pojawiają się kolejno. Odliczanie korzysta z czasu serwera. Zmiana długości dotyczy nowych rund; już rozpoczęta runda zachowuje swój czas.
+
+## Placówki
+
+Gracz wybiera placówkę z katalogu, wyszukując nazwę lub miasto (również bez polskich znaków). API rejestracji wymaga institutionId; dowolny tekst miasta nie jest już przyjmowany jako wybór. Panel → Zarządzaj placówkami pozwala dodawać i edytować nazwy oraz miasta, wyłączać placówki z nowych zapisów i przypisywać starsze konta bez placówki. Wyłączenie nie usuwa uczestników ani punktów. Stały identyfikator zachowuje wspólny ranking po zmianie nazwy. Istniejące dane bez placówki są wyraźnie oznaczone i nie są automatycznie przypisywane.
