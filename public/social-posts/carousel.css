@@ -11,7 +11,7 @@
 .post-link{display:block;border-radius:16px;color:inherit;text-decoration:none;height:100%}
 .post-image-frame{display:grid;place-items:center;padding:8px;background:#fff;border:1px solid rgba(20,34,58,.08);border-radius:18px;position:relative;overflow:hidden}
 .post-image{display:block;width:100%;height:205px;object-fit:contain;border-radius:11px;background:#f5f3fa}
-.post-caption{display:block;margin:11px 3px 3px;font:700 13px/1.4 'DM Sans',sans-serif;min-height:37px;overflow-wrap:anywhere;color:#3d315d}
+.post-caption{display:block;text-align:center;margin:11px 3px 3px;font:700 13px/1.4 'DM Sans',sans-serif;min-height:37px;overflow-wrap:anywhere;color:#3d315d}
 .post-image-fallback{display:none;width:100%;height:205px;align-items:center;justify-content:center;padding:22px;text-align:center;border-radius:11px;background:linear-gradient(135deg,#fce9f1,#eee9ff);font:700 14px/1.5 'DM Sans',sans-serif;color:#71528e}.post-image-frame.image-unavailable .post-image{display:none}.post-image-frame.image-unavailable .post-image-fallback{display:flex}
 @media(max-width:420px){.post-card{width:195px;flex-basis:195px;padding:10px}.post-image,.post-image-fallback{height:185px}.posts-heading h2{font-size:15px}.social-posts{margin-top:16px}}
 @media(prefers-reduced-motion:reduce){.posts-viewport{scroll-behavior:auto}}

@@ -29,7 +29,7 @@
     const delta=last?Math.min(now-last,60):0;last=now;
     if(visible&&!document.hidden&&!reduced.matches&&!hovered&&!pointerDown&&now>=resumeAt&&!viewport.contains(document.activeElement)){
       const width=group.getBoundingClientRect().width;
-      if(width){if(Math.abs(viewport.scrollLeft-position)>2)position=viewport.scrollLeft;position=(position+delta*.023)%width;viewport.scrollLeft=position;}
+      if(width){if(Math.abs(viewport.scrollLeft-position)>2)position=viewport.scrollLeft;position=(position+delta*.028)%width;viewport.scrollLeft=position;}
     } else position=viewport.scrollLeft;
     requestAnimationFrame(tick);
   }
