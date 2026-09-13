@@ -50,3 +50,9 @@ Na telefonie menu otwiera przycisk „Menu”. Katalog placówek i generator QR 
 Widok `/wyniki/` zachowuje tło i logotypy wydarzenia, wyróżnia odliczanie oraz pokazuje podium placówek, najlepszych graczy, punkty placówek i pełną listę uczestników. Komunikat organizatora ma stały pasek, razem ze stanem aktualizacji i przyciskiem „Tryb projekcyjny”. Układ mieści się na ekranach 1920 × 1080, 1366 × 768 i 1280 × 720; na telefonach i mniejszych oknach sekcje układają się pionowo.
 
 Na dużym ekranie długie listy i komunikaty przewijają się automatycznie. Wskazanie kursorem, użycie klawiatury lub ręczne przewijanie wstrzymuje ruch. Ustawienie systemowe ograniczające animacje wyłącza automatyczne przewijanie. Pełne nazwy i teksty pozostają dostępne. Zasłanianie ostatnich trzech minut i etapowe odsłanianie finału obowiązuje we wszystkich rankingach, również na bocznej liście. Po chwilowej utracie połączenia widok odzyskuje prawidłowy komunikat także wtedy, gdy dane się nie zmieniły.
+
+## Posty na stronie głównej
+
+Pod ikonami mediów społecznościowych znajduje się zapętlona karuzela dziewięciu postów. Zdjęcia i podpisy otwierają wskazane wpisy Instagrama w nowej karcie. Miniatury pochodzą z tych wpisów i są zapisane w `public/social-posts/`, więc strona nie pobiera osadzeń ani skryptów Instagrama. Podpisy, linki i kolejność ustala `public/social-posts/posts.js`. „Projekt Uważni” pozostaje ukryty na życzenie organizatora, do czasu dodania linku i zdjęcia.
+
+Kafelki przesuwają się w lewo, a po ostatnim wraca pierwszy. Strzałki, dotyk i przycisk pauzy pozwalają sterować przeglądaniem. Ruch zatrzymuje się podczas korzystania z klawiatury lub wskazania zdjęcia myszą; respektuje też systemowe ograniczenie animacji. Karuzela jest częścią strony powitalnej i nie zmienia ekranów pytań, punktacji ani przebiegu rundy.

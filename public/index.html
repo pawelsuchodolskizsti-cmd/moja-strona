@@ -1810,6 +1810,7 @@ textarea {
 }
 </style>
 <link rel="stylesheet" href="/player-experience.css">
+<link rel="stylesheet" href="/social-posts/carousel.css">
 </head>
 <body>
 <div class="micro-toast-stack" id="micro-toast-stack" role="status" aria-live="polite" aria-atomic="false"></div>
@@ -1844,6 +1845,18 @@ textarea {
       </a>
     </div>
   </div>
+
+  <section class="social-posts" id="social-posts" aria-label="Posty Fundacji One Day" aria-roledescription="karuzela" hidden>
+    <div class="posts-heading">
+      <h2>Poznaj One Day</h2>
+      <div class="posts-controls">
+        <button class="posts-control" type="button" data-posts-prev aria-label="Poprzedni post" aria-controls="posts-viewport">‹</button>
+        <button class="posts-control" type="button" data-posts-pause aria-label="Zatrzymaj przesuwanie postów" aria-pressed="false" aria-controls="posts-viewport">Ⅱ</button>
+        <button class="posts-control" type="button" data-posts-next aria-label="Następny post" aria-controls="posts-viewport">›</button>
+      </div>
+    </div>
+    <div class="posts-viewport" id="posts-viewport"><div class="posts-track"></div></div>
+  </section>
 
   <div class="announcement-box" data-announcement>
     <span class="announcement-label">Komunikat organizatora</span>
@@ -3819,5 +3832,7 @@ window.onload = async () => {
 };
 </script>
 
+<script src="/social-posts/posts.js"></script>
+<script src="/social-posts/carousel.js"></script>
 </body>
 </html>
