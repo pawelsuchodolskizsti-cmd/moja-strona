@@ -1,0 +1,27 @@
+/* Shared event lettering: the same pink-to-purple gradient as the live ranking. */
+.event-brand.event-brand {
+  color: #ff3d6b;
+  background: none;
+  -webkit-text-fill-color: currentColor;
+}
+@supports (background-clip: text) or (-webkit-background-clip: text) {
+  .event-brand.event-brand {
+    background: linear-gradient(135deg, #ff3d6b, #7c6af7);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+}
+@media print {
+  .event-brand.event-brand {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}
+@media (forced-colors: active) {
+  .event-brand.event-brand {
+    background: none;
+    color: CanvasText;
+    -webkit-text-fill-color: currentColor;
+  }
+}

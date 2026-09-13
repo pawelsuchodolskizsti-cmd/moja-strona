@@ -2118,11 +2118,12 @@
   }
 </style>
 <link rel="stylesheet" href="/admin/admin-navigation.css">
+<link rel="stylesheet" href="/event-brand.css">
 </head>
 <body>
 <div class="auth-shell" id="admin-login-screen" style="display:none">
   <div class="auth-card">
-    <div class="logo">Gwiazdka One Day 2026 - Panel Organizatora</div>
+    <div class="logo event-brand">Gwiazdka One Day 2026 - Panel Organizatora</div>
     <div class="auth-badge">Dostęp chroniony</div>
     <h1>Logowanie administratora</h1>
     <p class="auth-copy">Wpisz login i hasło organizatora, aby otworzyć panel zarządzania grą, wynikami, bonusami i komunikatami dla uczestników.</p>
@@ -2154,7 +2155,7 @@
   </div>
   <div class="header-row">
     <div class="header-main">
-      <div class="logo">Gwiazdka One Day 2026 - Panel Organizatora</div>
+      <div class="logo event-brand">Gwiazdka One Day 2026 - Panel Organizatora</div>
       <h1>Panel administratora</h1>
     </div>
     <div class="header-actions">
@@ -3254,7 +3255,7 @@ function renderPlayerPreview() {
     html = `
       <div class="player-preview-card">
         ${previewPartners}
-        <div class="player-preview-logo">Gwiazdka One Day 2026</div>
+        <div class="player-preview-logo event-brand">Gwiazdka One Day 2026</div>
         ${banner}
         <div class="player-preview-pill">Pytanie</div>
         <div class="player-preview-title">Gdzie ukrył się kolejny punkt trasy?</div>
@@ -3274,7 +3275,7 @@ function renderPlayerPreview() {
     html = `
       <div class="player-preview-card">
         ${previewPartners}
-        <div class="player-preview-logo">Gwiazdka One Day 2026</div>
+        <div class="player-preview-logo event-brand">Gwiazdka One Day 2026</div>
         ${banner}
         <div class="player-preview-pill">Finał gry</div>
         <div class="player-preview-title">Zapraszamy na podsumowanie</div>
@@ -3294,7 +3295,7 @@ function renderPlayerPreview() {
     html = `
       <div class="player-preview-card">
         ${previewPartners}
-        <div class="player-preview-logo">Gwiazdka One Day 2026</div>
+        <div class="player-preview-logo event-brand">Gwiazdka One Day 2026</div>
         ${banner}
         <div class="player-preview-pill">Dziękujemy</div>
         <div class="player-preview-title">Dziękujemy za udział</div>
@@ -3323,7 +3324,7 @@ function renderPlayerPreview() {
     html = `
       <div class="player-preview-card">
         ${previewPartners}
-        <div class="player-preview-logo">Gwiazdka One Day 2026</div>
+        <div class="player-preview-logo event-brand">Gwiazdka One Day 2026</div>
         ${banner}
         <div class="player-preview-pill">${gamePhase === 'active' ? 'Start gry' : 'Przed startem'}</div>
         <div class="player-preview-title">${gamePhase === 'active' ? 'Jak to działa?' : 'Gra jeszcze nie wystartowała'}</div>
@@ -5826,6 +5827,7 @@ function buildDiplomaDocumentHtml({ generatedAt, totalPackets, sheets }) {
       }
     }
   </style>
+<link rel="stylesheet" href="${window.location.origin}/event-brand.css">
 </head>
 <body>
   <div class="print-toolbar">
@@ -5858,7 +5860,7 @@ function buildDiplomaSheet(packet, sheetNumber) {
           <img class="logo-fundacja" src="${window.location.origin}/fundacjaoneday.svg" alt="Fundacja One Day">
           <img class="logo-energy" src="${window.location.origin}/energyliandia.svg" alt="Energylandia">
         </div>
-        <div class="brand">Gwiazdka One Day 2026</div>
+        <div class="brand event-brand">Gwiazdka One Day 2026</div>
         <div class="eyebrow">${escHtml(packet.eyebrow)}</div>
         <h1 class="diploma-title">${escHtml(packet.title)}</h1>
         <div class="recipient-label">${escHtml(packet.recipientLabel)}</div>
@@ -5888,7 +5890,7 @@ function buildAgreementSheet(packet, sheetNumber) {
             <img class="logo-fundacja" src="${window.location.origin}/fundacjaoneday.svg" alt="Fundacja One Day">
             <img class="logo-energy" src="${window.location.origin}/energyliandia.svg" alt="Energylandia">
           </div>
-          <div class="agreement-brand">Gwiazdka One Day 2026</div>
+          <div class="agreement-brand event-brand">Gwiazdka One Day 2026</div>
           <h1 class="agreement-title">${escHtml(packet.agreementTitle)}</h1>
           <div class="agreement-sub">Wersja robocza do czasu podmiany na finalny wzór dokumentu.</div>
         </div>

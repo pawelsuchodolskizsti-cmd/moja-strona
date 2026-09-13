@@ -42,7 +42,7 @@ window.AdminNavigation = (() => {
       nav.append(group);
     }
     sidebar.append(nav);
-    const footer=document.createElement('div');footer.className='admin-nav-footer';footer.innerHTML='<a href="/wyniki/" target="_blank" rel="noopener">Ekran wyników ↗</a><span>Gwiazdka One Day 2026</span>';sidebar.append(footer);
+    const footer=document.createElement('div');footer.className='admin-nav-footer';footer.innerHTML='<a href="/wyniki/" target="_blank" rel="noopener">Ekran wyników ↗</a><span class="event-brand">Gwiazdka One Day 2026</span>';sidebar.append(footer);
     toggle=document.createElement('button');toggle.type='button';toggle.className='admin-menu-toggle';toggle.innerHTML='<span aria-hidden="true">☰</span> Menu';toggle.setAttribute('aria-controls','admin-sidebar');toggle.setAttribute('aria-expanded','false');toggle.onclick=()=>drawer(true);
     backdrop=document.createElement('button');backdrop.type='button';backdrop.className='admin-menu-backdrop';backdrop.hidden=true;backdrop.tabIndex=-1;backdrop.setAttribute('aria-label','Zamknij menu');backdrop.onclick=()=>drawer(false);
     parent.prepend(toggle);parent.prepend(sidebar);parent.append(backdrop);

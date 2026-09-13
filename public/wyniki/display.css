@@ -91,3 +91,7 @@ html,body,.screen *{scrollbar-width:none;-ms-overflow-style:none}
 html::-webkit-scrollbar,body::-webkit-scrollbar,.screen *::-webkit-scrollbar{display:none;width:0;height:0}
 #podium{overflow:visible}
 @media(max-width:1099px),(max-height:649px){#leaderboard-list{max-height:460px;overflow-y:auto}}
+
+/* A light backing keeps the event gradient readable over the patterned background. */
+.brand-title{background:#fff;border-radius:10px;padding:0 12px}
+.brand-title:after{color:#635d7c}
