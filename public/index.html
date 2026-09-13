@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pl">
+<html lang="pl" class="view-pending">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -1812,8 +1812,11 @@ textarea {
 <link rel="stylesheet" href="/player-experience.css">
 <link rel="stylesheet" href="/social-posts/carousel.css">
 <link rel="stylesheet" href="/event-brand.css">
+<link rel="stylesheet" href="/view-loading.css">
+<script src="/view-loading.js"></script>
 </head>
 <body>
+<div id="view-loading" role="status" aria-live="polite"><div class="view-loading-card"><div class="event-brand">Gwiazdka One Day 2026</div><span class="view-loading-spinner" aria-hidden="true"></span><p id="view-loading-message">Wczytujemy grę…</p><button id="view-loading-retry" type="button" hidden onclick="location.reload()">Odśwież stronę</button></div></div>
 <div class="micro-toast-stack" id="micro-toast-stack" role="status" aria-live="polite" aria-atomic="false"></div>
 
 <!-- === LOGIN SCREEN === -->
@@ -2127,6 +2130,7 @@ textarea {
 let serverClockOffset = 0;
 function gameNow() { return Date.now() + serverClockOffset; }
 let participantId = null;
+let participantSessionUnavailable = false;
 let currentQuestion = null;
 let hasOpenedLogin = false;
 let participantStats = { answers: 0, bonuses: 0 };
@@ -3030,6 +3034,7 @@ function getGamePhase() {
 }
 
 function setActiveScreen(screenId = '') {
+  if (screenId) ViewLoading.finish();
   if (activeScreenId === screenId) return;
 
   screenIds.forEach((id) => {
@@ -3116,11 +3121,13 @@ function showThanksScreen() {
 
 async function restoreParticipantSession(options = {}) {
   const { clearWhenMissing = false } = options;
+  participantSessionUnavailable = false;
   if (!deviceToken) return null;
 
   try {
     const res = await fetch(`/api/participant-session?token=${encodeURIComponent(deviceToken)}`, { cache: 'no-store' });
     if (!res.ok) {
+      participantSessionUnavailable = ![400, 404, 403].includes(res.status);
       if (clearWhenMissing && (res.status === 400 || res.status === 404 || res.status === 403)) {
         clearStoredParticipantSession();
         participantId = null;
@@ -3141,6 +3148,7 @@ async function restoreParticipantSession(options = {}) {
     rememberParticipantSession(participantId);
     return participantId;
   } catch (e) {
+    participantSessionUnavailable = true;
     return null;
   }
 }
@@ -3613,14 +3621,20 @@ async function syncPlayerView(options = {}) {
   }
 
   syncPlayerViewPromise = (async () => {
-    const phase = await loadGameState({ manageScreens: !silent, force });
+    const phase = await loadGameState({ manageScreens: false, force });
 
     if (phase !== 'active') {
+      if (phase === 'offline') ViewLoading.error('Nie udało się wczytać gry. Sprawdź połączenie.');
+      else applyGamePhaseScreen(phase, !silent);
       return phase;
     }
 
-    if (!participantId && getStoredParticipantIdForCurrentGame()) {
+    if (!participantId && (participantSessionUnavailable || getStoredParticipantIdForCurrentGame())) {
       await restoreParticipantSession({clearWhenMissing:true});
+    }
+    if (!participantId && participantSessionUnavailable) {
+      ViewLoading.error('Nie udało się przywrócić sesji. Sprawdź połączenie.');
+      return phase;
     }
     if (!participantId) {
       if (!silent) {
@@ -3777,7 +3791,7 @@ function escHtml(s) {
 }
 
 /* INIT */
-window.onload = async () => {
+document.addEventListener('DOMContentLoaded', async () => {
   applyBrowserCompatibility();
   updateViewportHeight();
   updateCountdown();
@@ -3801,10 +3815,14 @@ window.onload = async () => {
     resetLocalParticipantSession();
   }
 
-  if (participantId && phase === 'active') {
+  if (!participantId && participantSessionUnavailable && (phase === 'active' || phase === 'paused')) {
+    ViewLoading.error('Nie udało się przywrócić sesji. Sprawdź połączenie.');
+  } else if (participantId && phase === 'active') {
     await showQuestionScreen({ force: true });
+  } else if (phase === 'offline') {
+    ViewLoading.error('Nie udało się wczytać gry. Sprawdź połączenie.');
   } else {
-    await loadGameState({ manageScreens: true });
+    applyGamePhaseScreen(phase, true);
   }
 
   renderSummaryCountdown();
@@ -3824,7 +3842,7 @@ window.onload = async () => {
     updateViewportHeight();
     schedulePlayerSync({ force: true });
   });
-};
+});
 </script>
 
 <script src="/social-posts/posts.js"></script>

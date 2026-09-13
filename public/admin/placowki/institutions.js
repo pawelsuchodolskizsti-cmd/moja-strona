@@ -33,5 +33,5 @@
   document.getElementById('refresh').onclick=load;document.getElementById('catalog-search').oninput=applyFilter;
   document.getElementById('add-institution').onsubmit=async event=>{event.preventDefault();const button=event.target.querySelector('button');button.disabled=true;try{await request({action:'save',name:document.getElementById('new-name').value,city:document.getElementById('new-city').value,active:true});event.target.reset();await load();message(status,'Dodano placówkę. Jest dostępna w wyszukiwarce gracza.');}catch(error){message(status,error.message,true);}finally{button.disabled=false;}};
   window.addEventListener('admin-session-expired',()=>AdminSession.redirect());
-  (async()=>{try{if(!await AdminSession.check()){AdminSession.redirect();return;}AdminNavigation.mountAux('institutions');document.getElementById('institution-admin').hidden=false;await load();}catch(error){message(status,'Nie udało się sprawdzić dostępu. Odśwież stronę.',true);}})();
+  (async()=>{try{if(!await AdminSession.check()){AdminSession.redirect();return;}AdminNavigation.mountAux('institutions');document.getElementById('institution-admin').hidden=false;await load();ViewLoading.finish();}catch(error){ViewLoading.error('Nie udało się sprawdzić dostępu. Sprawdź połączenie i odśwież stronę.');}})();
 })();

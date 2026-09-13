@@ -4,7 +4,7 @@ window.AdminSession = {
     if (response.status === 401) window.dispatchEvent(new Event('admin-session-expired'));
     return response;
   },
-  async check() { const r=await fetch('/api/admin-session',{credentials:'same-origin',cache:'no-store'});return r.ok && (await r.json()).authenticated; },
+  async check() { const r=await fetch('/api/admin-session',{credentials:'same-origin',cache:'no-store'});if(r.status===401)return false;if(!r.ok)throw Error('Nie udało się sprawdzić sesji.');return Boolean((await r.json()).authenticated); },
   async login(login,password) {
     const r=await fetch('/api/admin-session',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify({login,password})});
     const data=await r.json();if(!r.ok)throw Error(data.error||'Nie udało się zalogować.');return data.authenticated;

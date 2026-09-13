@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pl">
+<html lang="pl" class="view-pending">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -1359,8 +1359,11 @@ input:focus {
 </style>
 <link rel="stylesheet" href="/player-experience.css">
 <link rel="stylesheet" href="/event-brand.css">
+<link rel="stylesheet" href="/view-loading.css">
+<script src="/view-loading.js"></script>
 </head>
 <body>
+<div id="view-loading" role="status" aria-live="polite"><div class="view-loading-card"><div class="event-brand">Gwiazdka One Day 2026</div><span class="view-loading-spinner" aria-hidden="true"></span><p id="view-loading-message">Wczytujemy grę…</p><button id="view-loading-retry" type="button" hidden onclick="location.reload()">Odśwież stronę</button></div></div>
 <div class="micro-toast-stack" id="micro-toast-stack" role="status" aria-live="polite" aria-atomic="false"></div>
 
 <div class="card bonus-card" id="name-screen" style="display:none">
@@ -1580,6 +1583,7 @@ input:focus {
 let serverClockOffset = 0;
 function gameNow() { return Date.now() + serverClockOffset; }
 let participantId = null;
+let participantSessionChecked = false;
 let deviceToken = null;
 let activeGameState = {
   startedAt: null,
@@ -1740,6 +1744,7 @@ function rememberParticipantSession(id) {
 }
 
 function resetLocalParticipantSession() {
+  participantSessionChecked = false;
   participantId = null;
   participantStats = { answers: 0, bonuses: 0 };
   participantStatsFetchedAt = 0;
@@ -2302,6 +2307,7 @@ function getGamePhase() {
 }
 
 function setActiveBonusScreen(screenId = '') {
+  if (screenId) ViewLoading.finish();
   if (activeBonusScreenId === screenId) return;
 
   bonusScreenIds.forEach((id) => {
@@ -2559,7 +2565,7 @@ async function loadGameState(options = {}) {
 
   gameStateLoadPromise = (async () => {
     const res = await fetch('/api/game-state');
-    if (!res.ok) return getGamePhase();
+    if (!res.ok) return gameStateFetchedAt ? getGamePhase() : 'offline';
 
     const data = await res.json();
     if (participantId && data.started_at) {
@@ -2585,7 +2591,7 @@ async function loadGameState(options = {}) {
     return await gameStateLoadPromise;
   } catch (e) {
     renderGameRemaining();
-    return getGamePhase();
+    return gameStateFetchedAt ? getGamePhase() : 'offline';
   } finally {
     gameStateLoadPromise = null;
   }
@@ -2596,9 +2602,10 @@ async function restoreParticipantSession() {
 
   try {
     const res = await fetch(`/api/participant-session?token=${encodeURIComponent(deviceToken)}`);
-    if (!res.ok) return null;
+    if (!res.ok) { participantSessionChecked = [400, 403, 404].includes(res.status); return null; }
 
     const data = await res.json();
+    participantSessionChecked = true;
     if (!data.id) return null;
 
     participantId = data.id;
@@ -2731,6 +2738,7 @@ function renderBonusAnnouncement() {
   Object.values(bonusScreenElements).forEach(el=>{if(!el)return;let box=el.querySelector('.bonus-announcement');if(!box){box=document.createElement('div');box.className='bonus-announcement';el.prepend(box);}box.textContent=activeGameState.announcementText||'';box.hidden=!box.textContent;});
 }
 function showBonusPhaseState(phase) {
+  if (phase === 'offline') { ViewLoading.error('Nie udało się wczytać bonusu. Sprawdź połączenie.'); return; }
   if(phase==='paused'){showBonusResult({title:'Pauza techniczna',subtitle:activeGameState.technicalPauseText||'Za chwilę wracamy.',copy:'Twoje postępy są zapisane. Pozostań na stronie.',badge:'Pauza',icon:'II',animate:false});return;}
   if (phase === 'idle') {
     showBonusResult({
@@ -2779,6 +2787,13 @@ async function syncBonusView(options = {}) {
       return phase;
     }
 
+    if (!participantId) {
+      participantId = getStoredParticipantIdForCurrentGame() || null;
+      if (!participantId && !participantSessionChecked) {
+        await restoreParticipantSession();
+        if (!participantSessionChecked) { ViewLoading.error('Nie udało się przywrócić sesji. Sprawdź połączenie.'); return phase; }
+      }
+    }
     if (participantId && PlayerExperience.instruction(setActiveBonusScreen, () => syncBonusView({force:true}))) return phase;
     const bonusData = await loadBonusLabel({ force });
     if (!bonusData) return phase;
@@ -2813,8 +2828,9 @@ function scheduleBonusSync(options = {}) {
   }, 80);
 }
 
-window.onload = async () => {
+document.addEventListener('DOMContentLoaded', async () => {
   if (!bonusId) {
+    ViewLoading.finish();
     document.body.innerHTML = 'Nieprawid\u0142owy kod QR';
     return;
   }
@@ -2827,15 +2843,7 @@ window.onload = async () => {
   renderGameRemaining();
   setInterval(renderGameRemaining, 1000);
 
-  const phase = await loadGameState({ force: true });
-  const saved = getStoredParticipantIdForCurrentGame();
-  if (saved) {
-    participantId = saved;
-  } else if ((phase === 'active' || phase === 'paused') && !participantId) {
-    await restoreParticipantSession();
-  }
-
-  await syncBonusView();
+  await syncBonusView({ force: true });
 
   PlayerNetwork.startPolling(() => syncBonusView(), 15000, 3000);
   window.addEventListener('focus', () => {
@@ -2852,7 +2860,7 @@ window.onload = async () => {
     updateViewportHeight();
     scheduleBonusSync({ force: true });
   });
-};
+});
 
 async function doNameLogin() {
   primeFeedbackAudio();

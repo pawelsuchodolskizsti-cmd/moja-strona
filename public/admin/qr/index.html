@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html lang="pl">
+<html lang="pl" class="view-pending">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -621,8 +621,11 @@ h1 {
 <script src="/admin/qr/qr-zip.js"></script>
 <link rel="stylesheet" href="/admin/admin-navigation.css">
 <link rel="stylesheet" href="/event-brand.css">
+<link rel="stylesheet" href="/view-loading.css">
+<script src="/view-loading.js"></script>
 </head>
 <body>
+<div id="view-loading" role="status" aria-live="polite"><div class="view-loading-card"><div class="event-brand">Gwiazdka One Day 2026</div><span class="view-loading-spinner" aria-hidden="true"></span><p id="view-loading-message">Otwieramy panel…</p><button id="view-loading-retry" type="button" hidden onclick="location.reload()">Odśwież stronę</button></div></div>
   <div class="page">
     <div class="hero">
       <section class="panel">
@@ -1221,8 +1224,11 @@ function normalizeOrigin(value) { try { const url=new URL(String(value||window.l
   }
 
   async function loadDetailsCatalog() {
-    if(!await AdminSession.check()){AdminSession.redirect();return;}
+    try {
+      if(!await AdminSession.check()){AdminSession.redirect();return;}
+    } catch { ViewLoading.error('Nie udało się sprawdzić dostępu. Sprawdź połączenie i odśwież stronę.'); return; }
     AdminNavigation.mountAux('qr');
+    ViewLoading.finish();
     try {
       const origin = normalizeOrigin(document.getElementById('base-origin').value);
       const response = await AdminSession.fetch('/api/admin-results');

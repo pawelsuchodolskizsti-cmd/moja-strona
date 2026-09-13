@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pl">
+<html lang="pl" class="view-pending">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -2119,8 +2119,11 @@
 </style>
 <link rel="stylesheet" href="/admin/admin-navigation.css">
 <link rel="stylesheet" href="/event-brand.css">
+<link rel="stylesheet" href="/view-loading.css">
+<script src="/view-loading.js"></script>
 </head>
 <body>
+<div id="view-loading" role="status" aria-live="polite"><div class="view-loading-card"><div class="event-brand">Gwiazdka One Day 2026</div><span class="view-loading-spinner" aria-hidden="true"></span><p id="view-loading-message">Otwieramy panel…</p><button id="view-loading-retry" type="button" hidden onclick="location.reload()">Odśwież stronę</button></div></div>
 <div class="auth-shell" id="admin-login-screen" style="display:none">
   <div class="auth-card">
     <div class="logo event-brand">Gwiazdka One Day 2026 - Panel Organizatora</div>
@@ -2941,8 +2944,8 @@ async function logoutAdmin() {
 
 async function initializeAdminAccess() {
   applyEventMode(isEventModeEnabled());
-  applyAdminAccessState(false);
-  try { applyAdminAccessState(await AdminSession.check()); } catch { setAuthFeedback('Nie udało się sprawdzić sesji. Spróbuj ponownie.','error'); }
+  try { applyAdminAccessState(await AdminSession.check()); }
+  catch { ViewLoading.error('Nie udało się sprawdzić sesji. Sprawdź połączenie i odśwież stronę.'); return; }
   window.addEventListener('admin-session-expired',()=>{applyAdminAccessState(false);setAuthFeedback('Sesja wygasła. Zaloguj się ponownie.','error');});
 
   const passwordInput = document.getElementById('admin-password');
@@ -2960,9 +2963,9 @@ async function initializeAdminAccess() {
 
   if (adminUnlocked) {
     bootAdminPanel();
-  } else if (loginInput) {
-    loginInput.focus();
   }
+  ViewLoading.finish();
+  if (!adminUnlocked && loginInput) loginInput.focus();
 }
 
 function setAdminFeedback(message, type = '') {

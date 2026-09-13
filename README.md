@@ -39,6 +39,10 @@ Po zalogowaniu gracz przechodzi trzy kroki instrukcji: pytania QR, bonusy i wsp�
 
 Gracz wybiera placówkę z katalogu, wyszukując nazwę lub miasto (również bez polskich znaków). API rejestracji wymaga institutionId; dowolny tekst miasta nie jest już przyjmowany jako wybór. Panel → Placówki pozwala dodawać i edytować nazwy oraz miasta, wyłączać placówki z nowych zapisów i przypisywać starsze konta bez placówki. Wyłączenie nie usuwa uczestników ani punktów. Stały identyfikator zachowuje wspólny ranking po zmianie nazwy. Istniejące dane bez placówki są wyraźnie oznaczone i nie są automatycznie przypisywane.
 
+## Płynne otwieranie widoków
+
+Gracz i administrator widzą docelowy ekran dopiero po ustaleniu sesji i stanu gry. Wspólne `view-loading.css` i `view-loading.js` zapobiegają chwilowemu pokazaniu strony głównej lub logowania; przy wolnym połączeniu wyświetlają informację i możliwość odświeżenia. Widoki gracza startują po `DOMContentLoaded`, bez oczekiwania na zdjęcia. Przejściowy błąd sprawdzenia sesji nie oznacza wylogowania, a potwierdzony brak dostępu nadal wymaga logowania.
+
 ## Nawigacja panelu administratora
 
 Pulpit zawiera stan i czas rundy, liczniki uczestników, odpowiedzi i bonusów oraz start, stop, pauzę techniczną i przedłużenie gry. Boczne menu prowadzi do osobnych sekcji: aktywności na żywo, komunikatów, podglądu gracza, rankingów, placówek, odpowiedzi, bonusów, statystyk pytań, finału, kodów QR, dyplomów oraz testów i ustawień. Reset danych i symulacja znajdują się w sekcji „Testy i ustawienia”. Oznaczenie LIVE/TEST pozostaje widoczne w głównym panelu.
