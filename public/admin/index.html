@@ -2733,7 +2733,7 @@
           <div class="device-value" id="participant-modal-ip">Brak danych</div>
         </div>
         <div class="device-actions">
-          <button class="btn outline device-reset-btn" id="participant-release-device-btn" type="button" onclick="adjustParticipant('release-device')">Odblokuj logowanie na nowym urządzeniu</button>
+          <button class="btn outline" type="button" onclick="createParticipantTransfer(currentParticipantId)">Wygeneruj link do przeniesienia konta</button><button class="btn outline device-reset-btn" id="participant-release-device-btn" type="button" onclick="adjustParticipant('release-device')">Odblokuj logowanie na nowym urządzeniu</button>
           <div class="device-reset-note" id="participant-release-device-note">Po użyciu tego przycisku stare urządzenie straci przypisanie, a uczestnik zaloguje się ponownie na nowym telefonie.</div>
         </div>
         <div class="detail-list" id="participant-modal-bonuses"></div>
@@ -4674,7 +4674,7 @@ function renderLeaderboard() {
     return `
       <tr class="clickable-row" onclick="openParticipantModal(${participant.id})">
         <td class="rank ${rankClass}">${index + 1}</td>
-        <td>${escHtml(participant.firstName)} ${escHtml(participant.lastName)}</td>
+        <td>${escHtml(participant.firstName)} ${escHtml(participant.lastName)}<button type="button" class="btn outline" style="display:block;margin-top:6px;padding:6px 10px;font-size:11px" onclick="event.stopPropagation();createParticipantTransfer(${participant.id})">Przenieś konto</button></td>
         <td class="muted detail-col">${escHtml(city)}</td>
         <td>
           <span class="score-pill">${participant.score || 0} pkt</span>
@@ -5908,5 +5908,5 @@ window.addEventListener('pageshow', updateViewportHeight);
 initializeAdminAccess();
 </script>
 <script src="/admin/admin-data.js"></script>
-</body>
+<script src="/admin/session-transfer.js"></script></body>
 </html>
