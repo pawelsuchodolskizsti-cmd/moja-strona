@@ -2,6 +2,30 @@
   const $=id=>document.getElementById(id),node=(tag,text)=>{const n=document.createElement(tag);if(text!==undefined)n.textContent=text;return n;};
   const labels={draft:'Wzór - zapis testowy',pending_guardian:'Oczekuje na opiekuna',active:'Aktywna',withdrawn:'Wycofana'};
   let cursors=[0],page=0,version=0;
+  function csvCell(value){
+    let text=String(value??'');
+    if(/^[\s\uFEFF]*[=+@-]/u.test(text)||/^[\t\r\n]/.test(text))text="'"+text;
+    return '"'+text.replace(/"/g,'""')+'"';
+  }
+  $('contact-export').onclick=async()=>{
+    const button=$('contact-export'),status=$('contact-export-status');button.disabled=true;
+    try{
+      const rows=[['ID zapisu','ID uczestnika','Imię','Nazwisko','ID placówki','Placówka i miejscowość','E-mail','Status zgody','Data zgody (UTC)','Pełnoletność / opiekun','Wersja zgody','Treść zgody','Źródło zapisu']];
+      let before=0,count=0;
+      do{
+        const data=await request({before,status:'',search:''});
+        for(const item of data.items){
+          if(item.status==='withdrawn')continue;
+          rows.push([item.id,item.participantId,item.firstName,item.lastName,item.institutionId,item.institution,item.email,labels[item.status]||item.status,item.consentedAt,item.ageDeclaration==='adult'?'Osoba pełnoletnia':'Wymagane potwierdzenie opiekuna',item.version,item.consentText,item.source==='after-game'?'Po zakończeniu gry':item.source==='player-registration'?'Zapis do gry':item.source]);count++;
+        }
+        before=data.before;status.textContent=`Przygotowywanie pliku: ${count} osób…`;
+      }while(before);
+      if(!count){status.textContent='Brak zapisanych osób do eksportu.';return;}
+      const blob=new Blob(['\uFEFF'+rows.map(row=>row.map(csvCell).join(';')).join('\r\n')],{type:'text/csv;charset=utf-8'});
+      const url=URL.createObjectURL(blob),link=document.createElement('a');link.href=url;link.download=`one-day-kontakt-${new Date().toISOString().slice(0,10)}.csv`;document.body.append(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),60000);
+      status.textContent=`Plik gotowy. Liczba zapisanych osób: ${count}.`;
+    }catch(e){status.textContent='Nie udało się przygotować pełnego pliku. Spróbuj ponownie. '+e.message;}finally{button.disabled=false;}
+  };
   async function request(params,body){const response=await AdminSession.fetch('/api/admin-communications'+(params?'?'+new URLSearchParams(params):''),body?{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}:{cache:'no-store'});const data=await response.json();if(!response.ok)throw Error(data.error||'Nie udało się wczytać danych.');return data;}
   async function load(reset=false){if(reset){page=0;cursors=[0];}const ticket=++version;$('contact-prev').disabled=true;$('contact-next').disabled=true;$('contact-feedback').textContent='';try{
     const data=await request({before:cursors[page],status:$('contact-status').value,search:$('contact-search').value});if(ticket!==version)return;
