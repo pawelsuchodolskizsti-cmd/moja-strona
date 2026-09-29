@@ -46,6 +46,15 @@ body:has(.reveal-show.celebrating:not([hidden])) .reveal-ranking-stage{top:150px
 @media(max-width:600px){.reveal-ranking-stage{top:max(16px,env(safe-area-inset-top))}body:has(.reveal-show.celebrating:not([hidden])) .reveal-ranking-stage{top:145px}}
 @media(prefers-reduced-motion:reduce){.reveal-ranking-stage{transition:none}}
 `;
+  style.textContent+=`
+.award-winner[data-rank="1"]{--medal-ink:#8c650c;--medal-line:#d8b44f;--medal-light:#fff9dc;--medal-tint:#f4e5ae}
+.award-winner[data-rank="2"]{--medal-ink:#596474;--medal-line:#b2bdc9;--medal-light:#f7f9fc;--medal-tint:#dce3ec}
+.award-winner[data-rank="3"]{--medal-ink:#92532d;--medal-line:#c89470;--medal-light:#fff4e9;--medal-tint:#efd0b5}
+.award-card .award-winner[data-rank]{background:linear-gradient(145deg,var(--medal-light),var(--medal-tint));border-color:var(--medal-line);box-shadow:inset 0 1px 0 #fffc}
+.award-card .award-place{color:var(--medal-ink);align-self:center;display:grid;place-items:center;min-width:1.65em;min-height:1.65em;padding:.12em;border:2px solid var(--medal-line);border-radius:50%;background:linear-gradient(135deg,#fff9,var(--medal-tint));box-shadow:0 4px 12px #33221112;line-height:1}
+.award-card .award-name{color:var(--medal-ink)}
+.award-card .award-score{color:var(--medal-ink);background:none;-webkit-text-fill-color:currentColor}
+`;
   document.head.append(style);
   const finaleTitle=document.createElement('section');finaleTitle.className='finale-title-screen';finaleTitle.hidden=true;finaleTitle.setAttribute('aria-label','Finał Gwiazdki One Day 2026');finaleTitle.innerHTML='<div class="finale-title-card"><div class="finale-title-logos"><img src="/fundacjaoneday.svg" alt="Fundacja One Day"><img src="/energyliandia.svg" alt="Energylandia"></div><div class="finale-title-event event-brand">Gwiazdka One Day 2026</div><h1 class="finale-title-word event-brand">FINAŁ</h1></div>';document.body.append(finaleTitle);
   const overlay=document.createElement('div');overlay.className='reveal-show';overlay.hidden=true;overlay.innerHTML='<p></p><strong></strong><small>Za chwilę poznamy wyniki</small>';document.body.append(overlay);
@@ -64,7 +73,7 @@ body:has(.reveal-show.celebrating:not([hidden])) .reveal-ranking-stage{top:150px
     card.classList.toggle('award-podium',step===3&&items.length===3);const selected=step===3?items:items.slice(2-step,3-step);list.style.setProperty('--award-columns',Math.max(1,selected.length));
     if(!selected.length){const empty=document.createElement('p');empty.textContent=step<3?'Brak laureata na tym miejscu.':'Brak wyników do pokazania.';list.append(empty);}
     selected.forEach((item,index)=>{const rank=step===3?index+1:3-step,row=document.createElement('article');row.className='award-winner';row.dataset.rank=rank;
-      const badge=document.createElement('div');badge.className='award-place event-brand';badge.textContent=rank+'. miejsce';
+      const badge=document.createElement('div');badge.className='award-place';badge.textContent=['I','II','III'][rank-1];badge.setAttribute('aria-label',rank+'. miejsce');
       const name=document.createElement('div');name.className='award-name';const fullName=String((kind==='cities'?item.city:item.name)||'');fullName.split(/\s+/).filter(Boolean).forEach((word,i)=>{if(i)name.append(' ');const part=document.createElement('span');part.textContent=word;name.append(part);});
       const score=document.createElement('div');score.className='award-score event-brand';score.textContent=Number(item.score||0)+' pkt';
       row.append(badge,name,score);if(kind==='participants'&&item.city){const city=document.createElement('p');city.textContent=item.city;row.append(city);}list.append(row);});card.append(list);
