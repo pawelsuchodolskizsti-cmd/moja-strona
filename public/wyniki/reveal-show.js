@@ -19,7 +19,9 @@
 @media(max-width:600px){.reveal-ranking-stage{inset:145px 12px 16px}.reveal-ranking-stage .section-head{margin-bottom:12px}.reveal-ranking-stage .section-copy{font-size:11px}}
 @media(prefers-reduced-motion:reduce){.screen>*,.board>.board-card{transition:none!important}}
 `;
+  style.textContent+=`.finale-title-screen{position:fixed;inset:0;z-index:1100;display:grid;place-items:center;padding:clamp(16px,4vw,64px);background:#842663 url('/tlo-gry.png') center/cover}.finale-title-screen[hidden]{display:none}.finale-title-card{width:min(1200px,100%);padding:clamp(28px,5vw,80px);border-radius:clamp(28px,4vw,60px);text-align:center;background:rgba(255,250,255,.96);border:1px solid #ffffffaa;box-shadow:0 24px 90px #24133f50}.finale-title-logos{display:flex;align-items:center;justify-content:center;gap:clamp(20px,5vw,80px);margin-bottom:clamp(24px,4vh,52px)}.finale-title-logos img{width:clamp(110px,20vw,300px);max-width:42%;height:clamp(46px,7vw,96px);object-fit:contain}.finale-title-event{font:800 clamp(18px,3vw,44px)/1.25 'Syne',sans-serif}.finale-title-word{font:800 clamp(64px,15vw,230px)/1.1 'Syne',sans-serif;letter-spacing:-.045em;margin-top:clamp(24px,5vh,60px)}.finale-title-visible .screen{visibility:hidden}`;
   document.head.append(style);
+  const finaleTitle=document.createElement('section');finaleTitle.className='finale-title-screen';finaleTitle.hidden=true;finaleTitle.setAttribute('aria-label','Finał Gwiazdki One Day 2026');finaleTitle.innerHTML='<div class="finale-title-card"><div class="finale-title-logos"><img src="/fundacjaoneday.svg" alt="Fundacja One Day"><img src="/energyliandia.svg" alt="Energylandia"></div><div class="finale-title-event event-brand">Gwiazdka One Day 2026</div><h1 class="finale-title-word event-brand">FINAŁ</h1></div>';document.body.append(finaleTitle);
   const overlay=document.createElement('div');overlay.className='reveal-show';overlay.hidden=true;overlay.innerHTML='<p></p><strong></strong><small>Za chwilę poznamy wyniki</small>';document.body.append(overlay);
   const titleEl=overlay.querySelector('p'),numberEl=overlay.querySelector('strong'),noteEl=overlay.querySelector('small');
   numberEl.classList.add('event-brand');
@@ -102,6 +104,7 @@
   }
   function clearShow(){restoreFocus();active=null;seen.clear();overlay.hidden=true;overlay.classList.remove('counting','celebrating');clearTimeout(celebrationTimer);stopEffects();}
   setInterval(()=>{
+    const showTitle=Boolean(scoreboardState.finaleTitleActive)&&['ended','thanks'].includes(scoreboardState.phase);finaleTitle.hidden=!showTitle;document.body.classList.toggle('finale-title-visible',showTitle);if(showTitle){clearShow();return;}
     const reveal=scoreboardState.resultsReveal||{};
     const events=[['participants',reveal.participantsAt,'Najlepsi uczestnicy'],['cities',reveal.citiesAt,'Najlepsze placówki']].filter(e=>Number.isFinite(Date.parse(e[1])));
     if(!['ended','thanks'].includes(scoreboardState.phase)||!events.length){clearShow();return;}

@@ -2339,6 +2339,7 @@
         <button class="btn primary" id="btn-awards-next" type="button" onclick="nextAwardSlide()" disabled>Następne</button>
         <button class="btn outline" id="btn-lock-results" type="button" onclick="confirmAction('lock-results')">Zablokuj ponownie</button>
       </div>
+      <div class="reveal-actions"><button class="btn primary" id="btn-show-finale-title" type="button" onclick="setFinaleTitle(true)">Pokaż planszę FINAŁ</button><button class="btn outline" id="btn-hide-finale-title" type="button" onclick="setFinaleTitle(false)">Wróć do wyników</button></div>
       <p class="ops-copy">Rozdanie nagród: TOP 3 → 1. miejsce → 2. miejsce → 3. miejsce → pełna tablica. Użyj przycisku Następne lub dotknij tablicy wyników. Każdy etap czeka na kliknięcie.</p>
       <div class="reveal-actions"><button class="btn primary" id="btn-show-thanks" onclick="setFinaleThanks(true)">Pokaż podziękowanie</button><button class="btn outline" id="btn-hide-thanks" onclick="setFinaleThanks(false)">Wróć do finału</button></div>
       <div class="reveal-meta" id="reveal-results-meta">Start lub reset gry automatycznie zamknie wyniki od nowa.</div>
@@ -2791,7 +2792,8 @@ let previewMode = 'current';
 let pendingAction = null;
 let pendingActionScope = null;
 let currentTab = 'home';
-let awardPresentation=null,awardNextBusy=false;
+let awardPresentation=null,awardNextBusy=false,finaleTitleActive=false;
+async function setFinaleTitle(show){try{const r=await AdminSession.fetch('/api/game-state',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:show?'show-finale-title':'hide-finale-title',scope:activeDataScope})});const d=await r.json();if(!r.ok)throw Error(d.error);await loadGameState();setAdminFeedback(show?'Na tablicy wyświetla się plansza FINAŁ.':'Przywrócono wyniki.');}catch(e){setAdminFeedback(e.message,'error');}}
 async function nextAwardSlide(){if(!awardPresentation||awardNextBusy)return;awardNextBusy=true;document.getElementById('btn-awards-next').disabled=true;try{const r=await AdminSession.fetch('/api/game-state',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'presentation-next',scope:activeDataScope,kind:awardPresentation.kind,eventAt:awardPresentation.eventAt,step:awardPresentation.step})});const d=await r.json();if(!r.ok)throw Error(d.error);setAdminFeedback('Przechodzę do kolejnego widoku rozdania nagród.');}catch(e){setAdminFeedback(e.message,'error');}finally{awardNextBusy=false;await loadGameState();}}
 
 let isStateLoading = false;
@@ -3229,7 +3231,8 @@ function renderRevealControls() {
   const lockBtn = document.getElementById('btn-lock-results');
   if (!playersStep || !citiesStep || !lockStep) return;
 
-  const awardNext=document.getElementById('btn-awards-next');if(awardNext)awardNext.disabled=awardNextBusy||!awardPresentation||awardPresentation.step>=4||Date.parse(awardPresentation.eventAt)>GameClock.now();
+  const awardNext=document.getElementById('btn-awards-next');if(awardNext)awardNext.disabled=awardNextBusy||finaleTitleActive||!awardPresentation||awardPresentation.step>=4||Date.parse(awardPresentation.eventAt)>GameClock.now();
+  document.getElementById('btn-show-finale-title').disabled=finaleTitleActive||gamePhase!=='ended';document.getElementById('btn-hide-finale-title').disabled=!finaleTitleActive;
   const playersPending = Date.parse(resultsParticipantsRevealedAt) > GameClock.now();
   const citiesPending = Date.parse(resultsCitiesRevealedAt) > GameClock.now();
   const playersOpen = Boolean(resultsParticipantsRevealedAt);
@@ -3388,7 +3391,7 @@ async function loadGameState() {
     announcementUpdatedAt = data.announcement_updated_at || null;
     resultsParticipantsRevealedAt = data.results_participants_revealed_at || null;
     resultsCitiesRevealedAt = data.results_cities_revealed_at || null;
-    awardPresentation=data.presentation||null;
+    awardPresentation=data.presentation||null;finaleTitleActive=Boolean(data.finale_title_active);
 
     if (data.started_at) {
       summaryAt = data.summary_at ? Date.parse(data.summary_at) : null;
