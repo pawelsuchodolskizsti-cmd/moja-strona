@@ -10,7 +10,7 @@
   const message=e=>e.name==='TimeoutError'?'Połączenie trwa zbyt długo. Spróbuj ponownie. Wpisany tekst pozostał w formularzu.':e.message;
   function stars(){const value=Number(document.querySelector('[name=rating]:checked')?.value||0);document.querySelectorAll('.stars label').forEach((label,i)=>label.classList.toggle('selected',i<value));$('rating-label').textContent=value?`Twoja ocena: ${value} / 5`:'Wybierz od 1 do 5 gwiazdek';}
   document.querySelectorAll('[name=rating]').forEach(r=>r.onchange=stars);
-  function contact(data){$('contact-draft').hidden=!data.draft;$('contact-section').hidden=!contactOnly&&data.contactJoined;$('contact-form').hidden=data.contactJoined;if(data.contactJoined)$('page-status').textContent=contactOnly?'Twój zapis na kontakt jest już zachowany.':'';}
+  function contact(data){$('contact-draft').hidden=!data.draft;$('contact-section').hidden=data.contactJoined;$('contact-form').hidden=data.contactJoined;if(data.contactJoined)$('page-status').textContent=contactOnly?'Dziękujemy!':'';}
   async function load(){
     $('retry').hidden=true;
     try{const data=await request('status');$('page-status').textContent='';$('feedback-section').hidden=contactOnly;contact(data);
@@ -18,6 +18,6 @@
     }catch(e){$('page-status').textContent=message(e);$('retry').hidden=false;}
   }
   $('feedback-form').onsubmit=async e=>{e.preventDefault();const button=e.submitter;button.disabled=true;$('feedback-status').textContent='Zapisywanie…';try{await request('save',{rating:Number(document.querySelector('[name=rating]:checked')?.value),liked:$('liked').value,improvements:$('improvements').value});$('feedback-status').textContent='Dziękujemy! Twoja opinia została zapisana.';button.textContent='Zapisz zmiany opinii';}catch(error){$('feedback-status').textContent=message(error);}finally{button.disabled=false;}};
-  $('contact-form').onsubmit=async e=>{e.preventDefault();const button=e.submitter;button.disabled=true;try{const data=await request('join',CommunicationConsent.payload());contact(data);$('page-status').textContent=data.draft?'Dziękujemy! Zapisano testową zgodę na kontakt zgodnie z obecnym wzorem.':'Dziękujemy! Twój zapis na kontakt został zachowany.';}catch(error){$('contact-status').textContent=message(error);}finally{button.disabled=false;}};
+  $('contact-form').onsubmit=async e=>{e.preventDefault();const button=e.submitter;button.disabled=true;try{const data=await request('join',CommunicationConsent.payload());contact(data);$('page-status').textContent='Dziękujemy!';}catch(error){$('contact-status').textContent=message(error);}finally{button.disabled=false;}};
   $('retry').onclick=load;load();
 })();
