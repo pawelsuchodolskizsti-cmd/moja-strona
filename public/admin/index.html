@@ -2420,11 +2420,11 @@
         </div>
         <div class="qr-admin-route">
           <span>Pytania</span>
-          <strong id="qr-admin-question-range">/?q=1...</strong>
+          <strong id="qr-admin-question-range">Losowe linki pytań</strong>
         </div>
         <div class="qr-admin-route">
           <span>Bonusy</span>
-          <strong>/bonus/?b=B01...B10</strong>
+          <strong>Losowe linki bonusów</strong>
         </div>
       </div>
       <div class="ops-actions">
@@ -5047,7 +5047,7 @@ function refreshQrAdminSummary() {
   if (questionsEl) questionsEl.textContent = `${grouped.questions.length} pytań`;
   if (bonusesEl) bonusesEl.textContent = `${grouped.bonuses.length} bonusów`;
   if (metaEl) metaEl.textContent = `Stały adres generatora: ${getQrCenterUrl()}`;
-  if (questionRangeEl) questionRangeEl.textContent = `/?q=1...${grouped.questions.length || 0}`;
+  if (questionRangeEl) questionRangeEl.textContent = `${grouped.questions.length || 0} losowych linków pytań`;
 }
 
 function refreshDiplomaAdminSummary() {

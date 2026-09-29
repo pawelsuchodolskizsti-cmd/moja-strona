@@ -37,27 +37,30 @@ window.buildQrCatalog = function buildQrCatalog(origin, options = {}) {
 
   for (let i = 1; i <= questionCount; i += 1) {
     const question = questionCatalog.find((item) => Number(item.id) === i);
+    if(!question?.qrToken)continue;
     items.push({
       id: `question-${i}`,
       type: 'question',
       label: `Pytanie ${i}`,
       shortLabel: `Pyt. ${i}`,
       description: question?.text || `Kod QR otwieraj\u0105cy pytanie numer ${i}.`,
-      path: `/?q=${i}`,
-      url: `${baseOrigin}/?q=${i}`
+      path: `/?q=${question.qrToken}`,
+      url: `${baseOrigin}/?q=${question.qrToken}`
     });
   }
 
   bonusItems.forEach((bonus, index) => {
+    if(!bonus.qrToken)return;
     const bonusId = bonus.id || `B${String(index + 1).padStart(2, '0')}`;
+
     items.push({
       id: `bonus-${bonusId}`,
       type: 'bonus',
       label: bonus.label || `Bonus ${index + 1}`,
       shortLabel: bonusId,
       description: `Kod QR otwieraj\u0105cy bonus ${bonusId}.`,
-      path: `/bonus/?b=${bonusId}`,
-      url: `${baseOrigin}/bonus/?b=${bonusId}`
+      path: `/bonus/?b=${bonus.qrToken}`,
+      url: `${baseOrigin}/bonus/?b=${bonus.qrToken}`
     });
   });
 

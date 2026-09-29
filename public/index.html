@@ -3513,13 +3513,13 @@ async function fetchQuestionData(options = {}) {
   const q = getQuestionParam();
   if (!q || !participantId) return null;
 
-  const questionId = parseInt(q, 10);
+  const questionId = q;
   const requestKey = `${questionId}:${participantId}:${trackOpen ? 'open' : 'refresh'}`;
   if (questionLoadPromise && questionRequestKey === requestKey) {
     return questionLoadPromise;
   }
 
-  if (!force && !trackOpen && currentQuestion?.id === questionId && questionFetchedAt && (Date.now() - questionFetchedAt) < QUESTION_CACHE_MS) {
+  if (!force && !trackOpen && currentQuestion?.qrToken === questionId && questionFetchedAt && (Date.now() - questionFetchedAt) < QUESTION_CACHE_MS) {
     return { res: { ok: true, status: 200 }, data: currentQuestion, fromCache: true };
   }
 
@@ -3528,7 +3528,7 @@ async function fetchQuestionData(options = {}) {
     const res = await fetch(`/api/question?q=${encodeURIComponent(q)}&pid=${participantId}&token=${encodeURIComponent(deviceToken)}&track=${trackOpen ? '1' : '0'}`, { cache: 'no-store' });
     const data = await res.json();
     if (res.ok && !data.error) {
-      currentQuestion = data;
+      currentQuestion = {...data, qrToken:q};
       questionFetchedAt = Date.now();
       if (data.stats) {
         renderParticipantStats(data.stats);
@@ -3641,12 +3641,12 @@ async function refreshQuestionState(options = {}) {
     }
 
     if (qTextEl.innerText !== data.text) {
-      currentQuestion = data;
+      currentQuestion = {...data, qrToken:q};
       qTextEl.innerText = data.text;
     }
 
     if (!fromCache && data.alreadyAnswered && answerAreaEl.style.display !== 'none') {
-      currentQuestion = data;
+      currentQuestion = {...data, qrToken:q};
       showMicroToast('To pytanie zostało już zapisane. Możesz szukać kolejnego kodu QR.', 'info', 'Już wykonane', `question-sync-${data.id}`);
       showAnsweredState(data.previousAnswer || '', 'To pytanie masz już wykonane.', false, 'completed');
     }
@@ -3743,7 +3743,7 @@ async function submitAnswer() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         participantId,
-        questionId: currentQuestion.id,
+        questionId: currentQuestion.id, qrToken: getQuestionParam(),
         answer:     ans,
         deviceToken
       })
