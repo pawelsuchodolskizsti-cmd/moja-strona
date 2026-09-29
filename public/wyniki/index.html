@@ -390,6 +390,7 @@ function renderHeader() {
   const subline = document.getElementById('subline');
   const timerLabel = document.getElementById('timer-label');
   const timerValue = document.getElementById('timer-value');
+  timerValue.classList.toggle('timer-message',scoreboardState.phase === 'thanks');
   const timerNote = document.getElementById('timer-note');
   const suspenseMode = isSuspenseMode();
   document.body.classList.toggle('suspense-mode', suspenseMode);
