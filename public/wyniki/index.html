@@ -207,8 +207,8 @@ function isSuspenseMode() {
 function getRawRevealState() {
   const reveal = scoreboardState.resultsReveal || {};
   return {
-    participants: Boolean(reveal.participantsAt || scoreboardState.results_participants_revealed_at),
-    cities: Boolean(reveal.citiesAt || scoreboardState.results_cities_revealed_at)
+    participants: Date.parse(reveal.participantsAt || scoreboardState.results_participants_revealed_at) <= Math.min(GameClock.now(), Date.parse(scoreboardState.serverNow)),
+    cities: Date.parse(reveal.citiesAt || scoreboardState.results_cities_revealed_at) <= Math.min(GameClock.now(), Date.parse(scoreboardState.serverNow))
   };
 }
 
@@ -750,8 +750,8 @@ async function loadScoreboard(force = false) {
         participants: Boolean(data.resultsReveal?.participantsAt || data.results_participants_revealed_at),
         cities: Boolean(data.resultsReveal?.citiesAt || data.results_cities_revealed_at)
       };
-      if (lastRawRevealState.participants === false && incomingReveal.participants) triggerRevealMoment('participants');
-      if (lastRawRevealState.cities === false && incomingReveal.cities) triggerRevealMoment('cities');
+
+
       lastRawRevealState = incomingReveal;
 
       if (lastScoreboardVersion !== nextVersion || recoveredConnection) {
@@ -883,5 +883,5 @@ window.onload = async () => {
 };
 </script>
 <script src="/wyniki/display.js"></script>
-</body>
+<script src="/wyniki/reveal-show.js"></script></body>
 </html>

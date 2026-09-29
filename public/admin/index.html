@@ -2334,8 +2334,8 @@
         </div>
       </div>
       <div class="reveal-actions">
-        <button class="btn reveal-primary" id="btn-reveal-participants" type="button" onclick="confirmAction('reveal-participants')">Odsłoń osoby</button>
-        <button class="btn reveal-gold" id="btn-reveal-cities" type="button" onclick="confirmAction('reveal-cities')">Odsłoń placówki</button>
+        <button class="btn reveal-primary" id="btn-reveal-participants" type="button" onclick="confirmAction('reveal-participants')">Odsłoń osoby (10 s)</button>
+        <button class="btn reveal-gold" id="btn-reveal-cities" type="button" onclick="confirmAction('reveal-cities')">Odsłoń placówki (10 s)</button>
         <button class="btn outline" id="btn-lock-results" type="button" onclick="confirmAction('lock-results')">Zablokuj ponownie</button>
       </div>
       <div class="reveal-actions"><button class="btn primary" id="btn-show-thanks" onclick="setFinaleThanks(true)">Pokaż podziękowanie</button><button class="btn outline" id="btn-hide-thanks" onclick="setFinaleThanks(false)">Wróć do finału</button></div>
@@ -3224,6 +3224,8 @@ function renderRevealControls() {
   const lockBtn = document.getElementById('btn-lock-results');
   if (!playersStep || !citiesStep || !lockStep) return;
 
+  const playersPending = Date.parse(resultsParticipantsRevealedAt) > GameClock.now();
+  const citiesPending = Date.parse(resultsCitiesRevealedAt) > GameClock.now();
   const playersOpen = Boolean(resultsParticipantsRevealedAt);
   const citiesOpen = Boolean(resultsCitiesRevealedAt);
   const finaleWindow = gamePhase === 'active' || gamePhase === 'ended';
@@ -3232,15 +3234,15 @@ function renderRevealControls() {
   citiesStep.classList.toggle('active', citiesOpen);
   lockStep.classList.toggle('active', !playersOpen && !citiesOpen && finaleWindow);
 
-  playersLabel.textContent = playersOpen ? `Odsłonięto ${formatAnnouncementTime(resultsParticipantsRevealedAt)}.` : 'Czeka na odsłonięcie.';
-  citiesLabel.textContent = citiesOpen ? `Odsłonięto ${formatAnnouncementTime(resultsCitiesRevealedAt)}.` : 'Czeka na odsłonięcie.';
+  playersLabel.textContent = playersPending ? 'Trwa odliczanie do odsłonięcia.' : playersOpen ? `Odsłonięto ${formatAnnouncementTime(resultsParticipantsRevealedAt)}.` : 'Czeka na odsłonięcie.';
+  citiesLabel.textContent = citiesPending ? 'Trwa odliczanie do odsłonięcia.' : citiesOpen ? `Odsłonięto ${formatAnnouncementTime(resultsCitiesRevealedAt)}.` : 'Czeka na odsłonięcie.';
 
   if (playersBtn) playersBtn.disabled = playersOpen || gamePhase!=='ended';
-  if (citiesBtn) citiesBtn.disabled = citiesOpen || !playersOpen || gamePhase!=='ended';
+  if (citiesBtn) citiesBtn.disabled = citiesOpen || !playersOpen || playersPending || gamePhase!=='ended';
   if (lockBtn) lockBtn.disabled = !playersOpen && !citiesOpen;
 
   if (meta) {
-    meta.textContent = citiesOpen
+    meta.textContent = playersPending || citiesPending ? 'Na tablicy trwa odliczanie. Zasłoń wyniki, aby je anulować.' : citiesOpen
       ? 'Pełny ranking jest odsłonięty na tablicy wyników.'
       : playersOpen
         ? 'Uczestnicy są odsłonięci. Kolejny krok to spektakularne pokazanie rankingu placówek.'
@@ -3566,12 +3568,12 @@ function confirmAction(action) {
     },
     'reveal-participants': {
       title: 'Odsłonić wyniki uczestników?',
-      copy: 'Na tablicy wyników pojawi się mocna animacja i ranking najlepszych osób.',
+      copy: 'Na tablicy ruszy odliczanie od 10. Następnie pojawią się konfetti i ranking najlepszych osób.',
       button: 'Tak, odsłoń osoby'
     },
     'reveal-cities': {
       title: 'Odsłonić ranking placówek?',
-      copy: 'To drugi etap finału: po osobach tablica pokaże Top 3 placówek i punkty placówek.',
+      copy: 'Po odliczaniu od 10 tablica pokaże konfetti, Top 3 placówek i punkty placówek.',
       button: 'Tak, odsłoń placówki'
     },
     'lock-results': {
@@ -3799,8 +3801,8 @@ async function setResultsReveal(action) {
       action === 'lock-results'
         ? 'Wyniki zostały ponownie zasłonięte na tablicy.'
         : action === 'reveal-cities'
-          ? 'Ranking placówek został odsłonięty na tablicy wyników.'
-          : 'Wyniki uczestników zostały odsłonięte na tablicy wyników.',
+          ? 'Uruchomiono odliczanie do odsłonięcia placówek.'
+          : 'Uruchomiono odliczanie do odsłonięcia uczestników.',
       'success'
     );
   } catch (e) {
