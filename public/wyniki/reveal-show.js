@@ -40,6 +40,12 @@
 .reveal-ranking-stage .award-card>.section-title{font-family:'DM Sans',system-ui,sans-serif;font-weight:700;font-size:clamp(26px,3.2vw,52px);line-height:1.2;letter-spacing:-.025em;color:#9851b5;margin:0;text-align:center}
 @media(max-width:600px){.reveal-ranking-stage{gap:12px}.reveal-ranking-stage .award-card>.section-title{font-size:28px}}
 `;
+  style.textContent+=`
+.reveal-ranking-stage{top:max(24px,env(safe-area-inset-top));transition:top .65s ease}
+body:has(.reveal-show.celebrating:not([hidden])) .reveal-ranking-stage{top:150px}
+@media(max-width:600px){.reveal-ranking-stage{top:max(16px,env(safe-area-inset-top))}body:has(.reveal-show.celebrating:not([hidden])) .reveal-ranking-stage{top:145px}}
+@media(prefers-reduced-motion:reduce){.reveal-ranking-stage{transition:none}}
+`;
   document.head.append(style);
   const finaleTitle=document.createElement('section');finaleTitle.className='finale-title-screen';finaleTitle.hidden=true;finaleTitle.setAttribute('aria-label','Finał Gwiazdki One Day 2026');finaleTitle.innerHTML='<div class="finale-title-card"><div class="finale-title-logos"><img src="/fundacjaoneday.svg" alt="Fundacja One Day"><img src="/energyliandia.svg" alt="Energylandia"></div><div class="finale-title-event event-brand">Gwiazdka One Day 2026</div><h1 class="finale-title-word event-brand">FINAŁ</h1></div>';document.body.append(finaleTitle);
   const overlay=document.createElement('div');overlay.className='reveal-show';overlay.hidden=true;overlay.innerHTML='<p></p><strong></strong><small>Za chwilę poznamy wyniki</small>';document.body.append(overlay);
@@ -83,7 +89,7 @@
     let progress=readProgress(p);if(p.step>progress.remote){progress.step=Math.min(4,progress.step+p.step-progress.remote);progress.remote=p.step;saveProgress(p,progress);}
     if(progress.step>=4){stopEffects();overlay.hidden=true;restoreFocus();return;}
     const key=savedKey(p);if(!focus||focus.key!==key){restoreFocus();const target=document.querySelector(p.kind==='cities'?'#podium':'#leaderboard-list')?.closest('.board-card'),before=target?.getBoundingClientRect();
-      const stage=document.createElement('div'),card=document.createElement('section');stage.className='reveal-ranking-stage';stage.setAttribute('aria-label','Prezentacja nagród');card.className='card board-card award-card';stage.append(card);document.body.append(stage);document.body.classList.add('reveal-ranking-focus');focus={key,kind:p.kind,step:progress.step,stage,card,p};
+      const stage=document.createElement('div'),card=document.createElement('section');stage.className='reveal-ranking-stage';stage.addEventListener('transitionend',event=>{if(event.target===stage&&event.propertyName==='top')fitAwardText();});stage.setAttribute('aria-label','Prezentacja nagród');card.className='card board-card award-card';stage.append(card);document.body.append(stage);document.body.classList.add('reveal-ranking-focus');focus={key,kind:p.kind,step:progress.step,stage,card,p};
       restoreFocus=()=>{stage.remove();document.body.classList.remove('reveal-ranking-focus');focus=null;restoreFocus=()=>{};};
       renderFocus();if(before&&!reduced.matches){const after=card.getBoundingClientRect();card.animate([{transform:'translate('+(before.left-after.left)+'px,'+(before.top-after.top)+'px) scale('+(before.width/after.width)+','+(before.height/after.height)+')'},{transform:'none'}],{duration:1000,easing:'cubic-bezier(.2,.75,.2,1)'});}
     }else{const changed=focus.step!==progress.step;focus.step=progress.step;focus.p=p;renderFocus();if(changed&&progress.step<3)fireworks();}
@@ -136,7 +142,7 @@
     syncPresentation(scoreboardState.presentation);
     if(!focus||focus.step>=3){overlay.hidden=true;stopEffects();return;}
     overlay.classList.remove('counting');overlay.classList.add('celebrating');titleEl.textContent=title;numberEl.textContent='Brawo!';noteEl.textContent='Gratulujemy wszystkim uczestnikom';
-    clearTimeout(celebrationTimer);celebrationTimer=setTimeout(()=>{overlay.hidden=true;},6000);fireworks();
+    clearTimeout(celebrationTimer);celebrationTimer=setTimeout(()=>{overlay.hidden=true;fitAwardText();},6000);fireworks();
   }
   function clearShow(){restoreFocus();active=null;seen.clear();overlay.hidden=true;overlay.classList.remove('counting','celebrating');clearTimeout(celebrationTimer);stopEffects();}
   setInterval(()=>{
