@@ -1,7 +1,7 @@
 (() => {
   const dialog=document.createElement('dialog');
   dialog.className='player-help-dialog';dialog.setAttribute('aria-labelledby','player-help-title');dialog.setAttribute('aria-describedby','player-help-copy');
-  dialog.innerHTML='<h2 id="player-help-title">Potrzebujesz pomocy technicznej?</h2><p id="player-help-copy">Zgłoś się do teatru. Pomożemy Ci wrócić do gry.</p><form method="dialog"><button class="player-help-close" autofocus>Rozumiem</button></form>';
+  dialog.innerHTML='<h2 id="player-help-title">Potrzebujesz pomocy technicznej?</h2><p id="player-help-copy"><span>Zgłoś się do teatru.</span><span>Pomożemy Ci wrócić do gry.</span></p><form method="dialog"><button class="player-help-close" autofocus>Rozumiem</button></form>';
   document.body.append(dialog);
   dialog.addEventListener('click',event=>{if(event.target===dialog){const rect=dialog.getBoundingClientRect();if(event.clientX<rect.left||event.clientX>rect.right||event.clientY<rect.top||event.clientY>rect.bottom)dialog.close();}});
   for(const screen of document.querySelectorAll('body > .card')){
