@@ -33,3 +33,5 @@
 #institution-status {font:12px/1.5 system-ui;color:#705377;margin:8px 0;}
 #institution-retry {padding:4px 0;font-size:11px;text-decoration:underline;}
 #institution-retry[hidden] {display:none;}
+
+.after-game-actions{display:grid;gap:12px;margin-top:18px}.after-game-actions[hidden],.after-game-link[hidden]{display:none}.after-game-link{display:block;padding:16px 18px;border:1px solid #ddd0f8;border-radius:16px;background:linear-gradient(120deg,#fff5fb,#f1edff);color:#513471;text-decoration:none;text-align:center}.after-game-link strong{display:block;font-size:17px;color:#8047b0}.after-game-link span{display:block;font-size:13px;margin-top:4px}.after-game-link:focus-visible{outline:3px solid #9962db;outline-offset:3px}

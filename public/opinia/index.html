@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="pl" data-page-surface="game"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#e81e63"><title>Twoja opinia - One Day</title><link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&amp;family=DM+Sans:wght@400;500;700&amp;display=swap" rel="stylesheet"><link rel="icon" href="/favicon.svg"><link rel="stylesheet" href="/event-brand.css"><link rel="stylesheet" href="/mobile-canvas.css"><link rel="stylesheet" href="/opinia/opinia.css"><script src="/communication-policy.js"></script><script defer src="/communication-consent.js"></script><script defer src="/opinia/opinia.js"></script></head>
+<body><main><img class="foundation-logo" src="/fundacjaoneday.svg" alt="Fundacja One Day"><p class="event-brand">Gwiazdka One Day 2026</p><a class="back" href="/">Wróć do gry</a>
+<p id="page-status" role="status">Ładowanie…</p><button id="retry" type="button" hidden>Spróbuj ponownie</button>
+<section id="feedback-section" hidden><h1>Podziel się opinią</h1><p>Co zapamiętasz z dzisiejszej gry? Twoje zdanie pomoże nam przygotować kolejne wydarzenia.</p><form id="feedback-form">
+<fieldset><legend>Jak oceniasz grę?</legend><div class="stars">
+<label><input type="radio" name="rating" value="1" required><span aria-hidden="true">★</span><span class="sr-only">1 gwiazdka</span></label>
+<label><input type="radio" name="rating" value="2"><span aria-hidden="true">★</span><span class="sr-only">2 gwiazdki</span></label>
+<label><input type="radio" name="rating" value="3"><span aria-hidden="true">★</span><span class="sr-only">3 gwiazdki</span></label>
+<label><input type="radio" name="rating" value="4"><span aria-hidden="true">★</span><span class="sr-only">4 gwiazdki</span></label>
+<label><input type="radio" name="rating" value="5"><span aria-hidden="true">★</span><span class="sr-only">5 gwiazdek</span></label></div><p id="rating-label">Wybierz od 1 do 5 gwiazdek</p></fieldset>
+<label for="liked">Co Ci się podobało?</label><textarea id="liked" maxlength="2000" rows="4" placeholder="Twoje ulubione momenty (opcjonalnie)"></textarea>
+<label for="improvements">Co możemy poprawić?</label><textarea id="improvements" maxlength="2000" rows="4" placeholder="Twoje pomysły i wskazówki (opcjonalnie)"></textarea>
+<p class="hint">Opinię zobaczy organizator. Nie wpisuj danych innych osób. Ocena jest przypisana do Twojego konta, aby można było ją później poprawić.</p><button type="submit">Wyślij opinię</button><p id="feedback-status" role="status"></p></form></section>
+<section id="contact-section" hidden><h1>Zostań z One Day</h1><p>Poznaj kolejne wydarzenia, projekty i możliwości Fundacji. Do zapisu wykorzystamy imię, nazwisko, placówkę i e-mail z Twojego konta.</p>
+<form id="contact-form"><label class="consent"><input id="accept-communication" type="checkbox" required><span><strong data-communication-title></strong><span data-communication-text></span>Zapoznałem się z <a href="/komunikacja/" target="_blank" rel="noopener">zasadami kontaktu</a>.</span></label>
+<div id="communication-age-field" hidden><label for="communication-age">Potwierdzenie zgody</label><select id="communication-age"><option value="">Wybierz odpowiedź</option><option value="adult">Mam ukończone 18 lat</option><option value="guardian_required">Nie mam 18 lat - potrzebne potwierdzenie opiekuna</option></select></div>
+<p id="contact-draft" class="hint">To wzór zgody. Zapis testowy nie uruchamia wysyłki wiadomości. Dla osoby niepełnoletniej potrzebne jest potwierdzenie uprawnionego opiekuna.</p><button type="submit">Dołącz do aktualności Fundacji</button><p id="contact-status" role="status"></p></form><a href="/komunikacja/#rezygnacja">Zarządzaj zgodą na kontakt</a></section>
+</main></body></html>

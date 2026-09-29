@@ -1,6 +1,8 @@
 const { runHandler } = require('../lib/run-handler');
 
 const handlers = {
+  'player-feedback':require('../lib/handlers/player-feedback').handler,
+  'admin-feedback':require('../lib/handlers/admin-feedback').handler,
   'communication-consent':require('../lib/handlers/communication-consent').handler,
   'admin-communications':require('../lib/handlers/admin-communications').handler,
   'admin-history':require('../lib/handlers/admin-history').handler,
