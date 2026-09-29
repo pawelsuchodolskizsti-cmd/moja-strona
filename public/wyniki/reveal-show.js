@@ -11,26 +11,30 @@
     const canvas=document.createElement('canvas');canvas.className='reveal-effects';canvas.setAttribute('aria-hidden','true');document.body.append(canvas);
     const ctx=canvas.getContext('2d');if(!ctx){canvas.remove();return;}
     const colors=['#ff4089','#a174ff','#ffd66b','#b5ec7a','#ffffff'];
-    let width=innerWidth,height=innerHeight,particles=[],rockets=[],frame=0,last=performance.now(),start=last,nextBurst=0,nextConfetti=0,stopped=false;
+    let width=innerWidth,height=innerHeight,particles=[],rockets=[],halos=[],frame=0,last=performance.now(),start=last,nextBurst=0,nextConfetti=0,stopped=false;
     function resize(){width=innerWidth;height=innerHeight;const ratio=Math.min(devicePixelRatio||1,1.5);canvas.width=width*ratio;canvas.height=height*ratio;ctx.setTransform(ratio,0,0,ratio,0,0);}
     resize();window.addEventListener('resize',resize);
-    function stop(){if(stopped)return;stopped=true;cancelAnimationFrame(frame);window.removeEventListener('resize',resize);canvas.remove();particles=[];rockets=[];}
+    function stop(){if(stopped)return;stopped=true;cancelAnimationFrame(frame);window.removeEventListener('resize',resize);canvas.remove();particles=[];rockets=[];halos=[];}
     stopEffects=stop;
     function burst(x,y,color){
-      for(let i=0;i<64;i++){const angle=Math.PI*2*i/64,speed=50+Math.random()*150;particles.push({x,y,px:x,py:y,vx:Math.cos(angle)*speed,vy:Math.sin(angle)*speed,life:1.5+Math.random(),max:2.5,color,type:'spark',size:1.5+Math.random()*1.5});}
+      const scale=Math.min(1.6,Math.max(.7,Math.min(width,height)/700)),count=width<600?90:144;
+      halos.push({x,y,color,life:.65,scale});
+      for(let i=0;i<count;i++){const angle=Math.PI*2*i/count+Math.random()*.035,outer=i%3!==0,speed=(outer?240+Math.random()*160:90+Math.random()*100)*scale;particles.push({x,y,px:x,py:y,vx:Math.cos(angle)*speed,vy:Math.sin(angle)*speed,life:2.2+Math.random()*1.2,max:3.4,color:outer?color:'#ffd66b',type:'spark',size:(1.8+Math.random()*1.8)*scale});}
     }
     function draw(now){
       const elapsed=now-start;if(elapsed>=30000||reduced.matches){stop();return;}
       const dt=Math.min((now-last)/1000,.04);last=now;ctx.clearRect(0,0,width,height);
-      if(elapsed<27000&&elapsed>=nextBurst){nextBurst=elapsed+650;const x=(.08+Math.random()*.84)*width,target=(.12+Math.random()*.45)*height;rockets.push({x,y:height+10,target,color:colors[Math.floor(Math.random()*colors.length)]});}
+      if(elapsed<27000&&elapsed>=nextBurst){nextBurst=elapsed+(elapsed>22000?850:1100);const salvo=width<600?2:3;for(let i=0;i<salvo;i++){const x=(.12+(i+Math.random()*.5)/salvo*.76)*width,target=(.17+Math.random()*.36)*height;rockets.push({x,y:height+10+i*height*.13,target,color:colors[Math.floor(Math.random()*colors.length)]});}}
       if(elapsed<25500&&elapsed>=nextConfetti){nextConfetti=elapsed+220;for(let i=0;i<12;i++)particles.push({x:Math.random()*width,y:-20,vx:(Math.random()-.5)*60,vy:height/4+Math.random()*70,life:4.5,max:4.5,color:colors[i%colors.length],type:'confetti',size:5+Math.random()*5,angle:Math.random()*6,spin:Math.random()*5-2.5});}
-      for(const rocket of rockets){rocket.y-=height*dt;ctx.globalAlpha=.85;ctx.strokeStyle=rocket.color;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(rocket.x,rocket.y+32);ctx.lineTo(rocket.x,rocket.y);ctx.stroke();if(rocket.y<=rocket.target){burst(rocket.x,rocket.target,rocket.color);rocket.done=true;}}
+      for(const rocket of rockets){rocket.y-=height*dt;ctx.globalAlpha=.85;ctx.strokeStyle=rocket.color;ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(rocket.x,rocket.y+65);ctx.lineTo(rocket.x,rocket.y);ctx.stroke();if(rocket.y<=rocket.target){burst(rocket.x,rocket.target,rocket.color);rocket.done=true;}}
       rockets=rockets.filter(r=>!r.done);
+      for(const halo of halos){halo.life-=dt;const t=1-halo.life/.65;ctx.globalAlpha=Math.max(0,halo.life/.65)*.35;ctx.strokeStyle=halo.color;ctx.lineWidth=3;ctx.beginPath();ctx.arc(halo.x,halo.y,Math.max(0,20+t*150*halo.scale),0,Math.PI*2);ctx.stroke();}
+      halos=halos.filter(h=>h.life>0);
       for(const p of particles){p.life-=dt;p.px=p.x;p.py=p.y;p.x+=p.vx*dt;p.y+=p.vy*dt;ctx.globalAlpha=Math.min(1,p.life/.6);ctx.fillStyle=p.color;
-        if(p.type==='spark'){p.vy+=55*dt;p.vx*=Math.pow(.97,dt*60);ctx.strokeStyle=p.color;ctx.lineWidth=p.size;ctx.beginPath();ctx.moveTo(p.px,p.py);ctx.lineTo(p.x,p.y);ctx.stroke();}
+        if(p.type==='spark'){p.vy+=55*dt;const drag=Math.pow(.985,dt*60);p.vx*=drag;p.vy*=drag;ctx.strokeStyle=p.color;ctx.lineWidth=p.size;ctx.beginPath();ctx.moveTo(p.x-p.vx*.055,p.y-p.vy*.055);ctx.lineTo(p.x,p.y);ctx.stroke();ctx.globalAlpha*=.8;ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(p.x,p.y,p.size*.45,0,Math.PI*2);ctx.fill();}
         else{p.angle+=p.spin*dt;ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.angle);ctx.fillRect(-p.size/2,-p.size/2,p.size,p.size*1.7);ctx.restore();}
       }
-      particles=particles.filter(p=>p.life>0&&p.y<height+40);if(particles.length>1000)particles=particles.slice(-1000);ctx.globalAlpha=1;frame=requestAnimationFrame(draw);
+      particles=particles.filter(p=>p.life>0&&p.y<height+40);const limit=width<600?1100:1800;if(particles.length>limit)particles=particles.slice(-limit);ctx.globalAlpha=1;frame=requestAnimationFrame(draw);
     }
     frame=requestAnimationFrame(draw);
   }
