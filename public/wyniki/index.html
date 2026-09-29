@@ -560,7 +560,7 @@ function renderLeaderboardList() {
       <div class="list-rank">${participant.rank}</div>
       <div class="list-main">
         <div class="list-name">${escHtml(participant.name)}${getMovementPill(movement)}</div>
-        <div class="list-city">${escHtml(participant.city || 'Bez placówki')}</div>
+        ${revealState.citiesVisible ? `<div class="list-city">${escHtml(participant.city || 'Bez placówki')}</div>` : ''}
       </div>
       <div class="list-score">
         <strong class="${scoreChanged ? 'score-changed' : ''}">${participant.score} pkt</strong>
