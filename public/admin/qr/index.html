@@ -621,6 +621,7 @@ h1 {
 <script src="/admin/qr/qr-zip.js"></script>
 <link rel="stylesheet" href="/admin/admin-navigation.css">
 <link rel="stylesheet" href="/event-brand.css">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/view-loading.css">
 <script src="/view-loading.js"></script>
 <meta name="theme-color" content="#09111c">
@@ -820,6 +821,13 @@ function normalizeOrigin(value) { try { const url=new URL(String(value||window.l
     const cssClass = item.type === 'bonus' ? 'qr-card bonus' : 'qr-card';
     return `
       <article class="${cssClass}">
+        <div class="qr-print-brand">
+          <div class="qr-print-partners">
+            <img src="/fundacjaoneday.svg" alt="Fundacja One Day">
+            <img src="/energyliandia.svg" alt="Energylandia">
+          </div>
+          <div class="qr-print-event event-brand">Gwiazdka One Day 2026</div>
+        </div>
         <div class="qr-card-head">
           <div class="qr-card-title">${escapeHtml(item.label)}</div>
           <div class="qr-card-chip">${escapeHtml(item.shortLabel)}</div>
@@ -1258,8 +1266,9 @@ function normalizeOrigin(value) { try { const url=new URL(String(value||window.l
   window.addEventListener('admin-session-expired',()=>AdminSession.redirect());
   async function printQrCatalog() {
     try {
-      const images=Array.from(document.querySelectorAll('.qr-image'));
+      const images=Array.from(document.querySelectorAll('.qr-image, .qr-print-partners img'));
       await Promise.all(images.map(img=>img.decode()));
+      await document.fonts.ready;
       if(images.some(img=>!img.naturalWidth))throw Error();
       window.print();
     } catch { setDownloadStatus('Nie wszystkie kody zostały wygenerowane. Odśwież kody i spróbuj ponownie.','error'); }
