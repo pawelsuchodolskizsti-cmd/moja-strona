@@ -2334,8 +2334,8 @@
         </div>
       </div>
       <div class="reveal-actions">
-        <button class="btn reveal-primary" id="btn-reveal-participants" type="button" onclick="confirmAction('reveal-participants')">Odsłoń osoby (10 s)</button>
-        <button class="btn reveal-gold" id="btn-reveal-cities" type="button" onclick="confirmAction('reveal-cities')">Odsłoń placówki (10 s)</button>
+        <button class="btn reveal-primary" id="btn-reveal-participants" type="button" onclick="confirmAction('reveal-participants')">Odsłoń osoby (15 s)</button>
+        <button class="btn reveal-gold" id="btn-reveal-cities" type="button" onclick="confirmAction('reveal-cities')">Odsłoń placówki (15 s)</button>
         <button class="btn outline" id="btn-lock-results" type="button" onclick="confirmAction('lock-results')">Zablokuj ponownie</button>
       </div>
       <div class="reveal-actions"><button class="btn primary" id="btn-show-thanks" onclick="setFinaleThanks(true)">Pokaż podziękowanie</button><button class="btn outline" id="btn-hide-thanks" onclick="setFinaleThanks(false)">Wróć do finału</button></div>
@@ -3568,12 +3568,12 @@ function confirmAction(action) {
     },
     'reveal-participants': {
       title: 'Odsłonić wyniki uczestników?',
-      copy: 'Na tablicy ruszy odliczanie od 10. Następnie pojawią się konfetti i ranking najlepszych osób.',
+      copy: 'Na tablicy ruszy odliczanie od 10, trwające 15 sekund. Następnie pojawią się konfetti i ranking najlepszych osób.',
       button: 'Tak, odsłoń osoby'
     },
     'reveal-cities': {
       title: 'Odsłonić ranking placówek?',
-      copy: 'Po odliczaniu od 10 tablica pokaże konfetti, Top 3 placówek i punkty placówek.',
+      copy: 'Po 15-sekundowym odliczaniu od 10 tablica pokaże konfetti, Top 3 placówek i punkty placówek.',
       button: 'Tak, odsłoń placówki'
     },
     'lock-results': {
