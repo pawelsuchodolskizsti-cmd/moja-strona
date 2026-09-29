@@ -25,3 +25,32 @@
     -webkit-text-fill-color: currentColor;
   }
 }
+
+/* Spójny wygląd odliczania na tablicy i ekranach finału. */
+.status-value.timer,
+.status-finale-time {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  color: #ff3d6b;
+  letter-spacing: -.035em;
+  font-variant-numeric: tabular-nums;
+  text-shadow: none;
+}
+.status-value.timer { font-size: clamp(24px, 13cqw, 82px); }
+@supports (background-clip: text) or (-webkit-background-clip: text) {
+  .status-value.timer,
+  .status-finale-time {
+    background: linear-gradient(135deg, #ff3d6b, #7c6af7);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+}
+@media (forced-colors: active) {
+  .status-value.timer,
+  .status-finale-time {
+    background: none;
+    color: CanvasText;
+    -webkit-text-fill-color: currentColor;
+  }
+}
