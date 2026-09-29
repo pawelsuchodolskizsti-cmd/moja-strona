@@ -100,3 +100,9 @@ html::-webkit-scrollbar,body::-webkit-scrollbar,.screen *::-webkit-scrollbar{dis
 @media(max-width:420px){.brand-strip{flex-direction:column;align-items:stretch;gap:8px}.brand-block.logos{align-self:center}.brand-title{max-width:none;text-align:center;padding:8px 12px}}
 
 .timer-box{container-type:inline-size}.status-value.timer.timer-message{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(18px,8cqw,48px);letter-spacing:-.035em;line-height:1.2;text-align:center}
+
+/* Projekcja pokazuje treść dla publiczności bez opisów obsługi. */
+.projection-mode .reveal-stage-label,
+.projection-mode .reveal-stage-copy,
+.projection-mode .section-copy,
+.projection-mode .announcement-meta{display:none}
