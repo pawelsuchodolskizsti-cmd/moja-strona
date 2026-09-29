@@ -51,19 +51,19 @@
   function saveProgress(p,value){try{sessionStorage.setItem(savedKey(p),JSON.stringify(value));}catch{}}
   function presentationItems(kind){return kind==='cities'?[...(scoreboardState.cityStats||[])].sort(GameRanking.compareCities).slice(0,3):[...(scoreboardState.leaderboard||[])].sort((a,b)=>Number(a.rank)-Number(b.rank)).slice(0,3);}
   function renderFocus(){if(!focus)return;const items=presentationItems(focus.kind),signature=JSON.stringify([focus.step,items]);if(signature===focus.signature)return;focus.signature=signature;
-    const {card,step,kind}=focus;focus.stage.querySelector('.award-brand')?.remove();card.replaceChildren();card.classList.toggle('award-single',step>0);
+    const {card,step,kind}=focus;focus.stage.querySelector('.award-brand')?.remove();card.replaceChildren();card.classList.toggle('award-single',step<3);
     const brand=document.createElement('header');brand.className='award-brand';brand.innerHTML='<div class="award-brand-logos"><img src="/fundacjaoneday.svg" alt="Fundacja One Day"><img src="/energyliandia.svg" alt="Energylandia"></div><div class="award-brand-name event-brand">Gwiazdka One Day 2026</div>';const eventName=brand.querySelector('.award-brand-name');card.append(eventName);focus.stage.prepend(brand);
     const title=document.createElement('h2');title.className='section-title';title.textContent=kind==='cities'?'Najlepsze placówki':'Najlepsi uczestnicy';card.append(title);
     const list=document.createElement('div');list.className='award-winners';
-    card.classList.toggle('award-podium',step===0&&items.length===3);const selected=step===0?items:items.slice(step-1,step);list.style.setProperty('--award-columns',Math.max(1,selected.length));
-    if(!selected.length){const empty=document.createElement('p');empty.textContent=step?'Brak laureata na tym miejscu.':'Brak wyników do pokazania.';list.append(empty);}
-    selected.forEach((item,index)=>{const rank=step||index+1,row=document.createElement('article');row.className='award-winner';row.dataset.rank=rank;
+    card.classList.toggle('award-podium',step===3&&items.length===3);const selected=step===3?items:items.slice(2-step,3-step);list.style.setProperty('--award-columns',Math.max(1,selected.length));
+    if(!selected.length){const empty=document.createElement('p');empty.textContent=step<3?'Brak laureata na tym miejscu.':'Brak wyników do pokazania.';list.append(empty);}
+    selected.forEach((item,index)=>{const rank=step===3?index+1:3-step,row=document.createElement('article');row.className='award-winner';row.dataset.rank=rank;
       const badge=document.createElement('div');badge.className='award-place event-brand';badge.textContent=rank+'. miejsce';
       const name=document.createElement('div');name.className='award-name';const fullName=String((kind==='cities'?item.city:item.name)||'');fullName.split(/\s+/).filter(Boolean).forEach((word,i)=>{if(i)name.append(' ');const part=document.createElement('span');part.textContent=word;name.append(part);});
       const score=document.createElement('div');score.className='award-score event-brand';score.textContent=Number(item.score||0)+' pkt';
       row.append(badge,name,score);if(kind==='participants'&&item.city){const city=document.createElement('p');city.textContent=item.city;row.append(city);}list.append(row);});card.append(list);
     fitAwardText();
-    if(!reduced.matches)list.animate([{opacity:.25,transform:'scale(.94)'},{opacity:1,transform:'scale(1)'}],{duration:650,easing:'ease-out'});
+    if(step<3&&!reduced.matches)list.animate([{opacity:.25,transform:'scale(.94)'},{opacity:1,transform:'scale(1)'}],{duration:650,easing:'ease-out'});
   }
   function fitAwardText(){
     if(!focus)return;
@@ -81,12 +81,13 @@
   function syncPresentation(p){
     if(!p||!['ended','thanks'].includes(scoreboardState.phase)||Date.parse(p.eventAt)>Math.min(GameClock.now(),Date.parse(scoreboardState.serverNow))){restoreFocus();return;}
     let progress=readProgress(p);if(p.step>progress.remote){progress.step=Math.min(4,progress.step+p.step-progress.remote);progress.remote=p.step;saveProgress(p,progress);}
-    if(progress.step>=4){restoreFocus();return;}
+    if(progress.step>=4){stopEffects();overlay.hidden=true;restoreFocus();return;}
     const key=savedKey(p);if(!focus||focus.key!==key){restoreFocus();const target=document.querySelector(p.kind==='cities'?'#podium':'#leaderboard-list')?.closest('.board-card'),before=target?.getBoundingClientRect();
       const stage=document.createElement('div'),card=document.createElement('section');stage.className='reveal-ranking-stage';stage.setAttribute('aria-label','Prezentacja nagród');card.className='card board-card award-card';stage.append(card);document.body.append(stage);document.body.classList.add('reveal-ranking-focus');focus={key,kind:p.kind,step:progress.step,stage,card,p};
       restoreFocus=()=>{stage.remove();document.body.classList.remove('reveal-ranking-focus');focus=null;restoreFocus=()=>{};};
       renderFocus();if(before&&!reduced.matches){const after=card.getBoundingClientRect();card.animate([{transform:'translate('+(before.left-after.left)+'px,'+(before.top-after.top)+'px) scale('+(before.width/after.width)+','+(before.height/after.height)+')'},{transform:'none'}],{duration:1000,easing:'cubic-bezier(.2,.75,.2,1)'});}
-    }else{focus.step=progress.step;focus.p=p;renderFocus();}
+    }else{const changed=focus.step!==progress.step;focus.step=progress.step;focus.p=p;renderFocus();if(changed&&progress.step<3)fireworks();}
+    if(progress.step===3){stopEffects();overlay.hidden=true;clearTimeout(celebrationTimer);}
   }
   async function advance(){if(!focus||advanceBusy||performance.now()-lastTap<650)return;lastTap=performance.now();advanceBusy=true;const p={...focus.p},key=focus.key;
     try{const r=await fetch('/api/game-state',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'presentation-next',scope:scoreboardState.dataScope||'live',kind:p.kind,eventAt:p.eventAt,step:p.step})});
@@ -133,6 +134,7 @@
   }
   function celebrate(title,kind){
     syncPresentation(scoreboardState.presentation);
+    if(!focus||focus.step>=3){overlay.hidden=true;stopEffects();return;}
     overlay.classList.remove('counting');overlay.classList.add('celebrating');titleEl.textContent=title;numberEl.textContent='Brawo!';noteEl.textContent='Gratulujemy wszystkim uczestnikom';
     clearTimeout(celebrationTimer);celebrationTimer=setTimeout(()=>{overlay.hidden=true;},6000);fireworks();
   }
