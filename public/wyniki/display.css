@@ -1,4 +1,5 @@
 :root{--pink:#ff3d6b;--purple:#7c6af7;--gold:#ffd45a;--text:#241b3d;--muted:#736b83;--line:#e9e4ef;--app-height:100vh}
+.projection-mode .board-card .board-tools{display:none}
 *{box-sizing:border-box;margin:0;padding:0}
 html{background:#35132e}
 body{font-family:'DM Sans',sans-serif;color:var(--text);background:#e81e63 url('/tlo-gry.png') center/cover fixed;padding:24px;min-height:var(--app-height)}
