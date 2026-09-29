@@ -20,6 +20,17 @@
 @media(prefers-reduced-motion:reduce){.screen>*,.board>.board-card{transition:none!important}}
 `;
   style.textContent+=`.finale-title-screen{position:fixed;inset:0;z-index:1100;display:grid;place-items:center;padding:clamp(16px,4vw,64px);background:#842663 url('/tlo-gry.png') center/cover}.finale-title-screen[hidden]{display:none}.finale-title-card{width:min(1200px,100%);padding:clamp(28px,5vw,80px);border-radius:clamp(28px,4vw,60px);text-align:center;background:rgba(255,250,255,.96);border:1px solid #ffffffaa;box-shadow:0 24px 90px #24133f50}.finale-title-logos{display:flex;align-items:center;justify-content:center;gap:clamp(20px,5vw,80px);margin-bottom:clamp(24px,4vh,52px)}.finale-title-logos img{width:clamp(110px,20vw,300px);max-width:42%;height:clamp(46px,7vw,96px);object-fit:contain}.finale-title-event{font:800 clamp(18px,3vw,44px)/1.25 'Syne',sans-serif}.finale-title-word{font:800 clamp(64px,15vw,230px)/1.1 'Syne',sans-serif;letter-spacing:-.045em;margin-top:clamp(24px,5vh,60px)}.finale-title-visible .screen{visibility:hidden}`;
+  style.textContent+=`
+@media(min-width:701px){
+  .award-podium .award-winners{align-content:stretch;align-items:end;grid-template-rows:minmax(0,1fr);padding-top:16px}
+  .award-podium .award-winner{box-sizing:border-box;height:78%;min-height:0;gap:clamp(12px,2vh,22px);border-radius:24px 24px 12px 12px;border-bottom-width:10px}
+  .award-podium .award-winner[data-rank="1"]{grid-column:2;grid-row:1;height:96%;border-color:#d5b45b;background:linear-gradient(145deg,#fff8df,#f7edff)}
+  .award-podium .award-winner[data-rank="2"]{grid-column:1;grid-row:1;height:80%;border-color:#b7b3ce;background:linear-gradient(145deg,#f6f5ff,#eae9f5)}
+  .award-podium .award-winner[data-rank="3"]{grid-column:3;grid-row:1;height:64%;border-color:#cc9c85;background:linear-gradient(145deg,#fff1e8,#f5eaff)}
+  .award-podium .award-name{font-size:clamp(20px,2vw,38px)}
+  .award-podium .award-place,.award-podium .award-score{font-size:clamp(24px,2.5vw,44px)}
+}
+`;
   document.head.append(style);
   const finaleTitle=document.createElement('section');finaleTitle.className='finale-title-screen';finaleTitle.hidden=true;finaleTitle.setAttribute('aria-label','Finał Gwiazdki One Day 2026');finaleTitle.innerHTML='<div class="finale-title-card"><div class="finale-title-logos"><img src="/fundacjaoneday.svg" alt="Fundacja One Day"><img src="/energyliandia.svg" alt="Energylandia"></div><div class="finale-title-event event-brand">Gwiazdka One Day 2026</div><h1 class="finale-title-word event-brand">FINAŁ</h1></div>';document.body.append(finaleTitle);
   const overlay=document.createElement('div');overlay.className='reveal-show';overlay.hidden=true;overlay.innerHTML='<p></p><strong></strong><small>Za chwilę poznamy wyniki</small>';document.body.append(overlay);
@@ -35,7 +46,7 @@
     const brand=document.createElement('header');brand.className='award-brand';brand.innerHTML='<div class="award-brand-logos"><img src="/fundacjaoneday.svg" alt="Fundacja One Day"><img src="/energyliandia.svg" alt="Energylandia"></div><div class="award-brand-name event-brand">Gwiazdka One Day 2026</div>';card.append(brand);
     const title=document.createElement('h2');title.className='section-title';title.textContent=kind==='cities'?'Najlepsze placówki':'Najlepsi uczestnicy';card.append(title);
     const list=document.createElement('div');list.className='award-winners';
-    const selected=step===0?items:items.slice(step-1,step);list.style.setProperty('--award-columns',Math.max(1,selected.length));
+    card.classList.toggle('award-podium',step===0&&items.length===3);const selected=step===0?items:items.slice(step-1,step);list.style.setProperty('--award-columns',Math.max(1,selected.length));
     if(!selected.length){const empty=document.createElement('p');empty.textContent=step?'Brak laureata na tym miejscu.':'Brak wyników do pokazania.';list.append(empty);}
     selected.forEach((item,index)=>{const rank=step||index+1,row=document.createElement('article');row.className='award-winner';row.dataset.rank=rank;
       const badge=document.createElement('div');badge.className='award-place event-brand';badge.textContent=rank+'. miejsce';
@@ -53,7 +64,7 @@
     const sizes=texts.map(el=>parseFloat(getComputedStyle(el).fontSize));
     for(let scale=1;scale>=.25;scale-=.025){
       texts.forEach((el,i)=>el.style.fontSize=(sizes[i]*scale)+'px');
-      if(list.scrollHeight<=list.clientHeight+1&&[...list.querySelectorAll('.award-winner,.award-name')].every(el=>el.scrollWidth<=el.clientWidth+1))break;
+      if(list.scrollHeight<=list.clientHeight+1&&[...list.querySelectorAll('.award-winner,.award-name')].every(el=>el.scrollWidth<=el.clientWidth+1&&el.scrollHeight<=el.clientHeight+1))break;
     }
   }
   window.addEventListener('resize',fitAwardText);
