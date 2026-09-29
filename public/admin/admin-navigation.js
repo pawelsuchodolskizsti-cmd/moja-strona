@@ -79,7 +79,7 @@ window.AdminNavigation = (() => {
     const utilities=document.createElement('div');utilities.className='utility-grid admin-test-actions';
     for(const id of ['btn-quick-test','btn-integrity-scan','btn-start-simulator'])move(utilities,'#'+id);
     diagnostics.append(utilities);move(diagnostics,'#system-bar');move(diagnostics,'.notes-panel');move(diagnostics,'.simulator-card');
-    const resetCard=document.createElement('section');resetCard.className='ops-card admin-reset-card';resetCard.innerHTML='<div class="ops-title">Zarządzanie danymi</div><p class="ops-copy">Operacja dotyczy aktualnie wybranego trybu danych. Przed resetem powstaje pełne archiwum rund. Sprawdź, czy pracujesz na grze LIVE, czy na symulacji.</p>';
+    const resetCard=document.createElement('section');resetCard.className='ops-card admin-reset-card';resetCard.innerHTML='<div class="ops-title">Zarządzanie danymi</div><p class="ops-copy">Reset gry dotyczy aktualnie wybranego trybu danych. Przed resetem powstaje pełne archiwum rund. Sprawdź, czy pracujesz na grze LIVE, czy na symulacji.</p>';
     const reset=move(resetCard,'#btn-reset');reset.querySelector('small').textContent='Zapisuje archiwum i czyści wybrany tryb';diagnostics.append(resetCard);
     const feedback=document.getElementById('admin-feedback');feedback.setAttribute('role','status');main.insertBefore(feedback,main.querySelector('.hero'));
     const scope=document.createElement('div');scope.id='admin-scope-label';scope.className='admin-scope-label';scope.textContent='Dane gry LIVE';header.querySelector('.header-main').append(scope);
