@@ -4,10 +4,13 @@
   for(const target of targets){
     const panel=document.createElement('section');panel.className='after-game-actions';
     panel.innerHTML='<a class="after-game-link" href="/opinia/"><strong>Podziel się opinią</strong><span>Oceń grę i pomóż nam przygotować kolejne wydarzenia</span></a><a class="after-game-link" data-contact-invite href="/opinia/?kontakt=1" hidden><strong>Zostań z One Day</strong><span>Dołącz do aktualności Fundacji</span></a>';
-    if(target.id==='thanks-screen')target.append(panel);else target.after(panel);
+    const card=target.closest('.card');
+    panel.classList.toggle('after-game-home',target.id==='thanks-screen');
+    card.after(panel);
     let pending=false,lastCheck=0;
     const refresh=async()=>{
       panel.hidden=!target.getClientRects().length;
+      document.body.classList.toggle('after-game-separated',!panel.hidden);
       if(panel.hidden||pending||Date.now()-lastCheck<15000)return;
       pending=true;
       try{
