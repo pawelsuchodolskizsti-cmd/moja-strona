@@ -24,3 +24,32 @@ body.event-mode .admin-section .notes-panel,body.event-mode .admin-section .ops-
 #content-block-summary{margin-bottom:8px}#content-block-feedback{margin:8px 0 16px;line-height:1.5}
 
 .record-pagination{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:14px;padding:18px;color:#aebbd0}
+
+/* Wygodne sterowanie dotykowe bez zmian w układzie komputerowym. */
+@media screen and (max-width:700px){
+  #admin-shell.admin-layout button,body.admin-nav-aux button,.modal-overlay button{min-height:48px;touch-action:manipulation}
+  #admin-shell.admin-layout .btn,body.admin-nav-aux button,.modal-overlay .btn{padding:13px 16px;font-size:14px;line-height:1.4;white-space:normal}
+  #admin-sidebar .admin-nav-link{min-height:48px;margin:6px 0;font-size:14px}
+  #admin-sidebar .admin-nav-close{min-width:48px;min-height:48px}
+  .admin-menu-toggle{min-height:48px}
+  #admin-shell.admin-layout .header-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;width:100%}
+  #admin-shell.admin-layout .header-actions .btn{width:100%;font-size:13px}
+  .admin-section[data-admin-section=home] .action-grid,.admin-section[data-admin-section=home] .utility-grid{grid-template-columns:1fr;gap:16px}
+  .admin-section[data-admin-section=home] .action-btn{min-height:76px;padding:18px;font-size:17px}
+  .admin-layout .reveal-actions{display:grid;grid-template-columns:1fr;gap:14px;margin:20px 0}
+  .admin-layout .reveal-actions .btn{width:100%;min-height:54px}
+  #admin-shell.admin-layout #btn-awards-next{min-height:68px;margin-top:12px;font-size:20px;border:2px solid #c5ef92}
+  .admin-layout .reveal-actions + .reveal-actions{padding-top:20px;border-top:1px solid #39435d}
+  .admin-layout .toolbar{display:flex;flex-direction:column;align-items:stretch;gap:12px}
+  .admin-layout .toolbar input,.admin-layout .toolbar select,.admin-layout .toolbar .btn{width:100%;flex:auto}
+  #admin-shell.admin-layout input:not([type=checkbox]):not([type=radio]),#admin-shell.admin-layout select,#admin-shell.admin-layout textarea,body.admin-nav-aux input:not([type=checkbox]):not([type=radio]),body.admin-nav-aux select,body.admin-nav-aux textarea{font-size:16px;min-height:48px;max-width:100%;box-sizing:border-box}
+  .admin-layout .table-wrap{overscroll-behavior-x:contain}
+  .admin-layout td .btn{margin:5px 3px}
+  .admin-layout .admin-reset-card .btn,.admin-layout .admin-reset-card .action-btn{width:100%;max-width:none;margin-top:16px}
+  .modal-overlay{padding:12px}
+  .modal-overlay .modal{width:100%;max-width:100%;max-height:calc(100dvh - 24px);overflow-y:auto;box-sizing:border-box;padding:22px}
+  .modal-overlay .modal-btns{display:flex;flex-direction:column;gap:16px}
+  .modal-overlay .modal-btns .btn{width:100%}
+  body.admin-nav-aux main,body.admin-nav-aux .page{min-width:0}
+  body.admin-nav-aux button{overflow-wrap:anywhere}
+}
