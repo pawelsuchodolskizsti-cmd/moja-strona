@@ -3,7 +3,7 @@ window.PlayerExperience = (() => {
   const steps = [
     ['QR', 'Skanuj i zbieraj punkty', 'Szukaj kodów QR na trasie. Każdy kod otwiera pytanie. Poprawna odpowiedź to 1 punkt. Masz jedną próbę - przeczytaj pytanie uważnie.'],
     ['+1', 'Odkrywaj bonusy', 'Wypatruj bonusowych kodów QR i rozmawiaj z wolontariuszami. Zeskanuj kod i wpisz hasło do bonusu. Każdy bonus daje 1 dodatkowy punkt i można odebrać go tylko raz.'],
-    ['3 h', 'Graj przez 3 godziny', 'Wspólna runda trwa 3 godziny od startu organizatora. Odliczanie znajdziesz na ekranie głównym, przy każdym pytaniu i bonusie. Dołączając później, korzystasz z pozostałego czasu. Gotowy?']
+    ['3 h', 'Graj przez 3 godziny', 'Wspólna runda trwa 3 godziny od startu organizatora. Odliczanie znajdziesz na ekranie głównym, przy każdym pytaniu i bonusie. Dołączając później, korzystasz z pozostałego czasu.']
   ];
   const definitions = [
     {id:'first-clue', icon:'1', tone:'blue', name:'Pierwszy Trop', text:'Pierwszy kod za Tobą. Gra właśnie nabrała tempa.', field:'answers', goal:1},
@@ -29,7 +29,14 @@ window.PlayerExperience = (() => {
       root.querySelector('[data-instruction-step]').textContent = `Krok ${step + 1} z ${steps.length}`;
       root.querySelector('[data-instruction-icon]').textContent = steps[step][0];
       root.querySelector('[data-instruction-title]').textContent = steps[step][1];
-      root.querySelector('[data-instruction-copy]').textContent = steps[step][2];
+      const copy = root.querySelector('[data-instruction-copy]');
+      copy.textContent = steps[step][2];
+      if (step === steps.length - 1) {
+        const ready = document.createElement('strong');
+        ready.className = 'instruction-ready event-brand';
+        ready.textContent = 'Gotowy?';
+        copy.append(ready);
+      }
       root.querySelectorAll('[data-instruction-dot]').forEach((dot, i) => dot.classList.toggle('active', i <= step));
       const back = root.querySelector('[data-instruction-back]');
       back.hidden = step === 0;

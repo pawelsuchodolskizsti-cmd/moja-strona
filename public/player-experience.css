@@ -6,6 +6,7 @@
 .instruction-icon { width:100px; height:100px; margin:0 auto 24px; display:grid; place-items:center; border-radius:30px; background:linear-gradient(140deg,#f8e5f7,#e6f4ff); color:#913c99; font-family:'Syne',sans-serif; font-size:36px; font-weight:800; white-space:nowrap; line-height:1; border:1px solid #fff; }
 #instruction-screen h1 { font-size:28px; line-height:1.15; margin:0 0 16px; outline:none; }
 .instruction-copy { color:#634c6a; font-size:15px; line-height:1.65; margin-bottom:24px; }
+.instruction-ready { display:block; margin-top:20px; font-size:26px; font-weight:800; line-height:1.25; text-align:center; }
 .instruction-back { background:transparent; color:#765179; border:0; padding:14px 24px; font:inherit; cursor:pointer; }
 .instruction-back[hidden] { display:none; }
 .badge-board { display:block !important; }
