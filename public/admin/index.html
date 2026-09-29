@@ -2440,7 +2440,7 @@
 
     <section class="ops-card diploma-admin-card">
       <div class="ops-title">Dyplomy i umowy</div>
-      <div class="ops-copy">Gotowy pakiet dokumentów do druku i zapisu w PDF. System pobiera dane automatycznie z aktualnego rankingu uczestników oraz klasyfikacji placówek.</div>
+      <div class="ops-copy">Gotowy pakiet dokumentów do druku i zapisu w PDF. Kolejność: podium uczestników 1-3, podium placówek 1-3, następnie dokumenty pogrupowane placówkami razem z ich podopiecznymi. Dokumenty laureatów wydrukowane na początku nie są powtarzane. Po każdym dyplomie znajduje się jego umowa przekazania.</div>
       <div class="qr-admin-summary">
         <div class="qr-admin-pill" id="diploma-admin-total">0 pakietów</div>
         <div class="qr-admin-pill" id="diploma-admin-pages">0 stron</div>
@@ -5183,12 +5183,7 @@ function openDiplomaCenter() {
 
   const participants = getParticipantDiplomaRanking();
   const cities = getCityDiplomaRanking();
-  const packets = [
-    ...participants.slice(0, 3).map((participant, index) => buildParticipantPacket(participant, index + 1, false)),
-    ...cities.slice(0, 3).map((city, index) => buildCityPacket(city, index + 1, false)),
-    ...participants.slice(3).map((participant, index) => buildParticipantPacket(participant, index + 4, true)),
-    ...cities.slice(3).map((city, index) => buildCityPacket(city, index + 4, true))
-  ];
+  const packets = buildOrderedDiplomaPackets(participants, cities);
 
   const popup = window.open('', '_blank');
   if (!popup) {
@@ -5211,6 +5206,34 @@ function openDiplomaCenter() {
   popup.document.close();
 
   setAdminFeedback('Otworzyłem pakiet dyplomów i umów. W nowej karcie możesz od razu drukować lub zapisać całość do PDF.', 'success');
+}
+
+function buildOrderedDiplomaPackets(participants, cities) {
+  const packets = [
+    ...participants.slice(0, 3).map((participant, index) => buildParticipantPacket(participant, index + 1, false)),
+    ...cities.slice(0, 3).map((city, index) => buildCityPacket(city, index + 1, false))
+  ];
+  const institutionKey = item => item.institutionId
+    ? 'institution:' + item.institutionId
+    : 'legacy:' + String(item.city || 'Nieprzypisana placówka');
+  const groups = new Map();
+  participants.slice(3).forEach((participant, index) => {
+    const key = institutionKey(participant);
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key).push({participant, place:index + 4});
+  });
+  cities.forEach((city, index) => {
+    if (index >= 3) packets.push(buildCityPacket(city, index + 1, true));
+    const key = institutionKey(city);
+    for (const {participant, place} of groups.get(key) || []) {
+      packets.push(buildParticipantPacket(participant, place, true));
+    }
+    groups.delete(key);
+  });
+  for (const group of groups.values()) {
+    for (const {participant, place} of group) packets.push(buildParticipantPacket(participant, place, true));
+  }
+  return packets;
 }
 
 function getParticipantDiplomaRanking() { return [...allParticipants].sort(GameRanking.compareParticipants); }
