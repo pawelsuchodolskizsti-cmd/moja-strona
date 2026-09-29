@@ -683,7 +683,7 @@ async function loadScoreboard(force = false) {
 
   try {
     scoreboardLoadPromise = (async () => {
-      const res = await fetch('/api/public-scoreboard');
+      const res = await fetch('/api/public-scoreboard?scope=active');
       const data = await res.json();
       GameClock.sync(data.serverNow);
       if (!res.ok || data.error) {
