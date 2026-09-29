@@ -3,6 +3,12 @@
   if(!input)return;
   const list=document.getElementById('institution-options'),status=document.getElementById('institution-status'),retry=document.getElementById('institution-retry');
   let institutions=[],selected=null,highlight=-1,loaded=false;
+  function sizeList(){
+    if(list.hidden)return;
+    const height=[...list.children].slice(0,3).reduce((sum,item)=>sum+item.getBoundingClientRect().height,0);
+    if(height)list.style.setProperty('--institution-list-height',`${height+2}px`);
+  }
+  new ResizeObserver(sizeList).observe(list);
   const normalize=value=>value.normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/ł/g,'l').replace(/Ł/g,'L').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
   function near(a,b) {
     if(a.length<4||Math.abs(a.length-b.length)>1)return false;
@@ -28,6 +34,7 @@
       option.textContent=`${item.name} - ${item.city}`;option.onmousedown=e=>e.preventDefault();option.onclick=()=>choose(item);list.append(option);
     }
     list.hidden=!matches.length;input.setAttribute('aria-expanded',String(!list.hidden));input.removeAttribute('aria-activedescendant');
+    sizeList();
     list.scrollTop=0;
     status.textContent=matches.length ? 'Wybierz swoją placówkę. Listę możesz przewijać lub zawęzić, wpisując nazwę albo miasto.' : 'Brak pasujących placówek. Sprawdź nazwę lub zgłoś brak organizatorowi.';
   }

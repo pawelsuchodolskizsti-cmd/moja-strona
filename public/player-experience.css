@@ -22,7 +22,7 @@
 .micro-toast-stack { top:auto; bottom:16px; pointer-events:none; padding-bottom:env(safe-area-inset-bottom,0px); }
 @media (max-width:430px) { #instruction-screen h1 {font-size:25px;} .instruction-icon {width:80px;height:80px;margin-bottom:18px;font-size:28px;} }
 .institution-picker {text-align:left; margin-bottom:14px;}
-#institution-options {max-height:180px;max-height:min(180px,35dvh);overflow-y:auto;overflow-x:hidden;overscroll-behavior-y:contain;-webkit-overflow-scrolling:touch;scrollbar-width:thin;scrollbar-color:#b29bc9 #f4eff9;border:1px solid #d7c4e5;border-radius:12px;background:#fff;margin-top:6px;}
+#institution-options {max-height:var(--institution-list-height,135px);scrollbar-gutter:stable;overflow-y:auto;overflow-x:hidden;overscroll-behavior-y:contain;-webkit-overflow-scrolling:touch;scrollbar-width:thin;scrollbar-color:#b29bc9 #f4eff9;border:1px solid #d7c4e5;border-radius:12px;background:#fff;margin-top:6px;}
 #institution-options::-webkit-scrollbar {width:6px;}
 #institution-options::-webkit-scrollbar-thumb {background:#b29bc9;border-radius:6px;}
 #institution-options::-webkit-scrollbar-track {background:#f4eff9;}
