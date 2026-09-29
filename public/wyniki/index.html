@@ -406,7 +406,7 @@ function renderHeader() {
   } else if (scoreboardState.phase === 'ended') {
     headline.textContent = 'Finał i podsumowanie';
     subline.textContent = 'Gra dobiegła końca. Wyniki odsłania organizator podczas finału w Teatrze.';
-    timerLabel.textContent = 'Wyniki ogłasza organizator';
+    timerLabel.textContent = 'Do zbiórki w teatrze';
   } else if (scoreboardState.phase === 'thanks') {
     headline.textContent = 'Dziękujemy za udział';
     subline.textContent = 'Gra i podsumowanie zostały zakończone. Ekran pozostaje w trybie końcowym.';
@@ -420,8 +420,8 @@ function renderHeader() {
   const remaining = getRemainingMs();
   timerValue.textContent = scoreboardState.phase === 'idle'
     ? '-'
-    : scoreboardState.phase==='ended' ? 'FINAŁ' : scoreboardState.phase==='thanks' ? 'DZIĘKUJEMY' : (remaining !== null && remaining > 0 ? formatTimer(remaining) : '00:00');
-  if (timerNote) timerNote.textContent = '';
+    : scoreboardState.phase==='ended' ? formatTimer(GameClock.gatheringRemaining(scoreboardState) || 0) : scoreboardState.phase==='thanks' ? 'DZIĘKUJEMY' : (remaining !== null && remaining > 0 ? formatTimer(remaining) : '00:00');
+  if (timerNote) timerNote.textContent = scoreboardState.phase === 'ended' ? (GameClock.gatheringRemaining(scoreboardState) > 0 ? 'Kierujcie się do teatru. Wyniki odsłoni organizator.' : 'Zapraszamy do teatru. Czekamy na ogłoszenie wyników.') : '';
 }
 
 function renderAnnouncement() {

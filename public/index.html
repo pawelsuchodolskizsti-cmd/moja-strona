@@ -2095,7 +2095,7 @@ textarea {
     <p>Gra dobieg&#322;a ko&#324;ca. Za chwil&#281; zaczynamy specjalny pokaz i rozdanie upomink&oacute;w dla uczestnik&oacute;w.</p>
     <div class="status-finale-place">Miejsce: Teatr</div>
     <div class="status-finale-countdown">
-      <span class="status-finale-label">Wyniki ogłasza organizator</span>
+      <span class="status-finale-label">Do zbiórki w teatrze</span>
       <div class="status-finale-time" data-summary-remaining style="font-size:clamp(18px,5vw,26px)">Czekamy na finał</div>
     </div>
     <div class="badge-board" style="margin-top:14px;">
@@ -2990,6 +2990,12 @@ function renderSummaryCountdown() {
     ? summaryRemainingElements
     : document.querySelectorAll('[data-summary-remaining]');
   const summaryTarget = getSummaryCountdownTarget();
+
+  const gathering = GameClock.gatheringRemaining(activeGameState);
+  if (!summaryTarget && gathering !== null) {
+    targets.forEach(el => { el.innerText = gathering > 0 ? formatRemainingTime(gathering) : 'Zapraszamy do teatru'; });
+    return;
+  }
 
   if (!summaryTarget) {
     targets.forEach((el) => {

@@ -2544,6 +2544,12 @@ function renderGameRemaining() {
     return;
   }
 
+  const gathering = GameClock.gatheringRemaining(activeGameState);
+  if (gathering !== null) {
+    setGameRemainingLabel('Do zbiórki w teatrze');
+    gameRemainingElements.forEach(el => { el.innerText = gathering > 0 ? formatRemainingTime(gathering) : 'Zapraszamy do teatru'; });
+    return;
+  }
   const waiting=!!(activeGameState.endedAt||activeGameState.startedAt);
   setGameRemainingLabel(waiting?'Wyniki ogłasza organizator':'Do końca gry zostało');
   gameRemainingElements.forEach((element) => {
