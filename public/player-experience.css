@@ -9,7 +9,9 @@
 .instruction-ready { display:block; margin-top:20px; font-size:26px; font-weight:800; line-height:1.25; text-align:center; }
 .instruction-back { background:transparent; color:#765179; border:0; padding:14px 24px; font:inherit; cursor:pointer; }
 .instruction-back[hidden] { display:none; }
-.badge-board { display:block !important; }
+.badge-board { display:none !important; }
+#no-q-screen .badge-board { display:block !important; }
+#player-stats-question { display:none !important; }
 .milestone-next { display:grid; gap:8px; color:#66406e; padding:12px; border-radius:14px; background:rgba(255,255,255,.65); font-size:12px; }
 .milestone-next span { font-size:11px; }
 .milestone-next progress { width:100%; height:7px; accent-color:#ad369f; }
