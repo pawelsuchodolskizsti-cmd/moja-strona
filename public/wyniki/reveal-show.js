@@ -31,6 +31,15 @@
   .award-podium .award-place,.award-podium .award-score{font-size:clamp(24px,2.5vw,44px)}
 }
 `;
+  style.textContent+=`
+.reveal-ranking-stage{flex-direction:column;gap:18px}
+.reveal-ranking-stage>.award-brand{flex:0 0 auto}
+.reveal-ranking-stage>.award-brand .award-brand-logos{margin:0;filter:drop-shadow(0 2px 5px #fff9)}
+.reveal-ranking-stage>.award-card{height:auto;flex:1;min-height:0}
+.award-card>.award-brand-name{flex-shrink:0;text-align:center}
+.reveal-ranking-stage .award-card>.section-title{font-family:'DM Sans',system-ui,sans-serif;font-weight:700;font-size:clamp(26px,3.2vw,52px);line-height:1.2;letter-spacing:-.025em;color:#9851b5;margin:0;text-align:center}
+@media(max-width:600px){.reveal-ranking-stage{gap:12px}.reveal-ranking-stage .award-card>.section-title{font-size:28px}}
+`;
   document.head.append(style);
   const finaleTitle=document.createElement('section');finaleTitle.className='finale-title-screen';finaleTitle.hidden=true;finaleTitle.setAttribute('aria-label','Finał Gwiazdki One Day 2026');finaleTitle.innerHTML='<div class="finale-title-card"><div class="finale-title-logos"><img src="/fundacjaoneday.svg" alt="Fundacja One Day"><img src="/energyliandia.svg" alt="Energylandia"></div><div class="finale-title-event event-brand">Gwiazdka One Day 2026</div><h1 class="finale-title-word event-brand">FINAŁ</h1></div>';document.body.append(finaleTitle);
   const overlay=document.createElement('div');overlay.className='reveal-show';overlay.hidden=true;overlay.innerHTML='<p></p><strong></strong><small>Za chwilę poznamy wyniki</small>';document.body.append(overlay);
@@ -42,8 +51,8 @@
   function saveProgress(p,value){try{sessionStorage.setItem(savedKey(p),JSON.stringify(value));}catch{}}
   function presentationItems(kind){return kind==='cities'?[...(scoreboardState.cityStats||[])].sort(GameRanking.compareCities).slice(0,3):[...(scoreboardState.leaderboard||[])].sort((a,b)=>Number(a.rank)-Number(b.rank)).slice(0,3);}
   function renderFocus(){if(!focus)return;const items=presentationItems(focus.kind),signature=JSON.stringify([focus.step,items]);if(signature===focus.signature)return;focus.signature=signature;
-    const {card,step,kind}=focus;card.replaceChildren();card.classList.toggle('award-single',step>0);
-    const brand=document.createElement('header');brand.className='award-brand';brand.innerHTML='<div class="award-brand-logos"><img src="/fundacjaoneday.svg" alt="Fundacja One Day"><img src="/energyliandia.svg" alt="Energylandia"></div><div class="award-brand-name event-brand">Gwiazdka One Day 2026</div>';card.append(brand);
+    const {card,step,kind}=focus;focus.stage.querySelector('.award-brand')?.remove();card.replaceChildren();card.classList.toggle('award-single',step>0);
+    const brand=document.createElement('header');brand.className='award-brand';brand.innerHTML='<div class="award-brand-logos"><img src="/fundacjaoneday.svg" alt="Fundacja One Day"><img src="/energyliandia.svg" alt="Energylandia"></div><div class="award-brand-name event-brand">Gwiazdka One Day 2026</div>';const eventName=brand.querySelector('.award-brand-name');card.append(eventName);focus.stage.prepend(brand);
     const title=document.createElement('h2');title.className='section-title';title.textContent=kind==='cities'?'Najlepsze placówki':'Najlepsi uczestnicy';card.append(title);
     const list=document.createElement('div');list.className='award-winners';
     card.classList.toggle('award-podium',step===0&&items.length===3);const selected=step===0?items:items.slice(step-1,step);list.style.setProperty('--award-columns',Math.max(1,selected.length));
