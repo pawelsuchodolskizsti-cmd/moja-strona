@@ -2715,7 +2715,7 @@
 
     <div class="participant-sections">
       <div class="detail-card">
-        <h3>Zaliczone pytania</h3>
+        <h3>Udzielone odpowiedzi</h3>
         <div class="detail-list" id="participant-modal-answers"></div>
       </div>
       <div class="detail-card">
@@ -4936,14 +4936,14 @@ function renderParticipantModal(participantId) {
   setParticipantAdjustFeedback('');
 
   const answersEl = document.getElementById('participant-modal-answers');
-  if (!participantPassedAnswers.length) {
-    answersEl.innerHTML = '<div class="empty">Ten uczestnik nie ma jeszcze zaliczonych pytań.</div>';
+  if (!participantAnswers.length) {
+    answersEl.innerHTML = '<div class="empty">Ten uczestnik nie udzielił jeszcze odpowiedzi.</div>';
   } else {
-    answersEl.innerHTML = participantPassedAnswers.map(answer => `
+    answersEl.innerHTML = participantAnswers.map(answer => `
       <div class="detail-item">
         <div class="detail-item-title">Pytanie ${answer.questionId}</div>
         <div class="detail-item-sub">${escHtml(answer.questionText || 'Brak treści pytania')}</div>
-        <div class="detail-item-sub">Odpowiedź: ${escHtml(answer.answer || '-')} | zaliczone | ${formatDateTime(answer.createdAt)}</div>
+        <div class="detail-item-sub">Odpowiedź: ${escHtml(answer.answer || '-')} | ${answer.correct ? 'poprawna' : 'błędna'} | ${formatDateTime(answer.createdAt)}</div>
       </div>
     `).join('');
   }
