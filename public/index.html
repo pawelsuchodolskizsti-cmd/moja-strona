@@ -794,6 +794,13 @@ label {
   padding-bottom: 24px;
 }
 
+#login-screen.login-form-open > .event-bar,
+#login-screen.login-form-open > .countdown,
+#login-screen.login-form-open > .socials-wrap,
+#login-screen.login-form-open > .social-posts {
+  display: none;
+}
+
 #login-form h1 {
   margin-bottom: 2px;
 }
@@ -3218,6 +3225,7 @@ function clearParticipantAccess(message = 'To konto jest przypisane do innego ur
 /* GAME STATE */
 function openLoginForm() {
   triggerHaptic(10);
+  screenElements['login-screen']?.classList.add('login-form-open');
   hasOpenedLogin = true;
   howtoPanelEl.style.display = 'none';
   loginFormEl.style.display = 'block';
