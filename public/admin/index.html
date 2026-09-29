@@ -2336,8 +2336,10 @@
       <div class="reveal-actions">
         <button class="btn reveal-primary" id="btn-reveal-participants" type="button" onclick="confirmAction('reveal-participants')">Odsłoń osoby (15 s)</button>
         <button class="btn reveal-gold" id="btn-reveal-cities" type="button" onclick="confirmAction('reveal-cities')">Odsłoń placówki (15 s)</button>
+        <button class="btn primary" id="btn-awards-next" type="button" onclick="nextAwardSlide()" disabled>Następne</button>
         <button class="btn outline" id="btn-lock-results" type="button" onclick="confirmAction('lock-results')">Zablokuj ponownie</button>
       </div>
+      <p class="ops-copy">Rozdanie nagród: TOP 3 → 1. miejsce → 2. miejsce → 3. miejsce → pełna tablica. Użyj przycisku Następne lub dotknij tablicy wyników. Każdy etap czeka na kliknięcie.</p>
       <div class="reveal-actions"><button class="btn primary" id="btn-show-thanks" onclick="setFinaleThanks(true)">Pokaż podziękowanie</button><button class="btn outline" id="btn-hide-thanks" onclick="setFinaleThanks(false)">Wróć do finału</button></div>
       <div class="reveal-meta" id="reveal-results-meta">Start lub reset gry automatycznie zamknie wyniki od nowa.</div>
     </section>
@@ -2789,6 +2791,9 @@ let previewMode = 'current';
 let pendingAction = null;
 let pendingActionScope = null;
 let currentTab = 'home';
+let awardPresentation=null,awardNextBusy=false;
+async function nextAwardSlide(){if(!awardPresentation||awardNextBusy)return;awardNextBusy=true;document.getElementById('btn-awards-next').disabled=true;try{const r=await AdminSession.fetch('/api/game-state',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'presentation-next',scope:activeDataScope,kind:awardPresentation.kind,eventAt:awardPresentation.eventAt,step:awardPresentation.step})});const d=await r.json();if(!r.ok)throw Error(d.error);setAdminFeedback('Przechodzę do kolejnego widoku rozdania nagród.');}catch(e){setAdminFeedback(e.message,'error');}finally{awardNextBusy=false;await loadGameState();}}
+
 let isStateLoading = false;
 let pendingStateReload = false;
 let isDataLoading = false;
@@ -3224,6 +3229,7 @@ function renderRevealControls() {
   const lockBtn = document.getElementById('btn-lock-results');
   if (!playersStep || !citiesStep || !lockStep) return;
 
+  const awardNext=document.getElementById('btn-awards-next');if(awardNext)awardNext.disabled=awardNextBusy||!awardPresentation||awardPresentation.step>=4||Date.parse(awardPresentation.eventAt)>GameClock.now();
   const playersPending = Date.parse(resultsParticipantsRevealedAt) > GameClock.now();
   const citiesPending = Date.parse(resultsCitiesRevealedAt) > GameClock.now();
   const playersOpen = Boolean(resultsParticipantsRevealedAt);
@@ -3382,6 +3388,7 @@ async function loadGameState() {
     announcementUpdatedAt = data.announcement_updated_at || null;
     resultsParticipantsRevealedAt = data.results_participants_revealed_at || null;
     resultsCitiesRevealedAt = data.results_cities_revealed_at || null;
+    awardPresentation=data.presentation||null;
 
     if (data.started_at) {
       summaryAt = data.summary_at ? Date.parse(data.summary_at) : null;

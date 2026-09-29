@@ -1,7 +1,7 @@
 (() => {
   const style=document.createElement('style');
   style.textContent=`.reveal-show{position:fixed;inset:0;z-index:1000;display:grid;place-content:center;text-align:center;padding:24px;background:transparent;color:#fff;text-shadow:0 2px 5px #24133f,0 4px 18px #24133f,0 0 40px #24133f;pointer-events:none}.reveal-show[hidden]{display:none}.reveal-show.counting{backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);background:#21113b20}.reveal-show p{font:800 clamp(22px,4vw,60px)/1.2 'Syne',sans-serif;margin:0 0 24px}.reveal-show strong{display:block;font:800 clamp(86px,22vh,280px)/1 'Syne',sans-serif;color:#ff6baa}.reveal-show small{font:700 clamp(16px,2vw,26px)/1.5 'Syne',sans-serif;margin-top:24px}.reveal-show.celebrating{place-content:start center;padding-top:28px}.reveal-show.celebrating p{font-size:clamp(18px,2.4vw,36px);margin-bottom:8px}.reveal-show.celebrating strong{font-size:clamp(36px,6vw,86px)}.reveal-show.celebrating small{font-size:clamp(14px,1.5vw,22px);margin-top:8px}.reveal-effects{position:fixed;inset:0;z-index:1001;pointer-events:none;width:100%;height:100%}@media(prefers-reduced-motion:reduce){.reveal-show.counting{backdrop-filter:none;-webkit-backdrop-filter:none}}`;
-  style.textContent+=`.reveal-show strong.event-brand{text-shadow:none;filter:drop-shadow(0 3px 5px #24133f60)}
+  style.textContent+=`.award-card{gap:18px;text-align:center}.award-winners{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px;flex:1;min-height:0;align-content:center;overflow:auto}.award-winner{display:flex;flex-direction:column;justify-content:center;gap:22px;padding:28px 18px;border:1px solid #ded3ef;border-radius:22px;background:linear-gradient(135deg,#fff5fa,#f0edff);min-width:0}.award-place{font:800 clamp(22px,2.5vw,46px)/1.2 'Syne',sans-serif}.award-name{font:800 clamp(22px,2.5vw,48px)/1.2 'Syne',sans-serif;overflow-wrap:anywhere}.award-score{font:800 clamp(28px,3vw,56px)/1.2 'Syne',sans-serif}.award-next{align-self:center;max-width:100%;border:1px solid #d5c2ef;background:#f5efff;color:#6b3f8b;border-radius:14px;padding:12px 20px;min-height:44px;font:700 15px 'DM Sans',sans-serif;cursor:pointer}.award-single .award-winners{grid-template-columns:1fr}.award-single .award-name{font-size:clamp(30px,5vw,88px)}.award-single .award-place,.award-single .award-score{font-size:clamp(32px,4vw,64px)}@media(max-width:600px){.award-winners{grid-template-columns:1fr;gap:10px}.award-winner{padding:14px;gap:8px}.award-name{font-size:20px}.award-place,.award-score{font-size:24px}.award-card{gap:12px}.award-next{font-size:13px}}.reveal-show strong.event-brand{text-shadow:none;filter:drop-shadow(0 3px 5px #24133f60)}
 .screen>.brand-strip,.screen>.hero,.screen>.announcement-card,.screen>.city-card,.screen>.participants-sidebar,.board>.board-card{transition:transform 1.1s cubic-bezier(.2,.75,.2,1),opacity .8s}
 .reveal-ranking-focus .screen>.brand-strip,.reveal-ranking-focus .screen>.hero{transform:translateY(-110vh);opacity:0}
 .reveal-ranking-focus .screen>.participants-sidebar{transform:translateX(110vw);opacity:0}
@@ -23,18 +23,44 @@
   const overlay=document.createElement('div');overlay.className='reveal-show';overlay.hidden=true;overlay.innerHTML='<p></p><strong></strong><small>Za chwilę poznamy wyniki</small>';document.body.append(overlay);
   const titleEl=overlay.querySelector('p'),numberEl=overlay.querySelector('strong'),noteEl=overlay.querySelector('small');
   numberEl.classList.add('event-brand');
-  let restoreFocus=()=>{};
-  function focusRanking(kind){
-    restoreFocus();
-    const target=document.querySelector(kind==='cities'?'#podium':'#leaderboard-list')?.closest('.board-card');
-    if(!target)return;
-    const before=target.getBoundingClientRect(),marker=document.createComment('ranking position'),stage=document.createElement('div');
-    target.before(marker);stage.className='reveal-ranking-stage';stage.setAttribute('aria-label',kind==='cities'?'Najlepsze placówki':'Najlepsi uczestnicy');
-    document.body.append(stage);stage.append(target);document.body.classList.add('reveal-ranking-focus');
-    if(!reduced.matches){const after=target.getBoundingClientRect();target.animate([{transform:`translate(${before.left-after.left}px,${before.top-after.top}px) scale(${before.width/after.width},${before.height/after.height})`},{transform:'none'}],{duration:1100,easing:'cubic-bezier(.2,.75,.2,1)'});}
-    const timer=setTimeout(()=>restoreFocus(),30000);
-    restoreFocus=()=>{clearTimeout(timer);marker.replaceWith(target);stage.remove();document.body.classList.remove('reveal-ranking-focus');restoreFocus=()=>{};};
+  let restoreFocus=()=>{},focus=null,advanceBusy=false,lastTap=0;
+  const savedKey=p=>'award-presentation:'+String(scoreboardState.dataScope||'live')+':'+p.kind+':'+p.eventAt;
+  function readProgress(p){try{const v=JSON.parse(sessionStorage.getItem(savedKey(p))||'null');if(v&&Number.isInteger(v.step)&&v.step>=0&&v.step<=4&&Number.isInteger(v.remote)&&v.remote>=0&&v.remote<=4)return v;}catch{}return {step:p.step,remote:p.step};}
+  function saveProgress(p,value){try{sessionStorage.setItem(savedKey(p),JSON.stringify(value));}catch{}}
+  function presentationItems(kind){return kind==='cities'?[...(scoreboardState.cityStats||[])].sort(GameRanking.compareCities).slice(0,3):[...(scoreboardState.leaderboard||[])].sort((a,b)=>Number(a.rank)-Number(b.rank)).slice(0,3);}
+  function renderFocus(){if(!focus)return;const items=presentationItems(focus.kind),signature=JSON.stringify([focus.step,items]);if(signature===focus.signature)return;focus.signature=signature;
+    const {card,step,kind}=focus;card.replaceChildren();card.classList.toggle('award-single',step>0);
+    const title=document.createElement('h2');title.className='section-title';title.textContent=kind==='cities'?'Najlepsze placówki':'Najlepsi uczestnicy';card.append(title);
+    const list=document.createElement('div');list.className='award-winners';
+    const selected=step===0?items:items.slice(step-1,step);
+    if(!selected.length){const empty=document.createElement('p');empty.textContent=step?'Brak laureata na tym miejscu.':'Brak wyników do pokazania.';list.append(empty);}
+    selected.forEach((item,index)=>{const rank=step||index+1,row=document.createElement('article');row.className='award-winner';row.dataset.rank=rank;
+      const badge=document.createElement('div');badge.className='award-place event-brand';badge.textContent=rank+'. miejsce';
+      const name=document.createElement('div');name.className='award-name';name.textContent=kind==='cities'?item.city:item.name;
+      const score=document.createElement('div');score.className='award-score event-brand';score.textContent=Number(item.score||0)+' pkt';
+      row.append(badge,name,score);if(kind==='participants'&&item.city){const city=document.createElement('p');city.textContent=item.city;row.append(city);}list.append(row);});card.append(list);
+    const next=document.createElement('button');next.type='button';next.className='award-next';next.textContent=step===3?'Dotknij, aby wrócić do całej tablicy':'Dotknij, aby pokazać '+(step+1)+'. miejsce';next.onclick=advance;card.append(next);
+    if(!reduced.matches)list.animate([{opacity:.25,transform:'scale(.94)'},{opacity:1,transform:'scale(1)'}],{duration:650,easing:'ease-out'});
   }
+  function syncPresentation(p){
+    if(!p||!['ended','thanks'].includes(scoreboardState.phase)||Date.parse(p.eventAt)>Math.min(GameClock.now(),Date.parse(scoreboardState.serverNow))){restoreFocus();return;}
+    let progress=readProgress(p);if(p.step>progress.remote){progress.step=Math.min(4,progress.step+p.step-progress.remote);progress.remote=p.step;saveProgress(p,progress);}
+    if(progress.step>=4){restoreFocus();return;}
+    const key=savedKey(p);if(!focus||focus.key!==key){restoreFocus();const target=document.querySelector(p.kind==='cities'?'#podium':'#leaderboard-list')?.closest('.board-card'),before=target?.getBoundingClientRect();
+      const stage=document.createElement('div'),card=document.createElement('section');stage.className='reveal-ranking-stage';stage.setAttribute('aria-label','Prezentacja nagród');card.className='card board-card award-card';stage.append(card);document.body.append(stage);document.body.classList.add('reveal-ranking-focus');focus={key,kind:p.kind,step:progress.step,stage,card,p};
+      restoreFocus=()=>{stage.remove();document.body.classList.remove('reveal-ranking-focus');focus=null;restoreFocus=()=>{};};
+      renderFocus();if(before&&!reduced.matches){const after=card.getBoundingClientRect();card.animate([{transform:'translate('+(before.left-after.left)+'px,'+(before.top-after.top)+'px) scale('+(before.width/after.width)+','+(before.height/after.height)+')'},{transform:'none'}],{duration:1000,easing:'cubic-bezier(.2,.75,.2,1)'});}
+    }else{focus.step=progress.step;focus.p=p;renderFocus();}
+  }
+  async function advance(){if(!focus||advanceBusy||performance.now()-lastTap<650)return;lastTap=performance.now();advanceBusy=true;const p={...focus.p},key=focus.key;
+    try{const r=await fetch('/api/game-state',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'presentation-next',scope:scoreboardState.dataScope||'live',kind:p.kind,eventAt:p.eventAt,step:p.step})});
+      if(r.ok){const d=await r.json();scoreboardState.presentation=d.presentation;syncPresentation(d.presentation);scheduleScoreboardRefresh(true);}
+      else if(r.status===401){const progress=readProgress(p);progress.step=Math.min(4,progress.step+1);saveProgress(p,progress);if(focus?.key===key)syncPresentation(p);}
+      else{scheduleScoreboardRefresh(true);}
+    }catch{if(focus?.key===key){const note=focus.card.querySelector('.award-next');if(note)note.textContent='Brak połączenia. Dotknij, aby spróbować ponownie.';}}
+    finally{advanceBusy=false;}
+  }
+  document.addEventListener('click',event=>{if(focus&&!event.target.closest('button,a,input,select,textarea'))advance();});
   let active=null,seen=new Set(),celebrationTimer=null,lastRefresh=0,stopEffects=()=>{};
   const reduced=matchMedia('(prefers-reduced-motion: reduce)');
   function fireworks(){
@@ -70,7 +96,7 @@
     frame=requestAnimationFrame(draw);
   }
   function celebrate(title,kind){
-    focusRanking(kind);
+    syncPresentation(scoreboardState.presentation);
     overlay.classList.remove('counting');overlay.classList.add('celebrating');titleEl.textContent=title;numberEl.textContent='Brawo!';noteEl.textContent='Gratulujemy wszystkim uczestnikom';
     clearTimeout(celebrationTimer);celebrationTimer=setTimeout(()=>{overlay.hidden=true;},6000);fireworks();
   }
@@ -81,6 +107,7 @@
     if(!['ended','thanks'].includes(scoreboardState.phase)||!events.length){clearShow();return;}
     if(active&&!events.some(e=>e[0]+e[1]===active.key)){active=null;overlay.hidden=true;overlay.classList.remove('counting');}
     if(!active){
+      syncPresentation(scoreboardState.presentation);
       const pending=events.find(e=>Date.parse(e[1])>GameClock.now()&&!seen.has(e[0]+e[1]));
       if(!pending)return;
       active={kind:pending[0],key:pending[0]+pending[1],time:Date.parse(pending[1]),title:pending[2]};clearTimeout(celebrationTimer);stopEffects();restoreFocus();overlay.classList.remove('celebrating');overlay.classList.add('counting');
@@ -96,4 +123,3 @@
   },100);
   window.addEventListener('pagehide',()=>{restoreFocus();stopEffects();clearTimeout(celebrationTimer);});
 })();
-
