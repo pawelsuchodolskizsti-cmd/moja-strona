@@ -118,7 +118,7 @@
   }
   function clearShow(){restoreFocus();active=null;seen.clear();overlay.hidden=true;overlay.classList.remove('counting','celebrating');clearTimeout(celebrationTimer);stopEffects();}
   setInterval(()=>{
-    const showTitle=Boolean(scoreboardState.finaleTitleActive)&&['ended','thanks'].includes(scoreboardState.phase);finaleTitle.hidden=!showTitle;document.body.classList.toggle('finale-title-visible',showTitle);if(showTitle){clearShow();return;}
+    const showTitle=(Boolean(scoreboardState.finaleTitleActive)||(scoreboardState.finaleTitleAutoAt&&GameClock.now()>=Date.parse(scoreboardState.finaleTitleAutoAt)))&&['ended','thanks'].includes(scoreboardState.phase);finaleTitle.hidden=!showTitle;document.body.classList.toggle('finale-title-visible',showTitle);if(showTitle){clearShow();return;}
     const reveal=scoreboardState.resultsReveal||{};
     const events=[['participants',reveal.participantsAt,'Najlepsi uczestnicy'],['cities',reveal.citiesAt,'Najlepsze placówki']].filter(e=>Number.isFinite(Date.parse(e[1])));
     if(!['ended','thanks'].includes(scoreboardState.phase)||!events.length){clearShow();return;}
