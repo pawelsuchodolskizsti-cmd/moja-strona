@@ -45,4 +45,4 @@
 body.after-game-separated{flex-direction:column}.after-game-actions{width:100%;max-width:var(--screen-card-width);margin-top:24px;position:relative;z-index:1;flex-shrink:0}.after-game-actions.after-game-home{max-width:500px}.after-game-actions .after-game-link{padding:20px 22px;border-radius:20px;background:linear-gradient(120deg,#fff5fb,#f1edff);box-shadow:0 12px 32px #24133f20}
 .player-help-dialog #player-help-copy{text-align:center}.player-help-dialog #player-help-copy span{display:block}
 
-#instruction-screen .game-remaining { margin-bottom: 20px; }
+#instruction-screen .game-remaining { margin-bottom: 32px; }
