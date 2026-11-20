@@ -1,5 +1,5 @@
 <!doctype html>
-<html data-page-surface="admin" lang="pl" class="view-pending"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1, viewport-fit=cover"><title>Placówki - panel administratora</title>
+<html data-page-surface="admin" lang="pl" class="view-pending"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1, viewport-fit=cover"><title>Kody grup - panel administratora</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/admin/placowki/institutions.css"><link rel="stylesheet" href="/admin/admin-navigation.css">
 <link rel="stylesheet" href="/event-brand.css">
@@ -9,11 +9,11 @@
 <link rel="stylesheet" href="/mobile-canvas.css">
 <link rel="icon" type="image/x-icon" href="/favicon.ico?v=oneday-1"><link rel="icon" type="image/svg+xml" href="/favicon.svg?v=oneday-1"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=oneday-1"></head>
 <body>
-<div id="view-loading" role="status" aria-live="polite"><div class="view-loading-card"><div class="event-brand">Gwiazdka One Day 2026</div><span class="view-loading-spinner" aria-hidden="true"></span><p id="view-loading-message">Otwieramy panel…</p><button id="view-loading-retry" type="button" hidden onclick="location.reload()">Odśwież stronę</button></div></div><main><header><div><span class="eyebrow"><span class="event-brand">Gwiazdka One Day 2026</span> · administracja</span><h1>Placówki uczestników</h1><p>Jedna nazwa, wspólny wynik. Zarządzaj listą dostępną podczas zapisu do gry.</p></div><a href="/admin/">← Wróć do panelu</a></header>
+<div id="view-loading" role="status" aria-live="polite"><div class="view-loading-card"><div class="event-brand">Gwiazdka One Day 2026</div><span class="view-loading-spinner" aria-hidden="true"></span><p id="view-loading-message">Otwieramy panel…</p><button id="view-loading-retry" type="button" hidden onclick="location.reload()">Odśwież stronę</button></div></div><main><header><div><span class="eyebrow"><span class="event-brand">Gwiazdka One Day 2026</span> · administracja</span><h1>Kody grup uczestników</h1><p>Jeden kod, wspólny wynik. Zarządzaj listą dostępną podczas zapisu do gry.</p></div><a href="/admin/">← Wróć do panelu</a></header>
 <p id="status" role="status">Sprawdzam dostęp…</p>
 <div id="institution-admin" hidden>
-<section><h2>Dodaj placówkę</h2><form id="add-institution"><label>Nazwa placówki<input id="new-name" maxlength="160" required placeholder="Pełna nazwa placówki"></label><label>Miasto / miejscowość<input id="new-city" maxlength="100" required placeholder="np. Elbląg"></label><button type="submit">Dodaj placówkę</button></form></section>
-<section><div class="section-head"><div><h2>Katalog placówek</h2><p>Wyłączenie ukrywa placówkę przy nowych zapisach. Jej uczestnicy i punkty pozostają w rankingu.</p></div><button type="button" class="secondary" id="refresh">Odśwież listę</button></div><label>Wyszukaj w katalogu<input id="catalog-search" type="search" placeholder="Nazwa lub miejscowość"></label><div id="catalog"></div></section>
-<section><h2>Uczestnicy bez przypisanej placówki</h2><p>Starsze zgłoszenia zachowują dotychczasowe wyniki. Wybierz właściwą placówkę dla uczestnika z bieżącej rundy, aby połączyć jego punkty z jej rankingiem.</p><div id="unassigned"></div></section>
+<section><h2>Dodaj grupę</h2><form id="add-institution"><label>Kod grupy<input id="new-name" maxlength="24" required placeholder="np. K01"></label><button type="submit">Dodaj grupę</button></form></section>
+<section><div class="section-head"><div><h2>Katalog grup</h2><p>Wyłączenie ukrywa grupę przy nowych zapisach. Jej uczestnicy i punkty pozostają w rankingu.</p></div><button type="button" class="secondary" id="refresh">Odśwież listę</button></div><label>Wyszukaj w katalogu<input id="catalog-search" type="search" placeholder="Kod grupy"></label><div id="catalog"></div></section>
+<section><h2>Uczestnicy bez przypisanej grupy</h2><p>Starsze zgłoszenia zachowują dotychczasowe wyniki. Wybierz właściwą grupę dla uczestnika z bieżącej rundy, aby połączyć jego punkty z jej rankingiem.</p><div id="unassigned"></div></section>
 </div></main><script src="/admin/admin-session.js"></script>
 <script src="/admin/admin-navigation.js"></script><script src="/admin/placowki/institutions.js"></script></body></html>

@@ -2151,7 +2151,7 @@
 </div>
 
 <div class="shell" id="admin-shell" style="display:none">
-  <section class="ops-card"><div class="ops-title">Placówki uczestników</div><p class="ops-copy">Dodawaj i edytuj placówki dostępne przy zapisie do gry. Wyniki łączą się według placówki.</p><a class="btn" id="manage-institutions" href="/admin/placowki/">Zarządzaj placówkami</a></section>
+  <section class="ops-card"><div class="ops-title">Kody grup uczestników</div><p class="ops-copy">Dodawaj i edytuj grupy dostępne przy zapisie do gry. Wyniki łączą się według grupy.</p><a class="btn" id="manage-institutions" href="/admin/placowki/">Zarządzaj grupami</a></section>
   <div class="system-mini-bar warning" id="system-mini-bar">
     <div class="system-mini-main">
       <div class="system-mini-dot" id="system-mini-dot"></div>
@@ -2294,16 +2294,16 @@
 
   <div class="ops-grid">
     <section class="ops-card city-dashboard-card">
-      <div class="ops-title">Punkty placówek</div>
-      <div class="ops-copy">Szybki podgląd sumy punktów, liczby uczestników i odpowiedzi dla każdej placówki bez przechodzenia do zakładki rankingu.</div>
+      <div class="ops-title">Punkty grup</div>
+      <div class="ops-copy">Szybki podgląd sumy punktów, liczby uczestników i odpowiedzi dla każdej grupy bez przechodzenia do zakładki rankingu.</div>
       <div class="table-wrap city-summary tight">
         <div class="city-summary-head">
-          <div class="city-summary-copy" data-city-meta>Ładowanie rankingu placówek...</div>
+          <div class="city-summary-copy" data-city-meta>Ładowanie rankingu grup...</div>
         </div>
         <table>
           <thead>
             <tr>
-              <th>Placówka</th>
+              <th>Grupa</th>
               <th>Punkty</th>
               <th>Uczestnicy</th>
               <th>Odpowiedzi</th>
@@ -2318,7 +2318,7 @@
 
     <section class="ops-card reveal-control-card">
       <div class="ops-title">Odsłanianie wyników</div>
-      <div class="ops-copy">To steruje blokadą z końcówki gry na publicznej tablicy. Najpierw odsłoń uczestników, potem placówki, żeby finał miał mocniejszy efekt.</div>
+      <div class="ops-copy">To steruje blokadą z końcówki gry na publicznej tablicy. Najpierw odsłoń uczestników, potem grupy, żeby finał miał mocniejszy efekt.</div>
       <div class="reveal-status-row">
         <div class="reveal-step" id="reveal-step-lock">
           <strong>Blokada finałowa</strong>
@@ -2329,13 +2329,13 @@
           <span id="reveal-players-label">Czeka na odsłonięcie.</span>
         </div>
         <div class="reveal-step" id="reveal-step-cities">
-          <strong>Etap 2: placówki</strong>
+          <strong>Etap 2: grupy</strong>
           <span id="reveal-cities-label">Czeka na odsłonięcie.</span>
         </div>
       </div>
       <div class="reveal-actions">
         <button class="btn reveal-primary" id="btn-reveal-participants" type="button" onclick="confirmAction('reveal-participants')">Odsłoń osoby (15 s)</button>
-        <button class="btn reveal-gold" id="btn-reveal-cities" type="button" onclick="confirmAction('reveal-cities')">Odsłoń placówki (15 s)</button>
+        <button class="btn reveal-gold" id="btn-reveal-cities" type="button" onclick="confirmAction('reveal-cities')">Odsłoń grupy (15 s)</button>
         <button class="btn primary" id="btn-awards-next" type="button" onclick="nextAwardSlide()" disabled>Następne</button>
         <button class="btn outline" id="btn-lock-results" type="button" onclick="confirmAction('lock-results')">Zablokuj ponownie</button>
       </div>
@@ -2368,14 +2368,14 @@
         <button class="btn outline" type="button" onclick="confirmClearSimulation()">Usuń symulację</button>
         <button class="btn primary simulator-mega-btn" type="button" onclick="runStartSimulator()">
           Uruchom test 300 uczestników
-          <small>Ranking, placówki, odpowiedzi i bonusy będą aktualizować się live</small>
+          <small>Ranking, grupy, odpowiedzi i bonusy będą aktualizować się live</small>
         </button>
       </div>
       <div class="qr-admin-summary">
         <div class="qr-admin-pill" id="sim-total-participants">0 uczestników</div>
         <div class="qr-admin-pill" id="sim-total-answers">0 odpowiedzi</div>
         <div class="qr-admin-pill" id="sim-total-bonuses">0 bonusów</div>
-        <div class="qr-admin-pill" id="sim-total-cities">0 placówek</div>
+        <div class="qr-admin-pill" id="sim-total-cities">0 grup</div>
       </div>
       <div class="checklist" id="simulator-results">
         <div class="check-item pending">
@@ -2439,35 +2439,11 @@
     </section>
 
     <section class="ops-card diploma-admin-card">
-      <div class="ops-title">Dyplomy i umowy</div>
-      <div class="ops-copy">Gotowy pakiet dokumentów do druku i zapisu w PDF. Kolejność: podium uczestników 1-3, podium placówek 1-3, następnie dokumenty pogrupowane placówkami razem z ich podopiecznymi. Dokumenty laureatów wydrukowane na początku nie są powtarzane. Po każdym dyplomie znajduje się jego umowa przekazania.</div>
-      <div class="qr-admin-summary">
-        <div class="qr-admin-pill" id="diploma-admin-total">0 pakietów</div>
-        <div class="qr-admin-pill" id="diploma-admin-pages">0 stron</div>
-        <div class="qr-admin-pill" id="diploma-admin-thanks">0 podziękowań</div>
-      </div>
-      <div class="qr-admin-routes">
-        <div class="qr-admin-route">
-          <span>Top uczestników</span>
-          <strong id="diploma-admin-participants">3 podium + reszta</strong>
-        </div>
-        <div class="qr-admin-route">
-          <span>Top placówek</span>
-          <strong id="diploma-admin-cities">3 podium + reszta</strong>
-        </div>
-        <div class="qr-admin-route">
-          <span>Umowy</span>
-          <strong>1 robocza umowa po każdym dyplomie</strong>
-        </div>
-        <div class="qr-admin-route">
-          <span>Eksport</span>
-          <strong>Nowa karta → druk lub PDF</strong>
-        </div>
-      </div>
-      <div class="ops-actions">
-        <button class="btn primary" type="button" onclick="openDiplomaCenter()">Otwórz generator dyplomów</button>
-      </div>
-      <div class="ops-meta" id="diploma-admin-meta">Po wczytaniu wyników panel pokaże liczbę gotowych pakietów dokumentów.</div>
+      <div class="ops-title">Puste dyplomy</div>
+      <div class="ops-copy">Jeden dyplom na uczestnika w wybranym trybie LIVE lub TEST. Pole imienia i nazwiska pozostaje puste do ręcznego uzupełnienia. Nie drukujemy nicków, kodów grup ani wyników.</div>
+      <div class="qr-admin-summary"><div class="qr-admin-pill" id="diploma-admin-total">0 dyplomów</div><div class="qr-admin-pill" id="diploma-admin-pages">0 stron</div></div>
+      <div class="ops-actions"><button class="btn primary" type="button" onclick="openDiplomaCenter()">Otwórz generator dyplomów</button></div>
+      <div class="ops-meta" id="diploma-admin-meta"></div>
     </section>
   </div>
 
@@ -2523,11 +2499,11 @@
 
   <div id="tab-leaderboard">
     <div class="toolbar">
-      <input type="text" id="search-lb" placeholder="Szukaj po imieniu, nazwisku lub placówce..." oninput="renderLeaderboard()">
+      <input type="text" id="search-lb" placeholder="Szukaj po nicku lub kodzie grupy..." oninput="renderLeaderboard()">
       <select id="sort-lb" onchange="renderLeaderboard()">
         <option value="score">Sortuj: punkty</option>
-        <option value="city">Sortuj: placówka A-Z</option>
-        <option value="city-score">Sortuj: punkty placówki</option>
+        <option value="city">Sortuj: grupa A-Z</option>
+        <option value="city-score">Sortuj: punkty grupy</option>
       </select>
       <button class="btn primary" onclick="loadData()">Odśwież</button>
       <button class="btn outline" onclick="exportExcel()">Eksportuj Excel</button>
@@ -2539,8 +2515,8 @@
         <thead>
           <tr>
             <th>#</th>
-            <th>Imię i nazwisko</th>
-            <th class="detail-col">Placówka</th>
+            <th>Nick</th>
+            <th class="detail-col">Grupa</th>
             <th>Punkty łącznie</th>
             <th>Odpowiedzi</th>
             <th class="detail-col">Ostatnia aktywność</th>
@@ -2553,12 +2529,12 @@
     </div>
     <div class="table-wrap city-summary">
       <div class="city-summary-head">
-        <div class="city-summary-copy" data-city-meta>Ładowanie rankingu placówek...</div>
+        <div class="city-summary-copy" data-city-meta>Ładowanie rankingu grup...</div>
       </div>
       <table>
         <thead>
           <tr>
-            <th>Placówka</th>
+            <th>Grupa</th>
             <th>Punkty</th>
             <th>Uczestnicy</th>
             <th>Odpowiedzi</th>
@@ -2578,7 +2554,7 @@
         <option value="all">Wszystkie pytania</option>
       </select>
       <select id="filter-city" onchange="renderAnswers()">
-        <option value="all">Wszystkie placówki</option>
+        <option value="all">Wszystkie grupy</option>
       </select>
       <select id="filter-correct" onchange="renderAnswers()">
         <option value="all">Wszystkie wyniki</option>
@@ -2591,7 +2567,7 @@
         <thead>
           <tr>
             <th>Uczestnik</th>
-            <th class="detail-col">Placówka</th>
+            <th class="detail-col">Grupa</th>
             <th>Pytanie</th>
             <th>Odpowiedź</th>
             <th>Wynik</th>
@@ -2607,12 +2583,12 @@
 
   <div id="tab-bonuses" style="display:none">
     <div class="toolbar">
-      <input type="text" id="search-bonuses" placeholder="Szukaj po uczestniku, placówce lub bonusie..." oninput="renderBonuses()">
+      <input type="text" id="search-bonuses" placeholder="Szukaj po uczestniku, grupie lub bonusie..." oninput="renderBonuses()">
       <select id="filter-bonus-id" onchange="renderBonuses()">
         <option value="all">Wszystkie bonusy</option>
       </select>
       <select id="filter-bonus-city" onchange="renderBonuses()">
-        <option value="all">Wszystkie placówki</option>
+        <option value="all">Wszystkie grupy</option>
       </select>
       <div class="toolbar-meta" id="bonus-meta">Pokazano 0 bonusów</div>
     </div>
@@ -2621,7 +2597,7 @@
         <thead>
           <tr>
             <th>Uczestnik</th>
-            <th class="detail-col">Placówka</th>
+            <th class="detail-col">Grupa</th>
             <th>Bonus</th>
             <th>Punkt</th>
             <th>Czas</th>
@@ -3254,8 +3230,8 @@ function renderRevealControls() {
     meta.textContent = playersPending || citiesPending ? 'Na tablicy trwa odliczanie. Zasłoń wyniki, aby je anulować.' : citiesOpen
       ? 'Pełny ranking jest odsłonięty na tablicy wyników.'
       : playersOpen
-        ? 'Uczestnicy są odsłonięci. Kolejny krok to spektakularne pokazanie rankingu placówek.'
-        : 'Wyniki pozostają zasłonięte w finale. Odsłanianie działa etapami: najpierw osoby, potem placówki.';
+        ? 'Uczestnicy są odsłonięci. Kolejny krok to spektakularne pokazanie rankingu grup.'
+        : 'Wyniki pozostają zasłonięte w finale. Odsłanianie działa etapami: najpierw osoby, potem grupy.';
   }
 }
 function renderPlayerPreview() {
@@ -3582,9 +3558,9 @@ function confirmAction(action) {
       button: 'Tak, odsłoń osoby'
     },
     'reveal-cities': {
-      title: 'Odsłonić ranking placówek?',
-      copy: 'Po 15-sekundowym odliczaniu od 10 tablica pokaże konfetti, Top 3 placówek i punkty placówek.',
-      button: 'Tak, odsłoń placówki'
+      title: 'Odsłonić ranking grup?',
+      copy: 'Po 15-sekundowym odliczaniu od 10 tablica pokaże konfetti, Top 3 grup i punkty grup.',
+      button: 'Tak, odsłoń grupy'
     },
     'lock-results': {
       title: 'Zablokować wyniki ponownie?',
@@ -3789,7 +3765,7 @@ async function sendAnnouncement() {
 async function setResultsReveal(action) {
   const labels = {
     'reveal-participants': 'Odsłaniam wyniki uczestników...',
-    'reveal-cities': 'Odsłaniam ranking placówek...',
+    'reveal-cities': 'Odsłaniam ranking grup...',
     'lock-results': 'Zasłaniam wyniki ponownie...'
   };
   setAdminFeedback(labels[action] || 'Aktualizuję blokadę wyników...');
@@ -3811,7 +3787,7 @@ async function setResultsReveal(action) {
       action === 'lock-results'
         ? 'Wyniki zostały ponownie zasłonięte na tablicy.'
         : action === 'reveal-cities'
-          ? 'Uruchomiono odliczanie do odsłonięcia placówek.'
+          ? 'Uruchomiono odliczanie do odsłonięcia grup.'
           : 'Uruchomiono odliczanie do odsłonięcia uczestników.',
       'success'
     );
@@ -4021,7 +3997,7 @@ function buildStartSimulation(participantCount = 35) {
       firstName,
       lastName,
       city,
-      email: `symulator${participantId}@test.local`,
+      email: '',
       answeredCount,
       score,
       bonusCount,
@@ -4095,12 +4071,12 @@ function buildStartSimulation(participantCount = 35) {
           : 'Suma odpowiedzi nie zgadza się z liczbą odpowiedzi przypisaną uczestnikom.'
       },
       {
-        label: 'Ranking placówek',
+        label: 'Ranking grup',
         status: cityAggregationMatches ? 'ok' : 'error',
         badge: cityAggregationMatches ? 'OK' : 'Błąd',
         message: cityAggregationMatches
-          ? `Punkty placówek sumują się poprawnie. Liderem jest ${cityStats[0]?.city || '-'}.`
-          : 'Suma punktów placówek nie zgadza się z łącznym wynikiem uczestników.'
+          ? `Punkty grup sumują się poprawnie. Liderem jest ${cityStats[0]?.city || '-'}.`
+          : 'Suma punktów grup nie zgadza się z łącznym wynikiem uczestników.'
       },
       {
         label: 'Topka i remisy',
@@ -4125,7 +4101,7 @@ function renderStartSimulation(report) {
   participantsEl.textContent = `${report.participantCount} uczestników`;
   answersEl.textContent = `${report.totalAnswers} odpowiedzi`;
   bonusesEl.textContent = `${report.totalBonuses} bonusów`;
-  citiesEl.textContent = `${report.cityCount} placówek`;
+  citiesEl.textContent = `${report.cityCount} grup`;
 
   list.innerHTML = report.checks.map((item) => `
     <div class="check-item ${item.status}">
@@ -4138,7 +4114,7 @@ function renderStartSimulation(report) {
   `).join('');
 
   meta.textContent = report.topParticipant && report.topCity
-    ? `Lider testu: ${report.topParticipant.firstName} ${report.topParticipant.lastName} (${report.topParticipant.score} pkt) | Lider placówek: ${report.topCity.city} (${report.topCity.score} pkt).`
+    ? `Lider testu: ${report.topParticipant.firstName} ${report.topParticipant.lastName} (${report.topParticipant.score} pkt) | Lider grup: ${report.topCity.city} (${report.topCity.score} pkt).`
     : 'Wielki test korzysta z tych samych tabel i zasad liczenia co panel, ale działa w oddzielnym trybie danych.';
 }
 
@@ -4194,12 +4170,12 @@ function buildPersistedSimulationReport() {
         message: `Baza zwróciła ${adminTotals.answers} odpowiedzi oraz ${adminTotals.bonuses} bonusów. Te liczby rosną stopniowo przy odświeżaniu panelu i tablicy.`
       },
       {
-        label: 'Punkty placówek',
+        label: 'Punkty grup',
         status: cityOk ? 'ok' : 'warning',
         badge: cityOk ? 'OK' : 'Uwaga',
         message: cityStats.length
-          ? `W rankingu placówek widać ${cityStats.length} placówek, a liderem jest ${topCity?.city || '---'}.`
-          : 'Brak wystarczających danych placówek w trybie testowym.'
+          ? `W rankingu grup widać ${cityStats.length} grup, a liderem jest ${topCity?.city || '---'}.`
+          : 'Brak wystarczających danych grup w trybie testowym.'
       }
     ]
   };
@@ -4469,7 +4445,7 @@ function populateAnswerFilters() {
   questionSelect.innerHTML = '<option value="all">Wszystkie pytania</option>' +
     questions.map(question => `<option value="${question.id}">${escHtml(question.label)}</option>`).join('');
 
-  citySelect.innerHTML = '<option value="all">Wszystkie placówki</option>' +
+  citySelect.innerHTML = '<option value="all">Wszystkie grupy</option>' +
     cities.map(city => `<option value="${escapeAttr(city)}">${escHtml(city)}</option>`).join('');
 
   questionSelect.value = [...questionSelect.options].some(option => option.value === prevQuestion) ? prevQuestion : 'all';
@@ -4487,7 +4463,7 @@ function populateBonusFilters() {
   bonusSelect.innerHTML = '<option value="all">Wszystkie bonusy</option>' +
     bonusCatalog.map((bonus) => `<option value="${escapeAttr(bonus.id)}">${escHtml(bonus.label)}</option>`).join('');
 
-  citySelect.innerHTML = '<option value="all">Wszystkie placówki</option>' +
+  citySelect.innerHTML = '<option value="all">Wszystkie grupy</option>' +
     cities.map((city) => `<option value="${escapeAttr(city)}">${escHtml(city)}</option>`).join('');
 
   bonusSelect.value = [...bonusSelect.options].some((option) => option.value === prevBonus) ? prevBonus : 'all';
@@ -4553,7 +4529,7 @@ function renderLiveActivity() {
           <div class="live-item-badge">${formatSecondsToLabel(participant.secondsOpen)}</div>
         </div>
         <div class="live-item-sub">Pytanie ${participant.currentQuestionId}: ${escHtml(participant.currentQuestionText || 'Brak treści pytania')}</div>
-        <div class="live-item-sub">${escHtml(participant.city || 'Bez placówki')} | Odpowiedzi: ${participant.answeredCount || 0}</div>
+        <div class="live-item-sub">${escHtml(participant.city || 'Bez grupy')} | Odpowiedzi: ${participant.answeredCount || 0}</div>
       </div>
     `).join('');
   }
@@ -4583,7 +4559,7 @@ function renderLiveActivity() {
           <div class="live-item-badge">${formatDateTime(activity.createdAt)}</div>
         </div>
         <div class="live-item-sub">Otworzył pytanie ${activity.questionId}: ${escHtml(activity.questionText || 'Brak treści pytania')}</div>
-        <div class="live-item-sub">${escHtml(activity.city || 'Bez placówki')}</div>
+        <div class="live-item-sub">${escHtml(activity.city || 'Bez grupy')}</div>
       </div>
     `).join('');
   }
@@ -4598,15 +4574,15 @@ function renderCityRanking() {
 
   metas.forEach((meta) => {
     meta.textContent = cityStats.length
-      ? `Liczba punktujących placówek: ${cityStats.length}.`
-      : 'Brak placówek w aktualnych danych.';
+      ? `Liczba punktujących grup: ${cityStats.length}.`
+      : 'Brak grup w aktualnych danych.';
   });
 
   if (!bodies.length) return;
 
   if (!cityStats.length) {
     bodies.forEach((body) => {
-      body.innerHTML = '<tr><td colspan="4" class="empty">Brak danych o placówkach.</td></tr>';
+      body.innerHTML = '<tr><td colspan="4" class="empty">Brak danych o grupach.</td></tr>';
     });
     return;
   }
@@ -4644,8 +4620,8 @@ function renderLeaderboard() {
         return queryTokens.every(token => searchable.includes(token));
       })
     .sort((a, b) => {
-      const cityA = String(a.city || 'Bez placówki').trim() || 'Bez placówki';
-      const cityB = String(b.city || 'Bez placówki').trim() || 'Bez placówki';
+      const cityA = String(a.city || 'Bez grupy').trim() || 'Bez grupy';
+      const cityB = String(b.city || 'Bez grupy').trim() || 'Bez grupy';
 
       if (sortMode === 'city') {
         return cityA.localeCompare(cityB, 'pl') ||
@@ -4917,7 +4893,7 @@ function renderParticipantModal(participantId) {
   document.getElementById('participant-modal-name').textContent =
     `${participant.firstName || ''} ${participant.lastName || ''}`.trim() || 'Uczestnik';
   document.getElementById('participant-modal-sub').textContent =
-    `Placówka: ${participant.city || 'Brak placówki'} | Ostatnia aktywność: ${formatDateTime(participant.lastActivity)}`;
+    `Grupa: ${participant.city || 'Brak grupy'} | Ostatnia aktywność: ${formatDateTime(participant.lastActivity)}`;
 
   document.getElementById('participant-modal-passed-count').textContent = participantPassedAnswers.length;
   document.getElementById('participant-modal-answers-count').textContent = participantAnswers.length;
@@ -5061,40 +5037,10 @@ function refreshQrAdminSummary() {
 }
 
 function refreshDiplomaAdminSummary() {
-  const participantsEl = document.getElementById('diploma-admin-participants');
-  const citiesEl = document.getElementById('diploma-admin-cities');
-  const totalEl = document.getElementById('diploma-admin-total');
-  const pagesEl = document.getElementById('diploma-admin-pages');
-  const thanksEl = document.getElementById('diploma-admin-thanks');
-  const metaEl = document.getElementById('diploma-admin-meta');
-
-  const participantCount = allParticipants.length;
-  const cityCount = getCityStats().length;
-  const packetCount = participantCount + cityCount;
-  const pageCount = packetCount * 2;
-  const thanksCount = Math.max(participantCount - 3, 0) + Math.max(cityCount - 3, 0);
-
-  if (participantsEl) {
-    participantsEl.textContent = participantCount
-      ? `${Math.min(3, participantCount)} podium + ${Math.max(participantCount - 3, 0)} podziękowań`
-      : 'Brak danych uczestników';
-  }
-
-  if (citiesEl) {
-    citiesEl.textContent = cityCount
-      ? `${Math.min(3, cityCount)} podium + ${Math.max(cityCount - 3, 0)} podziękowań`
-      : 'Brak danych placówek';
-  }
-
-  if (totalEl) totalEl.textContent = `${packetCount} pakietów`;
-  if (pagesEl) pagesEl.textContent = `${pageCount} stron`;
-  if (thanksEl) thanksEl.textContent = `${thanksCount} podziękowań`;
-
-  if (metaEl) {
-    metaEl.textContent = packetCount
-      ? `Na podstawie aktualnego rankingu przygotujesz ${packetCount} dyplomów i ${packetCount} umów w jednym pakiecie.`
-      : 'Po wczytaniu wyników panel pokaże liczbę gotowych pakietów dokumentów.';
-  }
+  const count = allParticipants.length;
+  document.getElementById('diploma-admin-total').textContent = `${count} dyplomów`;
+  document.getElementById('diploma-admin-pages').textContent = `${count} stron`;
+  document.getElementById('diploma-admin-meta').textContent = `Liczba uczestników: ${count}. Każdy dyplom ma puste pole odbiorcy.`;
 }
 
 function openQrCenter() {
@@ -5112,12 +5058,12 @@ function downloadQrJpgPack() {
 }
 
 function exportCSV() {
-  let csv = 'Miejsce,Imię,Nazwisko,Placówka,E-mail,Punkty,Odpowiedzi\n';
+  let csv = 'Miejsce,Nick,Kod grupy,Punkty,Odpowiedzi\n';
 
   [...allParticipants]
     .sort(GameRanking.compareParticipants)
     .forEach((participant, index) => {
-      csv += `${index + 1},${safeCsv(participant.firstName)},${safeCsv(participant.lastName)},${safeCsv(participant.city || '')},${safeCsv(participant.email || '')},${participant.score || 0},${participant.answeredCount || 0}\n`;
+      csv += `${index + 1},${safeCsv(participant.firstName)},${safeCsv(participant.city || '')},${participant.score || 0},${participant.answeredCount || 0}\n`;
     });
 
   const anchor = document.createElement('a');
@@ -5136,9 +5082,9 @@ function exportExcel() {
     .map((participant) => `
       <tr>
         <td>${escHtml(participant.firstName || '')}</td>
-        <td>${escHtml(participant.lastName || '')}</td>
+
         <td>${escHtml(participant.city || '')}</td>
-        <td>${escHtml(participant.email || '')}</td>
+
       </tr>
     `)
     .join('');
@@ -5158,10 +5104,10 @@ function exportExcel() {
   <table>
     <thead>
       <tr>
-        <th>Imię</th>
-        <th>Nazwisko</th>
-        <th>Placówka</th>
-        <th>E-mail</th>
+        <th>Nick</th>
+
+        <th>Grupa</th>
+
       </tr>
     </thead>
     <tbody>${rows}</tbody>
@@ -5175,133 +5121,18 @@ function exportExcel() {
   anchor.click();
 }
 
+function buildBlankDiplomaPackets(count) {
+  return Array.from({length:count}, () => ({title:'Dyplom',eyebrow:'Udział w grze',recipientLabel:'Dyplom dla',recipientName:'',highlight:'Za udział w grze terenowej Gwiazdka One Day 2026.',note:'',stats:[]}));
+}
 function openDiplomaCenter() {
-  if (!allParticipants.length) {
-    setAdminFeedback('Najpierw wczytaj wyniki, aby przygotować dyplomy i umowy.', 'warning');
-    return;
-  }
-
-  const participants = getParticipantDiplomaRanking();
-  const cities = getCityDiplomaRanking();
-  const packets = buildOrderedDiplomaPackets(participants, cities);
-
+  if (!allParticipants.length) { setAdminFeedback('Brak uczestników do przygotowania dyplomów.', 'warning'); return; }
+  const packets = buildBlankDiplomaPackets(allParticipants.length);
   const popup = window.open('', '_blank');
-  if (!popup) {
-    setAdminFeedback('Przeglądarka zablokowała nowe okno. Zezwól na wyskakujące okna dla panelu admina.', 'warning');
-    return;
-  }
-
+  if (!popup) { setAdminFeedback('Zezwól na otwieranie okna druku w przeglądarce.', 'warning'); return; }
   popup.document.open();
-  popup.document.write(buildDiplomaDocumentHtml({
-    generatedAt: formatDiplomaGeneratedAt(new Date()),
-    totalPackets: packets.length,
-    participantWinners: participants.slice(0, 3),
-    cityWinners: cities.slice(0, 3),
-    sheets: packets.reduce((list, packet, index) => {
-      list.push(buildDiplomaSheet(packet, index * 2 + 1));
-      list.push(buildAgreementSheet(packet, index * 2 + 2));
-      return list;
-    }, [])
-  }));
+  popup.document.write(buildDiplomaDocumentHtml({generatedAt:formatDiplomaGeneratedAt(new Date()),totalPackets:packets.length,sheets:packets.map(buildDiplomaSheet)}));
   popup.document.close();
-
-  setAdminFeedback('Otworzyłem pakiet dyplomów i umów. W nowej karcie możesz od razu drukować lub zapisać całość do PDF.', 'success');
-}
-
-function buildOrderedDiplomaPackets(participants, cities) {
-  const packets = [
-    ...participants.slice(0, 3).map((participant, index) => buildParticipantPacket(participant, index + 1, false)),
-    ...cities.slice(0, 3).map((city, index) => buildCityPacket(city, index + 1, false))
-  ];
-  const institutionKey = item => item.institutionId
-    ? 'institution:' + item.institutionId
-    : 'legacy:' + String(item.city || 'Nieprzypisana placówka');
-  const groups = new Map();
-  participants.slice(3).forEach((participant, index) => {
-    const key = institutionKey(participant);
-    if (!groups.has(key)) groups.set(key, []);
-    groups.get(key).push({participant, place:index + 4});
-  });
-  cities.forEach((city, index) => {
-    if (index >= 3) packets.push(buildCityPacket(city, index + 1, true));
-    const key = institutionKey(city);
-    for (const {participant, place} of groups.get(key) || []) {
-      packets.push(buildParticipantPacket(participant, place, true));
-    }
-    groups.delete(key);
-  });
-  for (const group of groups.values()) {
-    for (const {participant, place} of group) packets.push(buildParticipantPacket(participant, place, true));
-  }
-  return packets;
-}
-
-function getParticipantDiplomaRanking() { return [...allParticipants].sort(GameRanking.compareParticipants); }
-
-function getCityDiplomaRanking() { return [...getCityStats()].sort(GameRanking.compareCities); }
-
-function buildParticipantPacket(participant, place, isAppreciation) {
-  const fullName = `${participant.firstName || ''} ${participant.lastName || ''}`.trim() || 'Uczestnik';
-  const cityName = participant.city || 'Bez placówki';
-  const placeLabel = formatPlaceLabel(place);
-
-  return {
-    type: 'participant',
-    title: isAppreciation ? 'Dyplom podziękowania' : 'Dyplom',
-    eyebrow: isAppreciation ? 'Udział w grze' : `${placeLabel} miejsce`,
-    recipientLabel: 'Dyplom dla',
-    recipientName: fullName,
-    highlight: isAppreciation ? 'Dziękujemy za udział w grze terenowej Gwiazdka One Day 2026.' : `Za zajęcie ${placeLabel} miejsca w grze terenowej Gwiazdka One Day 2026.`,
-    note: isAppreciation
-      ? `Miejsce w rankingu końcowym: ${place}.`
-      : 'Wyróżnienie przyznane na podstawie końcowego rankingu uczestników.',
-    stats: [
-      { label: 'Placówka', value: cityName },
-      { label: 'Punkty', value: `${participant.score || 0} pkt` },
-      { label: 'Odpowiedzi', value: `${participant.answeredCount || 0}` },
-      { label: 'E-mail', value: participant.email || 'Brak adresu e-mail' }
-    ],
-    agreementTitle: 'Umowa przekazania darowizny w postaci nagrody',
-    agreementRecipientLabel: 'Obdarowany',
-    agreementRecipientValue: `${fullName}${cityName ? `, ${cityName}` : ''}`,
-    agreementBody: [
-      'Organizator przekazuje nagrodę lub upominek przyznany w ramach wydarzenia Gwiazdka One Day 2026.',
-      'Dokument ma charakter roboczy i może zostać później zastąpiony finalnym wzorem umowy przekazania.',
-      `Nagroda została przygotowana dla uczestnika wskazanego na dyplomie za ${isAppreciation ? 'udział w grze' : `zajęcie ${placeLabel} miejsca`}.`
-    ]
-  };
-}
-
-function buildCityPacket(city, place, isAppreciation) {
-  const placeLabel = formatPlaceLabel(place);
-
-  return {
-    type: 'city',
-    title: isAppreciation ? 'Dyplom podziękowania dla placówki' : 'Dyplom dla placówki',
-    eyebrow: isAppreciation ? 'Klasyfikacja placówek' : `${placeLabel} miejsce`,
-    recipientLabel: 'Dyplom dla',
-    recipientName: city.city || 'Placówka',
-    highlight: isAppreciation
-      ? 'Za zaangażowanie i udział placówki w grze terenowej Gwiazdka One Day 2026.'
-      : `Za zajęcie ${placeLabel} miejsca w klasyfikacji placówek w grze terenowej Gwiazdka One Day 2026.`,
-    note: isAppreciation
-      ? `Pozycja placówki w rankingu końcowym: ${place}.`
-      : 'Wyróżnienie przyznane na podstawie sumy punktów wszystkich uczestników z danej placówki.',
-    stats: [
-      { label: 'Punkty placówki', value: `${city.score || 0} pkt` },
-      { label: 'Uczestnicy', value: `${city.participants || 0}` },
-      { label: 'Odpowiedzi', value: `${city.answers || 0}` },
-      { label: 'Średnio na osobę', value: formatCityAverage(city) }
-    ],
-    agreementTitle: 'Umowa przekazania darowizny w postaci nagrody',
-    agreementRecipientLabel: 'Odbiorca',
-    agreementRecipientValue: `Reprezentant placówki ${city.city || 'Placówka'}`,
-    agreementBody: [
-      'Organizator przekazuje nagrodę lub upominek przyznany w ramach klasyfikacji placówek wydarzenia Gwiazdka One Day 2026.',
-      'To jest wersja robocza dokumentu, przygotowana jako placeholder do czasu otrzymania właściwego wzoru umowy.',
-      `Nagroda dotyczy placówki wskazanej na dyplomie ${isAppreciation ? 'za udział w grze' : `za zajęcie ${placeLabel} miejsca w klasyfikacji`}.`
-    ]
-  };
+  setAdminFeedback(`Przygotowano ${packets.length} pustych dyplomów.`, 'success');
 }
 
 function buildDiplomaDocumentHtml({ generatedAt, totalPackets, sheets }) {
@@ -5313,7 +5144,7 @@ function buildDiplomaDocumentHtml({ generatedAt, totalPackets, sheets }) {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dyplomy i umowy - Gwiazdka One Day 2026</title>
+  <title>Puste dyplomy - Gwiazdka One Day 2026</title>
   <style>
     :root {
       --pink: #ff3d6b;
@@ -5791,7 +5622,7 @@ function buildDiplomaDocumentHtml({ generatedAt, totalPackets, sheets }) {
 </head>
 <body>
   <div class="print-toolbar">
-    <div class="print-chip">${totalPackets} pakietów</div>
+    <div class="print-chip">${totalPackets} dyplomów</div>
     <div class="print-chip">${escHtml(generatedAt)}</div>
     <button class="toolbar-btn primary" type="button" onclick="window.print()">Drukuj / Zapisz PDF</button>
     <button class="toolbar-btn secondary" type="button" onclick="window.close()">Zamknij</button>
@@ -5824,7 +5655,7 @@ function buildDiplomaSheet(packet, sheetNumber) {
         <div class="eyebrow">${escHtml(packet.eyebrow)}</div>
         <h1 class="diploma-title">${escHtml(packet.title)}</h1>
         <div class="recipient-label">${escHtml(packet.recipientLabel)}</div>
-        <h2 class="recipient-name">${escHtml(packet.recipientName)}</h2>
+        <h2 class="recipient-name" style="min-height:1.5em;border-bottom:2px dotted currentColor">${escHtml(packet.recipientName)}</h2>
         <div class="highlight">${escHtml(packet.highlight)}</div>
         <div class="note">${escHtml(packet.note)}</div>
         ${detailPills ? `<div class="certificate-details">${detailPills}</div>` : ''}
@@ -5835,55 +5666,6 @@ function buildDiplomaSheet(packet, sheetNumber) {
       </div>
     </section>
   `;
-}
-
-function buildAgreementSheet(packet, sheetNumber) {
-  return `
-    <section class="sheet agreement-sheet">
-      <img class="sheet-bg-image" src="${window.location.origin}/tlo-gry.png" alt="">
-      <div class="sheet-fill" aria-hidden="true"></div>
-      <div class="sheet-wash" aria-hidden="true"></div>
-      <div class="sheet-frame" aria-hidden="true"></div>
-      <div class="sheet-inner">
-        <div class="agreement-header">
-          <div class="logo-stack">
-            <img class="logo-fundacja" src="${window.location.origin}/fundacjaoneday.svg" alt="Fundacja One Day">
-            <img class="logo-energy" src="${window.location.origin}/energyliandia.svg" alt="Energylandia">
-          </div>
-          <div class="agreement-brand event-brand">Gwiazdka One Day 2026</div>
-          <h1 class="agreement-title">${escHtml(packet.agreementTitle)}</h1>
-          <div class="agreement-sub">Wersja robocza do czasu podmiany na finalny wzór dokumentu.</div>
-        </div>
-        <div class="agreement-grid">
-          <div class="agreement-box">
-            <strong>Organizator</strong>
-            <div>Fundacja One Day</div>
-          </div>
-          <div class="agreement-box">
-            <strong>${escHtml(packet.agreementRecipientLabel)}</strong>
-            <div>${escHtml(packet.agreementRecipientValue)}</div>
-          </div>
-          <div class="agreement-box">
-            <strong>Podstawa przekazania</strong>
-            <div>${escHtml(packet.highlight)}</div>
-          </div>
-        </div>
-        <div class="agreement-copy">
-          ${packet.agreementBody.map((paragraph) => `<p>${escHtml(paragraph)}</p>`).join('')}
-          <p>Miejsce na doprecyzowanie nagrody:<span class="fill-line"></span></p>
-          <p>Data przekazania:<span class="fill-line"></span></p>
-        </div>
-        <div class="agreement-footer">
-          <div class="signature">Podpis organizatora</div>
-          <div class="signature">${packet.type === 'city' ? 'Podpis odbiorcy / reprezentanta placówki' : 'Podpis obdarowanego'}</div>
-        </div>
-      </div>
-    </section>
-  `;
-}
-
-function formatPlaceLabel(place) {
-  return ['I', 'II', 'III'][place - 1] || `${place}.`;
 }
 
 function formatDiplomaGeneratedAt(date) {

@@ -1384,7 +1384,7 @@ input:focus {
     </div>
   </div>
   <h1>Odbierz dodatkowy punkt</h1>
-  <p class="subtitle">Podaj imię, nazwisko i adres e-mail oraz wybierz swoją placówkę, aby przejść do has&#322;a bonusowego przypisanego do tego kodu QR.</p>
+  <p class="subtitle">Podaj nick i wybierz kod grupy, aby przejść do has&#322;a bonusowego przypisanego do tego kodu QR.</p>
   <div class="bonus-note">To specjalna okazja. Bonus daje Ci dodatkowy punkt poza zwyk&#322;ymi pytaniami.</div>
 
   <div class="bonus-highlight">
@@ -1392,24 +1392,23 @@ input:focus {
     <div class="bonus-highlight-value" data-bonus-label>&#321;adowanie bonusu...</div>
   </div>
 
-  <label for="fname">Imi&#281;</label>
-  <input type="text" id="fname" data-uppercase-login placeholder="Wpisz imi&#281;">
+  <label for="fname">Twój nick</label>
+  <input type="text" id="fname" data-uppercase-login maxlength="24" autocomplete="off" placeholder="np. TYGRYS_7">
 
-  <label for="lname">Nazwisko</label>
-  <input type="text" id="lname" data-uppercase-login placeholder="Wpisz nazwisko">
+
 
   <div class="institution-picker">
-      <label for="institution-search">Twoja placówka</label>
-      <input id="institution-search" type="search" placeholder="Wpisz miasto lub nazwę placówki" autocomplete="off" role="combobox" aria-autocomplete="list" aria-controls="institution-options" aria-expanded="false">
+      <label for="institution-search">Twój kod grupy</label>
+      <input id="institution-search" type="search" placeholder="Wpisz kod grupy" autocomplete="off" role="combobox" aria-autocomplete="list" aria-controls="institution-options" aria-expanded="false">
       <input id="institution-id" type="hidden">
-      <div id="institution-options" role="listbox" aria-label="Placówki" hidden></div>
-      <p id="institution-status" role="status">Ładowanie placówek…</p>
-      <button type="button" class="instruction-back" id="institution-retry" hidden>Odśwież listę placówek</button>
+      <div id="institution-options" role="listbox" aria-label="Kody grup" hidden></div>
+      <p id="institution-status" role="status">Ładowanie grup…</p>
+      <button type="button" class="instruction-back" id="institution-retry" hidden>Odśwież listę grup</button>
     </div>
 
-  <label for="email">E-mail</label>
-  <input type="email" id="email" data-email-login inputmode="email" autocapitalize="off" autocomplete="email" spellcheck="false" placeholder="np. anna@example.com">
 
+
+  <p>Nie wpisuj imienia i nazwiska. <a href="/rodo/" target="_blank" rel="noopener">Informacja RODO - wzór</a> opisuje dane używane w grze.</p>
   <label class="terms-check" for="accept-rules-bonus">
     <input type="checkbox" id="accept-rules-bonus">
     <span class="terms-check-text">Akceptuję <a href="/regulamin/" target="_blank" rel="noopener">regulamin</a>.</span>
@@ -2868,23 +2867,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 async function doNameLogin() {
   primeFeedbackAudio();
   const fn = normalizeLoginValue(document.getElementById('fname').value);
-  const ln = normalizeLoginValue(document.getElementById('lname').value);
   const institutionId = Number(document.getElementById('institution-id').value);
-  const email = normalizeEmailValue(document.getElementById('email').value);
   const acceptedRules = !!acceptRulesBonusEl?.checked;
   const msg = nameMsgEl;
   const btn = nameBtnEl;
 
-  if (!fn || !ln || !institutionId || !email) {
-    msg.className = 'msg error';
-    msg.innerText = 'Uzupełnij dane i wybierz swoją placówkę z listy.';
-    return;
-  }
-
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    msg.className = 'msg error';
-    msg.innerText = 'Podaj poprawny adres e-mail.';
-    return;
+  if (!/^[-_\p{L}\p{N}]{2,24}$/u.test(fn) || !institutionId) {
+    msg.className='msg error';msg.innerText='Podaj nick (2-24 litery, cyfry, myślnik lub podkreślenie) i wybierz kod.';return;
   }
 
   if (!acceptedRules) {
@@ -2901,10 +2890,8 @@ async function doNameLogin() {
 
   try {
     const { response: res, data } = await postJsonWithRetry('/api/login', {
-      firstName: fn,
-      lastName: ln,
+      nickname: fn,
       institutionId,
-      email,
       deviceToken,
       acceptedRules
     });

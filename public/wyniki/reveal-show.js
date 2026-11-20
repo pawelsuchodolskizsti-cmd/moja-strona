@@ -68,7 +68,7 @@ body:has(.reveal-show.celebrating:not([hidden])) .reveal-ranking-stage{top:150px
   function renderFocus(){if(!focus)return;const items=presentationItems(focus.kind),signature=JSON.stringify([focus.step,items]);if(signature===focus.signature)return;focus.signature=signature;
     const {card,step,kind}=focus;focus.stage.querySelector('.award-brand')?.remove();card.replaceChildren();card.classList.toggle('award-single',step<3);
     const brand=document.createElement('header');brand.className='award-brand';brand.innerHTML='<div class="award-brand-logos"><img src="/fundacjaoneday.svg" alt="Fundacja One Day"><img src="/energyliandia.svg" alt="Energylandia"></div><div class="award-brand-name event-brand">Gwiazdka One Day 2026</div>';const eventName=brand.querySelector('.award-brand-name');card.append(eventName);focus.stage.prepend(brand);
-    const title=document.createElement('h2');title.className='section-title';title.textContent=kind==='cities'?'Najlepsze placówki':'Najlepsi uczestnicy';card.append(title);
+    const title=document.createElement('h2');title.className='section-title';title.textContent=kind==='cities'?'Najlepsze grupy':'Najlepsi uczestnicy';card.append(title);
     const list=document.createElement('div');list.className='award-winners';
     card.classList.toggle('award-podium',step===3&&items.length===3);const selected=step===3?items:items.slice(2-step,3-step);list.style.setProperty('--award-columns',Math.max(1,selected.length));
     if(!selected.length){const empty=document.createElement('p');empty.textContent=step<3?'Brak laureata na tym miejscu.':'Brak wyników do pokazania.';list.append(empty);}
@@ -157,7 +157,7 @@ body:has(.reveal-show.celebrating:not([hidden])) .reveal-ranking-stage{top:150px
   setInterval(()=>{
     const showTitle=(Boolean(scoreboardState.finaleTitleActive)||(scoreboardState.finaleTitleAutoAt&&GameClock.now()>=Date.parse(scoreboardState.finaleTitleAutoAt)))&&['ended','thanks'].includes(scoreboardState.phase);finaleTitle.hidden=!showTitle;document.body.classList.toggle('finale-title-visible',showTitle);if(showTitle){clearShow();return;}
     const reveal=scoreboardState.resultsReveal||{};
-    const events=[['participants',reveal.participantsAt,'Najlepsi uczestnicy'],['cities',reveal.citiesAt,'Najlepsze placówki']].filter(e=>Number.isFinite(Date.parse(e[1])));
+    const events=[['participants',reveal.participantsAt,'Najlepsi uczestnicy'],['cities',reveal.citiesAt,'Najlepsze grupy']].filter(e=>Number.isFinite(Date.parse(e[1])));
     if(!['ended','thanks'].includes(scoreboardState.phase)||!events.length){clearShow();return;}
     if(active&&!events.some(e=>e[0]+e[1]===active.key)){active=null;overlay.hidden=true;overlay.classList.remove('counting');}
     if(!active){

@@ -778,15 +778,6 @@ label {
 .login-privacy p {margin:8px 0;overflow-wrap:anywhere}
 .login-privacy a {color:#6844b0;font-weight:700;text-underline-offset:3px}
 .login-privacy .privacy-draft {font-size:12px;color:#795317}
-.communication-choice{margin:12px 0 16px;text-align:left;color:#514565;font-size:13px;line-height:1.55}
-#login-form .communication-choice .terms-check{margin-bottom:8px;background:#f4effc}
-.communication-choice strong,.communication-choice [data-communication-text]{display:block}
-.communication-choice strong{color:#6844b0;margin-bottom:7px;font-size:14px}
-.communication-choice a{color:#6844b0;text-underline-offset:3px}
-.communication-choice p{margin:8px 0}.communication-choice small{font-size:12px}
-#login-form .communication-choice label{letter-spacing:0;text-transform:none}
-#login-form .communication-choice select{width:100%;min-width:0;min-height:46px;background:#f7f7fb;border:1px solid #d9cde7;border-radius:10px;padding:10px;color:#392b59;font:16px system-ui}
-#communication-age-field[hidden]{display:none!important}
 
 #login-screen.login-form-open {
   min-height: auto;
@@ -1838,7 +1829,7 @@ textarea {
 <meta name="theme-color" content="#e81e63">
 <link rel="stylesheet" href="/mobile-canvas.css">
 <script src="/game-clock.js"></script>
-<script src="/communication-policy.js"></script><script src="/communication-consent.js" defer></script>
+
 <link rel="icon" type="image/x-icon" href="/favicon.ico?v=oneday-1"><link rel="icon" type="image/svg+xml" href="/favicon.svg?v=oneday-1"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=oneday-1"></head>
 <body>
 <div id="view-loading" role="status" aria-live="polite"><div class="view-loading-card"><div class="event-brand">Gwiazdka One Day 2026</div><span class="view-loading-spinner" aria-hidden="true"></span><p id="view-loading-message">Ładowanie…</p><button id="view-loading-retry" type="button" hidden onclick="location.reload()">Odśwież stronę</button></div></div>
@@ -1916,27 +1907,25 @@ textarea {
     <h1>Witaj!</h1>
     <p class="subtitle">Podaj dane, aby dołączyć do gry</p>
 
-    <label>Imię</label>
-    <input type="text" id="fname" data-uppercase-login placeholder="np. Anna">
+    <label for="fname">Twój nick</label>
+    <input type="text" id="fname" data-uppercase-login maxlength="24" autocomplete="off" placeholder="np. TYGRYS_7">
 
-    <label>Nazwisko</label>
-    <input type="text" id="lname" data-uppercase-login placeholder="np. Kowalska">
+
 
     <div class="institution-picker">
-      <label for="institution-search">Twoja placówka</label>
-      <input id="institution-search" type="search" placeholder="Wpisz miasto lub nazwę placówki" autocomplete="off" role="combobox" aria-autocomplete="list" aria-controls="institution-options" aria-expanded="false">
+      <label for="institution-search">Twój kod grupy</label>
+      <input id="institution-search" type="search" placeholder="Wpisz kod grupy" autocomplete="off" role="combobox" aria-autocomplete="list" aria-controls="institution-options" aria-expanded="false">
       <input id="institution-id" type="hidden">
-      <div id="institution-options" role="listbox" aria-label="Placówki" hidden></div>
-      <p id="institution-status" role="status">Ładowanie placówek…</p>
-      <button type="button" class="instruction-back" id="institution-retry" hidden>Odśwież listę placówek</button>
+      <div id="institution-options" role="listbox" aria-label="Kody grup" hidden></div>
+      <p id="institution-status" role="status">Ładowanie grup…</p>
+      <button type="button" class="instruction-back" id="institution-retry" hidden>Odśwież listę grup</button>
     </div>
 
-    <label>E-mail</label>
-    <input type="email" id="email" data-email-login inputmode="email" autocapitalize="off" autocomplete="email" spellcheck="false" placeholder="np. anna@example.com">
+
 
     <section class="login-privacy" aria-labelledby="login-privacy-title">
       <h2 id="login-privacy-title">Twoje dane w grze</h2>
-      <p>Fundacja One Day wykorzystuje podane dane do obsługi udziału i wyników. Publiczny ranking pokazuje imię, nazwisko, placówkę i punkty. E-mail oraz dane sesji nie są w nim publikowane.</p>
+      <p>Wymyśl nick, który nie zawiera Twojego imienia i nazwiska. Wybierz kod podany przez organizatora. Ranking pokazuje nick, kod i punkty. Nie prosimy o imię, nazwisko, e-mail ani telefon.</p>
       <p><a href="/rodo/" target="_blank" rel="noopener">Informacja RODO - wzór</a> opisuje zakres danych, ich przechowywanie i Twoje prawa.</p>
       <p class="privacy-draft">Informacja RODO jest wzorem do uzupełnienia i zatwierdzenia przez Fundację.</p>
     </section>
@@ -1944,13 +1933,6 @@ textarea {
       <input type="checkbox" id="accept-rules">
       <span class="terms-check-text">Akceptuję <a href="/regulamin/" target="_blank" rel="noopener">regulamin gry - wzór</a>.</span>
     </label>
-    <div class="communication-choice">
-      <label class="terms-check" for="accept-communication"><input type="checkbox" id="accept-communication"><span class="terms-check-text"><strong data-communication-title>Chcę poznawać nowe możliwości z One Day</strong><span data-communication-text></span><span>Zapoznałem się z <a href="/komunikacja/" target="_blank" rel="noopener">zasadami kontaktu</a>.</span></span></label>
-      <p><small>Dobrowolne. Możesz grać bez zaznaczania tego pola. To wzór zgody - zapis testowy nie uruchamia wysyłki wiadomości.</small></p>
-      <div id="communication-age-field" hidden><label for="communication-age">Potwierdzenie zgody</label><select id="communication-age"><option value="">Wybierz odpowiedź</option><option value="adult">Mam ukończone 18 lat</option><option value="guardian_required">Nie mam 18 lat - potrzebne potwierdzenie opiekuna</option></select><p><small>Za osobę niepełnoletnią zgodę potwierdza osoba uprawniona do jej reprezentowania. Sam zapis uczestnika tego nie zastępuje.</small></p></div>
-      <p><a href="/komunikacja/#rezygnacja" target="_blank" rel="noopener">Zarządzaj zgodą na kontakt</a></p>
-    </div>
-
     <button class="btn" id="login-btn" onclick="doLogin()">Dołącz do gry</button>
     <div class="msg error" id="login-msg"></div>
   </div>
@@ -2209,7 +2191,7 @@ const loginFormEl = document.getElementById('login-form');
 const statusBoxEl = document.getElementById('game-status-box');
 const howtoPanelEl = document.getElementById('howto-panel');
 const fnameInputEl = document.getElementById('fname');
-const emailInputEl = document.getElementById('email');
+
 const acceptRulesEl = document.getElementById('accept-rules');
 const loginBtnEl = document.getElementById('login-btn');
 const loginMsgEl = document.getElementById('login-msg');
@@ -2853,9 +2835,7 @@ function normalizeLoginValue(value) {
   return String(value || '').trim().toUpperCase();
 }
 
-function normalizeEmailValue(value) {
-  return String(value || '').trim().toLowerCase();
-}
+
 
 function updateLoginConsentState() {
   if (!loginBtnEl || !acceptRulesEl) return;
@@ -2886,14 +2866,7 @@ function bindUppercaseLoginFields() {
     });
   });
 
-  document.querySelectorAll('[data-email-login]').forEach((element) => {
-    element.addEventListener('input', () => {
-      const normalized = normalizeEmailValue(element.value);
-      if (element.value !== normalized) {
-        element.value = normalized;
-      }
-    });
-  });
+
 
   if (acceptRulesEl) {
     acceptRulesEl.addEventListener('change', updateLoginConsentState);
@@ -3130,7 +3103,7 @@ function isLoginFormBeingEdited() {
   const activeEl = document.activeElement;
   if (activeEl && loginFormEl.contains(activeEl)) return true;
 
-  return ['fname', 'lname', 'city', 'email'].some((id) => {
+  return ['fname', 'institution-search'].some((id) => {
     const field = document.getElementById(id);
     return !!field?.value?.trim();
   });
@@ -3430,27 +3403,11 @@ async function loadGameState(options = {}) {
 async function doLogin() {
   primeFeedbackAudio();
   const fn   = normalizeLoginValue(fnameInputEl.value);
-  const ln   = normalizeLoginValue(document.getElementById('lname').value);
   const institutionId = Number(document.getElementById('institution-id').value);
-  const email = normalizeEmailValue(emailInputEl.value);
   const acceptedRules = !!acceptRulesEl?.checked;
   const msg  = loginMsgEl;
-  let communication;
-  try{
-    communication={communicationConsent:false};
-    if(document.getElementById('accept-communication')?.checked){
-      if(!window.CommunicationConsent||!window.CommunicationPolicy)throw Error('Nie udało się wczytać zasad kontaktu. Odśwież stronę lub dołącz bez dodatkowej zgody.');
-      communication=CommunicationConsent.payload();
-    }
-  }catch(error){msg.innerText=error.message;return;}
-
-  if (!fn || !ln || !institutionId || !email) {
-    msg.innerText = 'Uzupełnij dane i wybierz swoją placówkę z listy.';
-    return;
-  }
-
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    msg.innerText = 'Podaj poprawny adres e-mail';
+  if (!/^[-_\p{L}\p{N}]{2,24}$/u.test(fn) || !institutionId) {
+    msg.innerText = 'Podaj nick (2-24 litery, cyfry, myślnik lub podkreślenie) i wybierz kod.';
     return;
   }
 
@@ -3466,13 +3423,10 @@ async function doLogin() {
 
   try {
     const { response: res, data } = await postJsonWithRetry('/api/login', {
-      firstName: fn,
-      lastName: ln,
+      nickname: fn,
       institutionId,
-      email,
       deviceToken,
-      acceptedRules,
-      ...communication
+      acceptedRules
     });
 
     if (!data.id) {

@@ -1,13 +1,13 @@
 window.AdminNavigation = (() => {
   const groups = [
     ['Gra', [['home','Pulpit'],['live','Na żywo'],['announcements','Komunikaty'],['content-blocks','Blokady techniczne'],['preview','Podgląd gracza']]],
-    ['Uczestnicy', [['leaderboard','Ranking'],['institution-ranking','Ranking placówek'],['institutions','Placówki','/admin/placowki/'],['answers','Odpowiedzi'],['bonuses','Bonusy'],['question-stats','Statystyki pytań']]],
-    ['Organizacja', [['feedback','Opinie uczestników','/admin/opinie/'],['communications','Kontakt Fundacji','/admin/komunikacja/'],['history','Historia i archiwum','/admin/historia/'],['volunteers','Wolontariusze','/admin/wolontariusze/'],['finale','Finał i wyniki'],['qr','Kody QR i pytania','/admin/qr/'],['documents','Dyplomy i pliki'],['diagnostics','Testy i ustawienia']]]
+    ['Uczestnicy', [['leaderboard','Ranking'],['institution-ranking','Ranking grup'],['institutions','Kody grup','/admin/placowki/'],['answers','Odpowiedzi'],['bonuses','Bonusy'],['question-stats','Statystyki pytań']]],
+    ['Organizacja', [['feedback','Opinie uczestników','/admin/opinie/'],['history','Historia i archiwum','/admin/historia/'],['events','Historia zdarzeń','/admin/historia/?view=events'],['finale','Finał i wyniki'],['qr','Kody QR i pytania','/admin/qr/'],['documents','Dyplomy i pliki'],['diagnostics','Testy i ustawienia']]]
   ];
   const descriptions = {
     'content-blocks':'Czasowo wyłącz pojedynczy kod QR i przywróć go po naprawie.',
     home:'Stan rundy i najważniejsze sterowanie grą.',live:'Aktywność uczestników i ruch przy pytaniach.',
-    leaderboard:'Wyniki uczestników, szczegóły kont i eksport danych.', 'institution-ranking':'Wspólne wyniki uczestników każdej placówki.',
+    leaderboard:'Wyniki uczestników, szczegóły kont i eksport danych.', 'institution-ranking':'Wspólne wyniki uczestników każdej grupy.',
     answers:'Przeglądaj odpowiedzi i filtruj ich wyniki.',bonuses:'Sprawdź odebrane bonusy uczestników.',
     'question-stats':'Skuteczność odpowiedzi i statystyki pytań.',announcements:'Przekaż informację wszystkim graczom.',
     finale:'Steruj kolejnymi etapami odsłaniania wyników.',preview:'Sprawdź najważniejsze ekrany gracza.',

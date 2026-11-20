@@ -17,7 +17,7 @@
     return row[b.length]<=1;
   }
   function choose(item) {
-    selected=item;idInput.value=item.id;input.value=`${item.name} - ${item.city}`;
+    selected=item;idInput.value=item.id;input.value=item.name;
     status.textContent=`Wybrano: ${input.value}`;close();input.focus();
   }
   function close(){list.hidden=true;input.setAttribute('aria-expanded','false');input.removeAttribute('aria-activedescendant');highlight=-1;}
@@ -25,18 +25,18 @@
     if(!loaded)return;
     const terms=normalize(input.value).split(' ').filter(Boolean);
     const matches=institutions.filter(item=>{
-      const words=normalize(item.name+' '+item.city).split(' ');
+      const words=normalize(item.name).split(' ');
       return terms.every(term=>words.some(word=>word.includes(term)||near(term,word)));
     });
     list.replaceChildren();highlight=-1;
     for(const item of matches){
       const option=document.createElement('button');option.type='button';option.role='option';option.id=`institution-option-${item.id}`;option.dataset.id=item.id;option.setAttribute('aria-selected','false');
-      option.textContent=`${item.name} - ${item.city}`;option.onmousedown=e=>e.preventDefault();option.onclick=()=>choose(item);list.append(option);
+      option.textContent=item.name;option.onmousedown=e=>e.preventDefault();option.onclick=()=>choose(item);list.append(option);
     }
     list.hidden=!matches.length;input.setAttribute('aria-expanded',String(!list.hidden));input.removeAttribute('aria-activedescendant');
     sizeList();
     list.scrollTop=0;
-    status.textContent=matches.length ? 'Wybierz swoją placówkę. Listę możesz przewijać lub zawęzić, wpisując nazwę albo miasto.' : 'Brak pasujących placówek. Sprawdź nazwę lub zgłoś brak organizatorowi.';
+    status.textContent=matches.length ? 'Wybierz swoją grupę. Listę możesz przewijać lub zawęzić, wpisując kod.' : 'Brak pasujących grup. Sprawdź nazwę lub zgłoś brak organizatorowi.';
   }
   input.addEventListener('input',()=>{selected=null;idInput.value='';render()});
   input.addEventListener('focus',()=>{if(!selected)render()});
@@ -51,14 +51,14 @@
   });
   document.addEventListener('click',event=>{if(!event.target.closest('.institution-picker'))close()});
   async function load(){
-    loaded=false;retry.hidden=true;status.textContent='Ładowanie placówek…';
+    loaded=false;retry.hidden=true;status.textContent='Ładowanie grup…';
     try{
       const response=await fetch('/api/institutions',{cache:'no-store'});if(!response.ok)throw Error();
       const data=await response.json();institutions=data.institutions;loaded=true;
       if(selected){const updated=institutions.find(i=>i.id===selected.id);if(updated)choose(updated);else{selected=null;idInput.value='';}}
-      if(!selected){status.textContent=institutions.length?'Wyszukaj miasto lub nazwę, a następnie wybierz placówkę.':'Brak dostępnych placówek. Skontaktuj się z organizatorem.';if(document.activeElement===input)render();}
+      if(!selected){status.textContent=institutions.length?'Wyszukaj i wybierz kod podany przez organizatora.':'Brak dostępnych grup. Skontaktuj się z organizatorem.';if(document.activeElement===input)render();}
       retry.hidden=false;
-    }catch{status.textContent='Nie udało się pobrać placówek. Sprawdź połączenie i odśwież listę.';retry.hidden=false;}
+    }catch{status.textContent='Nie udało się pobrać grup. Sprawdź połączenie i odśwież listę.';retry.hidden=false;}
   }
   retry.onclick=load;load();
 })();

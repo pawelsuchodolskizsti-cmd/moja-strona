@@ -1,3 +1,19 @@
+## Aktualizacja 20 listopada 2026
+
+Rankingi używają nicków i kodów grup. Usunięto moduły kontaktu Fundacji i panelu wolontariuszy. Bonusy pozostają dostępne. Generator drukuje jeden pusty dyplom na uczestnika w wybranym trybie, bez umów, kodów i wyników. Historia zdarzeń pokazuje błędy i odrzucone żądania API; historia operacji i archiwum pozostają dostępne.
+
+Przed publikacją sprawdź SECURITY-CONFIG.md oraz konfigurację sekretów. Zmiana wymaga ADMIN_LOGIN, ADMIN_PASSWORD i oddzielnego ADMIN_SESSION_SECRET w produkcji.
+
+## Aktualizacja 20.11.2026: nick i kody grup
+
+Zapis wymaga nicku (2-24 litery, cyfry, myślnik lub podkreślenie), kodu grupy i akceptacji regulaminu gry. Nie zbieramy imienia, nazwiska, e-maila ani telefonu. CRM i zgody kontaktowe są wyłączone, także w starych endpointach. Opinie o grze pozostają dostępne.
+
+Administrator dodaje kody w menu Kody grup. Na nowej bazie lista jest pusta. Dawne przypisania uczestników otrzymują techniczne kody K001, K002 itd., zachowując identyfikatory i punkty. Nazwy oraz miasta nie są kopiowane do katalogu kodów. Stare tabele i archiwa nie są automatycznie kasowane. Symulacja bez katalogu używa TEST-1, TEST-2, TEST-3 bez dodawania ich do wyboru graczy.
+
+W celu zgodności z wcześniejszą wersją nick jest przechowywany w kolumnie first_name, last_name i email pozostają puste dla nowych kont, institution_id wskazuje kod z group_codes. Dawne nazwy kolumn i adresy API nie oznaczają zbierania tych danych. Wspólna baza nadal zapisuje punkty, odpowiedzi, rundy, sesje i dane techniczne. Dostęp odzyskuje się przez jednorazowy link administratora, nigdy przez sam nick.
+
+Poniżej historyczna dokumentacja poprzedniej wersji. Opisy CRM oraz zapisu po danych osobowych są nieaktualne.
+
 # Gra terenowa QR - wersja po naprawach, 11.09.2026
 
 Projekt zachowuje pytania, bonusy, panel administratora, ekran wyników, generator QR, dyplomy i symulację. Naprawiono ochronę panelu, punktację i obsługę rund oraz błędy formularzy i widoków.

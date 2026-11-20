@@ -8,7 +8,7 @@
   function institutionStats(participants) {
     const groups = new Map();
     for (const p of participants) {
-      const label=String(p.city||'Nieprzypisana placówka');
+      const label=String(p.city||'Nieprzypisana grupa');
       const key=p.institutionId ? 'institution:'+p.institutionId : 'legacy:'+label;
       const group=groups.get(key)||{institutionId:p.institutionId||null,city:label,score:0,participants:0,answers:0};
       if(Number(p.score)>0 && (!group.scoreAt||Date.parse(p.scoreAt||p.createdAt)>Date.parse(group.scoreAt)))group.scoreAt=p.scoreAt||p.createdAt;
