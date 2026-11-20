@@ -1,8 +1,0 @@
-.privacy-notice{margin:18px 0;padding:0;border:1px solid #d8ccec;border-radius:14px;background:#faf7ff;text-align:left;color:#35294d}
-.privacy-notice summary{padding:15px 16px;min-height:48px;cursor:pointer;font-size:15px;font-weight:700;line-height:1.5;overflow-wrap:anywhere}
-.privacy-notice summary:focus-visible{outline:3px solid #7952b3;outline-offset:3px;border-radius:12px}
-.privacy-notice-content{font-family:Arial,sans-serif;font-size:14px;line-height:1.65;overflow-wrap:anywhere;text-align:left}
-.privacy-notice .privacy-notice-content{padding:0 16px 16px}
-.privacy-notice-content p{margin:12px 0}
-.privacy-notice-content a{color:#59378d;text-decoration:underline}
-@media(max-width:600px){.privacy-notice-content{font-size:15px}.privacy-notice summary{padding:14px}}
