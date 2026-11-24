@@ -15,8 +15,8 @@
   }
   .qr-card::before { content:none; }
   .qr-print-brand { display:block; width:100%; margin-bottom:5mm; text-align:center; }
-  .qr-print-partners { display:flex; justify-content:center; align-items:center; gap:6mm; margin-bottom:4mm; }
-  .qr-print-partners img { width:46mm; height:11mm; object-fit:contain; }
+  .qr-print-partners { display:flex; justify-content:center; align-items:center; flex-direction:column; gap:1mm; margin-bottom:4mm; }
+  .qr-print-partners img { width:34mm; height:7mm; object-fit:contain; }
   .qr-print-event { font:800 15pt/1.2 'Syne',sans-serif; }
   .qr-card-head { display:block!important; width:100%; text-align:center; margin:0 0 5mm; }
   .qr-card-title { font-size:22pt; line-height:1.25; overflow-wrap:anywhere; }
